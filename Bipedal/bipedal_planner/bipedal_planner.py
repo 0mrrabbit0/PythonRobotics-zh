@@ -1,6 +1,6 @@
 """
-Bipedal Walking with modifying designated footsteps
-author: Takayuki Murooka (takayuki5168)
+通过修正指定落脚点实现双足行走
+作者: Takayuki Murooka (takayuki5168)
 """
 import numpy as np
 import math
@@ -12,8 +12,8 @@ import mpl_toolkits.mplot3d.art3d as art3d
 
 class BipedalPlanner(object):
     def __init__(self):
-        self.act_p = []  # actual footstep positions
-        self.ref_p = []  # reference footstep positions
+        self.act_p = []  # 实际落脚点位置
+        self.ref_p = []  # 参考落脚点位置
         self.com_trajectory = []
         self.ref_footsteps = None
         self.g = 9.8
@@ -46,30 +46,30 @@ class BipedalPlanner(object):
             print("No footsteps")
             return
 
-        # set up plotter
+        # 设置绘图器
         if plot:
             fig = plt.figure()
             ax = Axes3D(fig)
             fig.add_axes(ax)
             com_trajectory_for_plot = []
 
-        px, py = 0.0, 0.0  # reference footstep position
-        px_star, py_star = px, py  # modified footstep position
+        px, py = 0.0, 0.0  # 参考落脚点位置
+        px_star, py_star = px, py  # 修正后的落脚点位置
         xi, xi_dot, yi, yi_dot = 0.0, 0.0, 0.01, 0.0
         time = 0.0
         n = 0
         self.ref_p.append([px, py, 0])
         self.act_p.append([px, py, 0])
         for i in range(len(self.ref_footsteps)):
-            # simulate x, y and those of dot of inverted pendulum
+            # 仿真倒立摆的 x、y 及其导数
             xi, xi_dot, yi, yi_dot = self.inverted_pendulum(
                 xi, xi_dot, px_star, yi, yi_dot, py_star, z_c, t_sup)
 
-            # update time
+            # 更新时间
             time += t_sup
             n += 1
 
-            # calculate px, py, x_, y_, vx_, vy_
+            # 计算 px、py、x_、y_、vx_、vy_
             f_x, f_y, f_theta = self.ref_footsteps[n - 1]
             rotate_mat = np.array([[math.cos(f_theta), -math.sin(f_theta)],
                                    [math.sin(f_theta), math.cos(f_theta)]])
@@ -96,11 +96,11 @@ class BipedalPlanner(object):
                 [(1 + C) / (Tc * S) * x_, (C - 1) / (Tc * S) * y_])))
             self.ref_p.append([px, py, f_theta])
 
-            # calculate reference COM
+            # 计算参考质心
             xd, xd_dot = px + x_, vx_
             yd, yd_dot = py + y_, vy_
 
-            # calculate modified footsteps
+            # 计算修正后的落脚点
             D = a * math.pow(C - 1, 2) + b * math.pow(S / Tc, 2)
             px_star = -a * (C - 1) / D * (xd - C * xi - Tc * S * xi_dot) \
                       - b * S / (Tc * D) * (xd_dot - S / Tc * xi - C * xi_dot)
@@ -108,7 +108,7 @@ class BipedalPlanner(object):
                       - b * S / (Tc * D) * (yd_dot - S / Tc * yi - C * yi_dot)
             self.act_p.append([px_star, py_star, f_theta])
 
-            # plot
+            # 绘图
             if plot:
                 self.plot_animation(ax, com_trajectory_for_plot, px_star,
                                     py_star, z_c)
@@ -117,12 +117,12 @@ class BipedalPlanner(object):
 
     def plot_animation(self, ax, com_trajectory_for_plot, px_star, py_star,
                        z_c):  # pragma: no cover
-        # for plot trajectory, plot in for loop
+        # 为绘制轨迹，在循环中绘图
         for c in range(len(self.com_trajectory)):
             if c > len(com_trajectory_for_plot):
-                # set up plotter
+                # 设置绘图器
                 plt.cla()
-                # for stopping simulation with the esc key.
+                # 按 Esc 键停止仿真。
                 plt.gcf().canvas.mpl_connect(
                     'key_release_event',
                     lambda event:
@@ -131,16 +131,16 @@ class BipedalPlanner(object):
                 ax.set_xlim(0, 1)
                 ax.set_ylim(-0.5, 0.5)
 
-                # update com_trajectory_for_plot
+                # 更新用于绘图的质心轨迹
                 com_trajectory_for_plot.append(self.com_trajectory[c])
 
-                # plot com
+                # 绘制质心
                 ax.plot([p[0] for p in com_trajectory_for_plot],
                         [p[1] for p in com_trajectory_for_plot], [
                             0 for _ in com_trajectory_for_plot],
                         color="red")
 
-                # plot inverted pendulum
+                # 绘制倒立摆
                 ax.plot([px_star, com_trajectory_for_plot[-1][0]],
                         [py_star, com_trajectory_for_plot[-1][1]],
                         [0, z_c], color="green", linewidth=3)
@@ -148,7 +148,7 @@ class BipedalPlanner(object):
                            [com_trajectory_for_plot[-1][1]],
                            [z_c], color="green", s=300)
 
-                # foot rectangle for self.ref_p
+                # self.ref_p 的足底矩形
                 foot_width = 0.06
                 foot_height = 0.04
                 for j in range(len(self.ref_p)):
@@ -170,7 +170,7 @@ class BipedalPlanner(object):
                     ax.add_patch(rec)
                     art3d.pathpatch_2d_to_3d(rec, z=0, zdir="z")
 
-                # foot rectangle for self.act_p
+                # self.act_p 的足底矩形
                 for j in range(len(self.act_p)):
                     angle = self.act_p[j][2] + \
                             math.atan2(foot_height,
