@@ -1,15 +1,15 @@
 """
 
-A rocket powered landing with successive convexification
+用逐次凸化求解火箭动力着陆
 
-author: Sven Niederberger
+作者: Sven Niederberger
         Atsushi Sakai
 
-Reference:
-- Python implementation of 'Successive Convexification for 6-DoF Mars Rocket Powered Landing with Free-Final-Time' paper
-by Michael Szmuk and Behcet Acıkmese.
+参考文献:
+- 论文 'Successive Convexification for 6-DoF Mars Rocket Powered Landing with Free-Final-Time' 的 Python 实现
+作者为 Michael Szmuk 与 Behcet Acıkmese。
 
-- EmbersArc/SuccessiveConvexificationFreeFinalTime: Implementation of "Successive Convexification for 6-DoF Mars Rocket Powered Landing with Free-Final-Time" https://github.com/EmbersArc/SuccessiveConvexificationFreeFinalTime
+- EmbersArc/SuccessiveConvexificationFreeFinalTime：对 "Successive Convexification for 6-DoF Mars Rocket Powered Landing with Free-Final-Time" 的实现 https://github.com/EmbersArc/SuccessiveConvexificationFreeFinalTime
 
 """
 import warnings
@@ -19,17 +19,17 @@ from scipy.integrate import odeint
 import cvxpy
 import matplotlib.pyplot as plt
 
-# Trajectory points
+# 轨迹点
 K = 50
 
-# Max solver iterations
+# 求解器最大迭代次数
 iterations = 30
 
-# Weight constants
-W_SIGMA = 1  # flight time
-W_DELTA = 1e-3  # difference in state/input
-W_DELTA_SIGMA = 1e-1  # difference in flight time
-W_NU = 1e5  # virtual control
+# 权重常数
+W_SIGMA = 1  # 飞行时间
+W_DELTA = 1e-3  # 状态/输入的差异
+W_DELTA_SIGMA = 1e-1  # 飞行时间的差异
+W_NU = 1e5  # 虚拟控制
 
 print(cvxpy.installed_solvers())
 solver = 'CLARABEL'
@@ -40,26 +40,26 @@ show_animation = True
 
 class Rocket_Model_6DoF:
     """
-    A 6 degree of freedom rocket landing problem.
+    六自由度火箭着陆问题。
     """
 
     def __init__(self, rng):
         """
-        A large r_scale for a small scale problem will
-        ead to numerical problems as parameters become excessively small
-        and (it seems) precision is lost in the dynamics.
+        对小尺度问题使用过大的 r_scale
+        会导致数值问题，因为参数会变得过小，
+        并且（看起来）动力学中会损失精度。
         """
         self.n_x = 14
         self.n_u = 3
 
-        # Mass
+        # 质量
         self.m_wet = 3.0  # 30000 kg
         self.m_dry = 2.2  # 22000 kg
 
-        # Flight time guess
+        # 飞行时间初值
         self.t_f_guess = 10.0  # 10 s
 
-        # State constraints
+        # 状态约束
         self.r_I_final = np.array((0., 0., 0.))
         self.v_I_final = np.array((-1e-1, 0., 0.))
         self.q_B_I_final = self.euler_to_quat((0, 0, 0))
@@ -67,7 +67,7 @@ class Rocket_Model_6DoF:
 
         self.w_B_max = np.deg2rad(60)
 
-        # Angles
+        # 角度
         max_gimbal = 20
         max_angle = 90
         glidelslope_angle = 20
@@ -76,20 +76,20 @@ class Rocket_Model_6DoF:
         self.cos_theta_max = np.cos(np.deg2rad(max_angle))
         self.tan_gamma_gs = np.tan(np.deg2rad(glidelslope_angle))
 
-        # Thrust limits
+        # 推力限制
         self.T_max = 5.0
         self.T_min = 0.3
 
-        # Angular moment of inertia
+        # 转动惯量
         self.J_B = 1e-2 * np.diag([1., 1., 1.])
 
-        # Gravity
+        # 重力
         self.g_I = np.array((-1, 0., 0.))
 
-        # Fuel consumption
+        # 燃料消耗
         self.alpha_m = 0.01
 
-        # Vector from thrust point to CoM
+        # 从推力作用点到质心的向量
         self.r_T_B = np.array([-1e-2, 0., 0.])
 
         self.set_random_initial_state(rng)
@@ -248,7 +248,7 @@ class Rocket_Model_6DoF:
 
     def initialize_trajectory(self, X, U):
         """
-        Initialize the trajectory with linear approximation.
+        用线性近似初始化轨迹。
         """
         K = X.shape[1]
 
@@ -269,44 +269,44 @@ class Rocket_Model_6DoF:
 
     def get_constraints(self, X_v, U_v, X_last_p, U_last_p):
         """
-        Get model specific constraints.
+        获取模型特定的约束。
 
-        :param X_v: cvx variable for current states
-        :param U_v: cvx variable for current inputs
-        :param X_last_p: cvx parameter for last states
-        :param U_last_p: cvx parameter for last inputs
-        :return: A list of cvx constraints
+        :param X_v: 当前状态的 cvx 变量
+        :param U_v: 当前输入的 cvx 变量
+        :param X_last_p: 上一时刻状态的 cvx 参数
+        :param U_last_p: 上一时刻输入的 cvx 参数
+        :return: cvx 约束列表
         """
-        # Boundary conditions:
+        # 边界条件：
         constraints = [
             X_v[0, 0] == self.x_init[0],
             X_v[1:4, 0] == self.x_init[1:4],
             X_v[4:7, 0] == self.x_init[4:7],
-            # X_v[7:11, 0] == self.x_init[7:11],  # initial orientation is free
+            # X_v[7:11, 0] == self.x_init[7:11],  # 初始姿态自由
             X_v[11:14, 0] == self.x_init[11:14],
 
-            # X_[0, -1] final mass is free
+            # X_[0, -1] 末端质量自由
             X_v[1:, -1] == self.x_final[1:],
             U_v[1:3, -1] == 0,
         ]
 
         constraints += [
-            # State constraints:
-            X_v[0, :] >= self.m_dry,  # minimum mass
+            # 状态约束：
+            X_v[0, :] >= self.m_dry,  # 最小质量
             cvxpy.norm(X_v[2: 4, :], axis=0) <= X_v[1, :] / \
-            self.tan_gamma_gs,  # glideslope
+            self.tan_gamma_gs,  # 下滑道
             cvxpy.norm(X_v[9:11, :], axis=0) <= np.sqrt(
-                (1 - self.cos_theta_max) / 2),  # maximum angle
-            # maximum angular velocity
+                (1 - self.cos_theta_max) / 2),  # 最大角度
+            # 最大角速度
             cvxpy.norm(X_v[11: 14, :], axis=0) <= self.w_B_max,
 
-            # Control constraints:
+            # 控制约束：
             cvxpy.norm(U_v[1:3, :], axis=0) <= self.tan_delta_max * \
-            U_v[0, :],  # gimbal angle constraint
-            cvxpy.norm(U_v, axis=0) <= self.T_max,  # upper thrust constraint
+            U_v[0, :],  # 万向节角度约束
+            cvxpy.norm(U_v, axis=0) <= self.T_max,  # 推力上界约束
         ]
 
-        # linearized lower thrust constraint
+        # 线性化的推力下界约束
         rhs = [U_last_p[:, k] / cvxpy.norm(U_last_p[:, k]) @ U_v[:, k]
                for k in range(X_v.shape[1])]
         constraints += [
@@ -329,7 +329,7 @@ class Integrator:
         self.S_bar = np.zeros([m.n_x, K - 1])
         self.z_bar = np.zeros([m.n_x, K - 1])
 
-        # vector indices for flat matrices
+        # 展平矩阵的向量下标
         x_end = m.n_x
         A_bar_end = m.n_x * (1 + m.n_x)
         B_bar_end = m.n_x * (1 + m.n_x + m.n_u)
@@ -345,7 +345,7 @@ class Integrator:
 
         self.f, self.A, self.B = m.f_func, m.A_func, m.B_func
 
-        # integration initial condition
+        # 积分初值
         self.V0 = np.zeros((m.n_x * (1 + m.n_x + m.n_u + m.n_u + 2),))
         self.V0[self.A_bar_ind] = np.eye(m.n_x).reshape(-1)
 
@@ -353,20 +353,20 @@ class Integrator:
 
     def calculate_discretization(self, X, U, sigma):
         """
-        Calculate discretization for given states, inputs and total time.
+        对给定的状态、输入与总时间计算离散化。
 
-        :param X: Matrix of states for all time points
-        :param U: Matrix of inputs for all time points
-        :param sigma: Total time
-        :return: The discretization matrices
+        :param X: 全部时刻的状态矩阵
+        :param U: 全部时刻的输入矩阵
+        :param sigma: 总时间
+        :return: 离散化矩阵
         """
         for k in range(self.K - 1):
             self.V0[self.x_ind] = X[:, k]
             V = np.array(odeint(self._ode_dVdt, self.V0, (0, self.dt),
                                 args=(U[:, k], U[:, k + 1], sigma))[1, :])
 
-            # using \Phi_A(\tau_{k+1},\xi) = \Phi_A(\tau_{k+1},\tau_k)\Phi_A(\xi,\tau_k)^{-1}
-            # flatten matrices in column-major (Fortran) order for CVXPY
+            # 利用 \Phi_A(\tau_{k+1},\xi) = \Phi_A(\tau_{k+1},\tau_k)\Phi_A(\xi,\tau_k)^{-1}
+            # 按列优先（Fortran）顺序展平矩阵，供 CVXPY 使用
             Phi = V[self.A_bar_ind].reshape((self.n_x, self.n_x))
             self.A_bar[:, k] = Phi.flatten(order='F')
             self.B_bar[:, k] = np.matmul(Phi, V[self.B_bar_ind].reshape(
@@ -380,22 +380,22 @@ class Integrator:
 
     def _ode_dVdt(self, V, t, u_t0, u_t1, sigma):
         """
-        ODE function to compute dVdt.
+        用于计算 dVdt 的常微分方程函数。
 
-        :param V: Evaluation state V = [x, Phi_A, B_bar, C_bar, S_bar, z_bar]
-        :param t: Evaluation time
-        :param u_t0: Input at start of interval
-        :param u_t1: Input at end of interval
-        :param sigma: Total time
-        :return: Derivative at current time and state dVdt
+        :param V: 求值状态 V = [x, Phi_A, B_bar, C_bar, S_bar, z_bar]
+        :param t: 求值时刻
+        :param u_t0: 区间起点的输入
+        :param u_t1: 区间终点的输入
+        :param sigma: 总时间
+        :return: 当前时刻与状态下的导数 dVdt
         """
         alpha = (self.dt - t) / self.dt
         beta = t / self.dt
         x = V[self.x_ind]
         u = u_t0 + beta * (u_t1 - u_t0)
 
-        # using \Phi_A(\tau_{k+1},\xi) = \Phi_A(\tau_{k+1},\tau_k)\Phi_A(\xi,\tau_k)^{-1}
-        # and pre-multiplying with \Phi_A(\tau_{k+1},\tau_k) after integration
+        # 利用 \Phi_A(\tau_{k+1},\xi) = \Phi_A(\tau_{k+1},\tau_k)\Phi_A(\xi,\tau_k)^{-1}
+        # 并在积分后左乘 \Phi_A(\tau_{k+1},\tau_k)
         Phi_A_xi = np.linalg.inv(
             V[self.A_bar_ind].reshape((self.n_x, self.n_x)))
 
@@ -418,15 +418,15 @@ class Integrator:
 
 class SCProblem:
     """
-    Defines a standard Successive Convexification problem and
-            adds the model specific constraints and objectives.
+    定义标准的逐次凸化问题，并
+            加入模型特定的约束与目标函数。
 
-    :param m: The model object
-    :param K: Number of discretization points
+    :param m: 模型对象
+    :param K: 离散点数量
     """
 
     def __init__(self, m, K):
-        # Variables:
+        # 变量：
         self.var = dict()
         self.var['X'] = cvxpy.Variable((m.n_x, K))
         self.var['U'] = cvxpy.Variable((m.n_u, K))
@@ -435,7 +435,7 @@ class SCProblem:
         self.var['delta_norm'] = cvxpy.Variable(nonneg=True)
         self.var['sigma_norm'] = cvxpy.Variable(nonneg=True)
 
-        # Parameters:
+        # 参数：
         self.par = dict()
         self.par['A_bar'] = cvxpy.Parameter((m.n_x * m.n_x, K - 1))
         self.par['B_bar'] = cvxpy.Parameter((m.n_x * m.n_u, K - 1))
@@ -452,14 +452,14 @@ class SCProblem:
         self.par['weight_delta_sigma'] = cvxpy.Parameter(nonneg=True)
         self.par['weight_nu'] = cvxpy.Parameter(nonneg=True)
 
-        # Constraints:
+        # 约束：
         constraints = []
 
-        # Model:
+        # 模型：
         constraints += m.get_constraints(
             self.var['X'], self.var['U'], self.par['X_last'], self.par['U_last'])
 
-        # Dynamics:
+        # 动力学：
         # x_t+1 = A_*x_t+B_*U_t+C_*U_T+1*S_*sigma+zbar+nu
         constraints += [
             self.var['X'][:, k + 1] ==
@@ -475,7 +475,7 @@ class SCProblem:
             for k in range(K - 1)
         ]
 
-        # Trust regions:
+        # 信赖域：
         dx = cvxpy.sum(cvxpy.square(
             self.var['X'] - self.par['X_last']), axis=0)
         du = cvxpy.sum(cvxpy.square(
@@ -484,10 +484,10 @@ class SCProblem:
         constraints += [cvxpy.norm(dx + du, 1) <= self.var['delta_norm']]
         constraints += [cvxpy.norm(ds, 'inf') <= self.var['sigma_norm']]
 
-        # Flight time positive:
+        # 飞行时间为正：
         constraints += [self.var['sigma'] >= 0.1]
 
-        # Objective:
+        # 目标函数：
         sc_objective = cvxpy.Minimize(
             self.par['weight_sigma'] * self.var['sigma'] +
             self.par['weight_nu'] * cvxpy.norm(self.var['nu'], 'inf') +
@@ -501,8 +501,8 @@ class SCProblem:
 
     def set_parameters(self, **kwargs):
         """
-        All parameters have to be filled before calling solve().
-        Takes the following arguments as keywords:
+        调用 solve() 之前必须填入全部参数。
+        接受以下关键字参数：
 
         A_bar
         B_bar
@@ -534,7 +534,7 @@ class SCProblem:
     def solve(self, **kwargs):
         error = False
         try:
-            with warnings.catch_warnings():  # For User warning from solver
+            with warnings.catch_warnings():  # 忽略求解器的 UserWarning
                 warnings.simplefilter('ignore')
                 self.prob.solve(verbose=verbose_solver,
                                 solver=solver)
@@ -563,7 +563,7 @@ def axis3d_equal(X, Y, Z, ax):
                                     - 1:2:2][1].flatten() + 0.5 * (Y.max() + Y.min())
     Zb = 0.5 * max_range * np.mgrid[-1:2:2, -1:2:2,
                                     - 1:2:2][2].flatten() + 0.5 * (Z.max() + Z.min())
-    # Comment or uncomment following both lines to test the fake bounding box:
+    # 注释或取消注释下面两行，以测试伪包围盒：
     for xb, yb, zb in zip(Xb, Yb, Zb):
         ax.plot([xb], [yb], [zb], 'w')
 
@@ -572,15 +572,15 @@ def plot_animation(X, U):  # pragma: no cover
 
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
-    # for stopping simulation with the esc key.
+    # 按 Esc 键停止仿真。
     fig.canvas.mpl_connect('key_release_event',
                            lambda event: [exit(0) if event.key == 'escape' else None])
 
     for k in range(K):
         plt.cla()
-        ax.plot(X[2, :], X[3, :], X[1, :])  # trajectory
+        ax.plot(X[2, :], X[3, :], X[1, :])  # 轨迹
         ax.scatter3D([0.0], [0.0], [0.0], c="r",
-                     marker="x")  # target landing point
+                     marker="x")  # 目标着陆点
         axis3d_equal(X[2, :], X[3, :], X[1, :], ax)
 
         rx, ry, rz = X[1:4, k]
@@ -599,11 +599,11 @@ def plot_animation(X, U):  # pragma: no cover
         Fx, Fy, Fz = np.dot(np.transpose(CBI), U[:, k])
         dx, dy, dz = np.dot(np.transpose(CBI), np.array([1., 0., 0.]))
 
-        # attitude vector
+        # 姿态向量
         ax.quiver(ry, rz, rx, dy, dz, dx, length=0.5, linewidth=3.0,
                   arrow_length_ratio=0.0, color='black')
 
-        # thrust vector
+        # 推力向量
         ax.quiver(ry, rz, rx, -Fy, -Fz, -Fx, length=0.1,
                   arrow_length_ratio=0.0, color='red')
 
@@ -615,11 +615,11 @@ def main(rng=None):
     print("start!!")
     m = Rocket_Model_6DoF(rng)
 
-    # state and input list
+    # 状态与输入列表
     X = np.empty(shape=[m.n_x, K])
     U = np.empty(shape=[m.n_u, K])
 
-    # INITIALIZATION
+    # 初始化
     sigma = m.t_f_guess
     X, U = m.initialize_trajectory(X, U)
 

@@ -1,7 +1,7 @@
 """
-Class for plotting a quadrotor
+用于绘制四旋翼的类
 
-Author: Daniel Ingram (daniel-s-ingram)
+作者: Daniel Ingram (daniel-s-ingram)
 """
 
 from math import cos, sin
@@ -23,7 +23,7 @@ class Quadrotor():
         if self.show_animation:
             plt.ion()
             fig = plt.figure()
-            # for stopping simulation with the esc key.
+            # 按 Esc 键停止仿真。
             fig.canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
 

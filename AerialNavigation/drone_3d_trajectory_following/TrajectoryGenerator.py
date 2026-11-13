@@ -1,7 +1,7 @@
 """
-Generates a quintic polynomial trajectory.
+生成五次多项式轨迹。
 
-Author: Daniel Ingram (daniel-s-ingram)
+作者: Daniel Ingram (daniel-s-ingram)
 """
 
 import numpy as np
