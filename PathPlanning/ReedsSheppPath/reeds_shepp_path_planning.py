@@ -1,9 +1,9 @@
 """
 
-Reeds Shepp path planner sample code
+Reeds-Shepp 路径规划器示例代码
 
-author Atsushi Sakai(@Atsushi_twi)
-co-author Videh Patel(@videh25) : Added the missing RS paths
+作者 Atsushi Sakai(@Atsushi_twi)
+共同作者 Videh Patel(@videh25)：补充了缺失的 Reeds-Shepp 路径
 
 """
 import sys
@@ -21,19 +21,19 @@ show_animation = True
 
 class Path:
     """
-    Path data container
+    路径数据容器
     """
 
     def __init__(self):
-        # course segment length  (negative value is backward segment)
+        # 路径段长度（负值表示后退段）
         self.lengths = []
-        # course segment type char ("S": straight, "L": left, "R": right)
+        # 路径段类型字符（"S"：直线，"L"：左转，"R"：右转）
         self.ctypes = []
-        self.L = 0.0  # Total lengths of the path
-        self.x = []  # x positions
-        self.y = []  # y positions
-        self.yaw = []  # orientations [rad]
-        self.directions = []  # directions (1:forward, -1:backward)
+        self.L = 0.0  # 路径总长度
+        self.x = []  # x 位置
+        self.y = []  # y 位置
+        self.yaw = []  # 航向角 [rad]
+        self.directions = []  # 挡位（1：前进，-1：后退）
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
@@ -50,7 +50,7 @@ def pi_2_pi(x):
     return angle_mod(x)
 
 def mod2pi(x):
-    # Be consistent with fmod in cplusplus here.
+    # 此处与 C++ 中的 fmod 保持一致。
     v = np.mod(x, np.copysign(2.0 * math.pi, x))
     if v < -math.pi:
         v += 2.0 * math.pi
@@ -65,16 +65,16 @@ def set_path(paths, lengths, ctypes, step_size):
     path.lengths = lengths
     path.L = sum(np.abs(lengths))
 
-    # check same path exist
+    # 检查是否已存在相同路径
     for i_path in paths:
         type_is_same = (i_path.ctypes == path.ctypes)
         length_is_close = (sum(np.abs(i_path.lengths)) - path.L) <= step_size
         if type_is_same and length_is_close:
-            return paths  # same path found, so do not insert path
+            return paths  # 发现相同路径，因此不插入
 
-    # check path is long enough
+    # 检查路径是否足够长
     if path.L <= step_size:
-        return paths  # too short, so do not insert path
+        return paths  # 过短，因此不插入
 
     paths.append(path)
     return paths
@@ -161,8 +161,8 @@ def left_right_x_left_right(x, y, phi):
     eeta = y - 1 - math.cos(phi)
     u1, theta = polar(zeta, eeta)
 
-    # Solutions refering to (2 < u1 <= 4) are considered sub-optimal in paper
-    # Solutions do not exist for u1 > 4
+    # 论文中认为对应于 (2 < u1 <= 4) 的解是次优的
+    # 当 u1 > 4 时解不存在
     if u1 <= 2:
         A = math.acos((u1 + 2) * 0.25)
         t = mod2pi(theta + A + math.pi/2)
@@ -295,12 +295,12 @@ def generate_path(q0, q1, max_curvature, step_size):
     step_size *= max_curvature
 
     paths = []
-    path_functions = [left_straight_left, left_straight_right,                          # CSC
-                      left_x_right_x_left, left_x_right_left, left_right_x_left,        # CCC
-                      left_right_x_left_right, left_x_right_left_x_right,               # CCCC
-                      left_x_right90_straight_left, left_x_right90_straight_right,      # CCSC
-                      left_straight_right90_x_left, left_straight_left90_x_right,       # CSCC
-                      left_x_right90_straight_left90_x_right]                           # CCSCC
+    path_functions = [left_straight_left, left_straight_right,                          # CSC（曲线-直线-曲线）
+                      left_x_right_x_left, left_x_right_left, left_right_x_left,        # CCC（曲线-曲线-曲线）
+                      left_right_x_left_right, left_x_right_left_x_right,               # CCCC（四段曲线）
+                      left_x_right90_straight_left, left_x_right90_straight_right,      # CCSC（曲线-曲线-直线-曲线）
+                      left_straight_right90_x_left, left_straight_left90_x_right,       # CSCC（曲线-直线-曲线-曲线）
+                      left_x_right90_straight_left90_x_right]                           # CCSCC（曲线-曲线-直线-曲线-曲线）
 
     for path_func in path_functions:
         flag, travel_distances, steering_dirns = path_func(x, y, dth)
@@ -383,14 +383,14 @@ def interpolate(dist, length, mode, max_curvature, origin_x, origin_y,
         x = origin_x + dist / max_curvature * math.cos(origin_yaw)
         y = origin_y + dist / max_curvature * math.sin(origin_yaw)
         yaw = origin_yaw
-    else:  # curve
+    else:  # 曲线
         ldx = math.sin(dist) / max_curvature
         ldy = 0.0
         yaw = None
-        if mode == "L":  # left turn
+        if mode == "L":  # 左转
             ldy = (1.0 - math.cos(dist)) / max_curvature
             yaw = origin_yaw + dist
-        elif mode == "R":  # right turn
+        elif mode == "R":  # 右转
             ldy = (1.0 - math.cos(dist)) / -max_curvature
             yaw = origin_yaw - dist
         gdx = math.cos(-origin_yaw) * ldx + math.sin(-origin_yaw) * ldy
@@ -411,7 +411,7 @@ def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
                                                          path.ctypes, maxc,
                                                          step_size)
 
-        # convert global coordinate
+        # 转换到全局坐标
         path.x = [math.cos(-q0[2]) * ix + math.sin(-q0[2]) * iy + q0[0] for
                   (ix, iy) in zip(xs, ys)]
         path.y = [-math.sin(-q0[2]) * ix + math.cos(-q0[2]) * iy + q0[1] for
@@ -427,9 +427,9 @@ def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
 def reeds_shepp_path_planning(sx, sy, syaw, gx, gy, gyaw, maxc, step_size=0.2):
     paths = calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size)
     if not paths:
-        return None, None, None, None, None  # could not generate any path
+        return None, None, None, None, None  # 无法生成任何路径
 
-    # search minimum cost path
+    # 搜索最小代价路径
     best_path_index = paths.index(min(paths, key=lambda p: abs(p.L)))
     b_path = paths[best_path_index]
 
@@ -464,7 +464,7 @@ def main():
         plt.plot(xs, ys, label="final course " + str(modes))
         print(f"{lengths=}")
 
-        # plotting
+        # 绘图
         plot_arrow(start_x, start_y, start_yaw)
         plot_arrow(end_x, end_y, end_yaw)
 

@@ -1,13 +1,11 @@
 """
-Author: Jonathan Schwartz (github.com/SchwartzCode)
+作者: Jonathan Schwartz (github.com/SchwartzCode)
 
-This code provides a simple implementation of Dynamic Movement
-Primitives, which is an approach to learning curves by modelling
-them as a weighted sum of gaussian distributions. This approach
-can be used to dampen noise in a curve, and can also be used to
-stretch a curve by adjusting its start and end points.
+本代码提供动态运动原语（DMP）的一个简单实现。DMP 将曲线
+建模为高斯分布的加权和，从而学习曲线。该方法可用于抑制
+曲线中的噪声，也可通过调整起点与终点来拉伸曲线。
 
-More information on Dynamic Movement Primitives available at:
+动态运动原语（DMP）的更多信息见：
 https://arxiv.org/abs/2102.03861
 https://www.frontiersin.org/journals/computational-neuroscience/articles/10.3389/fncom.2013.00138/full
 
@@ -23,19 +21,18 @@ class DMP:
     def __init__(self, training_data, data_period, K=156.25, B=25):
         """
         Arguments:
-            training_data - input data of form [N, dim]
-            data_period   - amount of time training data covers
-            K and B       - spring and damper constants to define
-                            DMP behavior
+            training_data - 形式为 [N, dim] 的输入数据
+            data_period   - 训练数据所覆盖的时间长度
+            K 与 B        - 定义 DMP 行为的弹簧与阻尼常数
         """
 
-        self.K = K  # virtual spring constant
-        self.B = B  # virtual damper coefficient
+        self.K = K  # 虚拟弹簧常数
+        self.B = B  # 虚拟阻尼系数
 
         self.timesteps = training_data.shape[0]
         self.dt = data_period / self.timesteps
 
-        self.weights = None  # weights used to generate DMP trajectories
+        self.weights = None  # 用于生成 DMP 轨迹的权重
 
         self.T_orig = data_period
 
@@ -46,8 +43,8 @@ class DMP:
                                      num_weights=10):
         """
         Arguments:
-            data [(steps x spacial dim) np array] - data to replicate with DMP
-            data_period [float] - time duration of data
+            data [(步数 x 空间维数) np array] - 要用 DMP 复现的数据
+            data_period [float] - 数据的时间长度
         """
 
         if not isinstance(training_data, np.ndarray):
@@ -60,7 +57,7 @@ class DMP:
         init_state = training_data[0]
         goal_state = training_data[-1]
 
-        # means (C) and std devs (H) of gaussian basis functions
+        # 高斯基函数的均值 (C) 与标准差 (H)
         C = np.linspace(0, 1, num_weights)
         H = (0.65*(1./(num_weights-1))**2)
 
@@ -110,18 +107,18 @@ class DMP:
 
     def recreate_trajectory(self, init_state, goal_state, T):
         """
-        init_state - initial state/position
-        goal_state - goal state/position
-        T  - amount of time to travel q0 -> g
+        init_state - 初始状态/位置
+        goal_state - 目标状态/位置
+        T  - 从 q0 运动到 g 所用的时间
         """
 
-        nrBasis = len(self.weights[0])  # number of gaussian basis functions
+        nrBasis = len(self.weights[0])  # 高斯基函数的数量
 
-        # means (C) and std devs (H) of gaussian basis functions
+        # 高斯基函数的均值 (C) 与标准差 (H)
         C = np.linspace(0, 1, nrBasis)
         H = (0.65*(1./(nrBasis-1))**2)
 
-        # initialize virtual system
+        # 初始化虚拟系统
         time = 0
 
         q = init_state
@@ -143,7 +140,7 @@ class DMP:
                 else:
                     f = 0
 
-                # simulate dynamics
+                # 仿真动力学
                 qdd[dim] = (self.K*(goal_state[dim] - q[dim])/T**2
                             - self.B*qd[dim]/T
                             + (goal_state[dim] - init_state[dim])*f/T**2)
@@ -190,10 +187,9 @@ class DMP:
 
     def show_DMP_purpose(self):
         """
-        This function conveys the purpose of DMPs:
-            to capture a trajectory and be able to stretch
-            and squeeze it in terms of start and stop position
-            or time
+        本函数说明 DMP 的用途：
+            捕获一条轨迹，并能够在起点与终点位置
+            或时间上对其进行拉伸与压缩
         """
 
         q0_orig = self.training_data[0]
@@ -237,8 +233,8 @@ class DMP:
 
 def example_DMP():
     """
-    Creates a noisy trajectory, fits weights to it, and then adjusts the
-    trajectory by moving its start position, goal position, or period
+    生成一条带噪声的轨迹，拟合其权重，然后通过移动
+    起点位置、目标点位置或周期来调整该轨迹
     """
     t = np.arange(0, 3*np.pi/2, 0.01)
     t1 = np.arange(3*np.pi/2, 2*np.pi, 0.01)[:-1]

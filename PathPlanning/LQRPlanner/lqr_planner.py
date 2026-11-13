@@ -1,8 +1,8 @@
 """
 
-LQR local path planning
+LQR 局部路径规划
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者: Atsushi Sakai (@Atsushi_twi)
 
 """
 
@@ -19,8 +19,8 @@ SHOW_ANIMATION = True
 class LQRPlanner:
 
     def __init__(self):
-        self.MAX_TIME = 100.0  # Maximum simulation time
-        self.DT = 0.1  # Time tick
+        self.MAX_TIME = 100.0  # 最大仿真时间
+        self.DT = 0.1  # 时间步长
         self.GOAL_DIST = 0.1
         self.MAX_ITER = 150
         self.EPS = 0.01
@@ -29,9 +29,9 @@ class LQRPlanner:
 
         rx, ry = [sx], [sy]
 
-        x = np.array([sx - gx, sy - gy]).reshape(2, 1)  # State vector
+        x = np.array([sx - gx, sy - gy]).reshape(2, 1)  # 状态向量
 
-        # Linear system model
+        # 线性系统模型
         A, B = self.get_system_model()
 
         found_path = False
@@ -52,9 +52,9 @@ class LQRPlanner:
                 found_path = True
                 break
 
-            # animation
+            # 动画
             if show_animation:  # pragma: no cover
-                # for stopping simulation with the esc key.
+                # 按 Esc 键停止仿真。
                 plt.gcf().canvas.mpl_connect('key_release_event',
                         lambda event: [exit(0) if event.key == 'escape' else None])
                 plt.plot(sx, sy, "or")
@@ -71,7 +71,7 @@ class LQRPlanner:
 
     def solve_dare(self, A, B, Q, R):
         """
-        solve a discrete time_Algebraic Riccati equation (DARE)
+        求解离散时间代数 Riccati 方程（DARE）
         """
         X, Xn = Q, Q
 
@@ -85,16 +85,16 @@ class LQRPlanner:
         return Xn
 
     def dlqr(self, A, B, Q, R):
-        """Solve the discrete time lqr controller.
+        """求解离散时间 LQR 控制器。
         x[k+1] = A x[k] + B u[k]
         cost = sum x[k].T*Q*x[k] + u[k].T*R*u[k]
-        # ref Bertsekas, p.151
+        # 参考文献 Bertsekas, p.151
         """
 
-        # first, try to solve the ricatti equation
+        # 首先尝试求解 Riccati 方程
         X = self.solve_dare(A, B, Q, R)
 
-        # compute the LQR gain
+        # 计算 LQR 增益
         K = la.inv(B.T @ X @ B + R) @ (B.T @ X @ A)
 
         eigValues = la.eigvals(A - B @ K)
@@ -121,8 +121,8 @@ class LQRPlanner:
 def main():
     print(__file__ + " start!!")
 
-    ntest = 10  # number of goal
-    area = 100.0  # sampling area
+    ntest = 10  # 目标点数量
+    area = 100.0  # 采样区域
 
     lqr_planner = LQRPlanner()
 

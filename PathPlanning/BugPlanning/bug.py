@@ -1,7 +1,7 @@
 """
-Bug Planning
-author: Sarim Mehdi(muhammadsarim.mehdi@studio.unibo.it)
-Source: https://web.archive.org/web/20201103052224/https://sites.google.com/site/ece452bugalgorithms/
+Bug 算法路径规划
+作者：Sarim Mehdi(muhammadsarim.mehdi@studio.unibo.it)
+来源：https://web.archive.org/web/20201103052224/https://sites.google.com/site/ece452bugalgorithms/
 """
 
 import numpy as np
@@ -54,10 +54,10 @@ class BugPlanner:
 
     def bug0(self):
         """
-        Greedy algorithm where you move towards goal
-        until you hit an obstacle. Then you go around it
-        (pick an arbitrary direction), until it is possible
-        for you to start moving towards goal in a greedy manner again
+        贪心算法：朝目标点运动，
+        直到碰到障碍物。然后绕行障碍物
+        （任选一个方向），直到可以
+        再次以贪心方式朝目标点运动
         """
         mov_dir = 'normal'
         cand_x, cand_y = -np.inf, -np.inf
@@ -115,12 +115,12 @@ class BugPlanner:
 
     def bug1(self):
         """
-        Move towards goal in a greedy manner.
-        When you hit an obstacle, you go around it and
-        back to where you hit the obstacle initially.
-        Then, you go to the point on the obstacle that is
-        closest to your goal and you start moving towards
-        goal in a greedy manner from that new point.
+        以贪心方式朝目标点运动。
+        碰到障碍物时，绕行一周并
+        回到最初碰到障碍物的位置。
+        然后前往障碍物上离目标点
+        最近的点，并从该新点开始
+        以贪心方式朝目标点运动。
         """
         mov_dir = 'normal'
         cand_x, cand_y = -np.inf, -np.inf
@@ -192,16 +192,16 @@ class BugPlanner:
 
     def bug2(self):
         """
-        Move towards goal in a greedy manner.
-        When you hit an obstacle, you go around it and
-        keep track of your distance from the goal.
-        If the distance from your goal was decreasing before
-        and now it starts increasing, that means the current
-        point is probably the closest point to the
-        goal (this may or may not be true because the algorithm
-        doesn't explore the entire boundary around the obstacle).
-        So, you depart from this point and continue towards the
-        goal in a greedy manner
+        以贪心方式朝目标点运动。
+        碰到障碍物时绕行，并
+        记录与目标点的距离。
+        若此前到目标点的距离在减小，
+        而现在开始增大，则说明当前点
+        很可能是离目标点最近的点
+        （这未必成立，因为算法
+        不会探索障碍物的整条边界）。
+        于是从该点离开，继续以贪心方式
+        朝目标点运动
         """
         mov_dir = 'normal'
         cand_x, cand_y = -np.inf, -np.inf
@@ -275,7 +275,7 @@ class BugPlanner:
 
 
 def main(bug_0, bug_1, bug_2):
-    # set obstacle positions
+    # 设置障碍物位置
     o_x, o_y = [], []
 
     s_x = 0.0

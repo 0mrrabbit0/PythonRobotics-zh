@@ -1,7 +1,7 @@
 """
-This file implements a grid with a 3d reservation matrix with dimensions for x, y, and time. There
-is also infrastructure to generate dynamic obstacles that move around the grid. The obstacles' paths
-are stored in the reservation matrix on creation.
+本文件实现带三维预留矩阵的栅格，维度为 x、y 与时间。其中
+还包含用于生成在栅格中运动的动态障碍物的基础设施。障碍物的路径
+在创建时存入预留矩阵。
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,11 +15,11 @@ class Interval:
     end_time: int
 
 class ObstacleArrangement(Enum):
-    # Random obstacle positions and movements
+    # 随机障碍物位置与运动
     RANDOM = 0
-    # Obstacles start in a line in y at center of grid and move side-to-side in x
+    # 障碍物在栅格中心沿 y 排成一行，并沿 x 左右往复运动
     ARRANGEMENT1 = 1
-    # Static obstacle arrangement
+    # 静态障碍物布置
     NARROW_CORRIDOR = 2
 
 """
@@ -27,22 +27,22 @@ Generates a 2d numpy array with lists for elements.
 """
 def empty_2d_array_of_lists(x: int, y: int) -> np.ndarray:
     arr = np.empty((x, y), dtype=object)
-    # assign each element individually - np.full creates references to the same list
+    # 逐个元素赋值——np.full 会让所有元素引用同一个列表
     arr[:] = [[[] for _ in range(y)] for _ in range(x)]
     return arr
 
 class Grid:
-    # Set in constructor
+    # 在构造函数中设置
     grid_size: np.ndarray
     reservation_matrix: np.ndarray
     obstacle_paths: list[list[Position]] = []
-    # Obstacles will never occupy these points. Useful to avoid impossible scenarios
+    # 障碍物永远不会占据这些点。用于避免无解情形
     obstacle_avoid_points: list[Position] = []
 
-    # Number of time steps in the simulation
+    # 仿真中的时间步数
     time_limit: int
 
-    # Logging control
+    # 日志控制
     verbose = False
 
     def __init__(
@@ -69,9 +69,9 @@ class Grid:
             self.obstacle_paths = self.generate_narrow_corridor_obstacles(num_obstacles)
 
         for i, path in enumerate(self.obstacle_paths):
-            obs_idx = i + 1  # avoid using 0 - that indicates free space in the grid
+            obs_idx = i + 1  # 避免使用 0——0 表示栅格中的空闲空间
             for t, position in enumerate(path):
-                # Reserve old & new position at this time step
+                # 在该时间步预留旧位置与新位置
                 if t > 0:
                     self.reservation_matrix[path[t - 1].x, path[t - 1].y, t] = obs_idx
                 self.reservation_matrix[position.x, position.y, t] = obs_idx
@@ -82,7 +82,7 @@ class Grid:
     def generate_dynamic_obstacles(self, obs_count: int) -> list[list[Position]]:
         obstacle_paths = []
         for _ in range(0, obs_count):
-            # Sample until a free starting space is found
+            # 采样直到找到空闲的起始空间
             initial_position = self.sample_random_position()
             while not self.valid_obstacle_position(initial_position, 0):
                 initial_position = self.sample_random_position()
@@ -91,8 +91,8 @@ class Grid:
             if self.verbose:
                 print("Obstacle initial position: ", initial_position)
 
-            # Encourage obstacles to mostly stay in place - too much movement leads to chaotic planning scenarios
-            # that are not fun to watch
+            # 使障碍物大多停留原地——运动过多会导致规划场景混乱
+            # 不便于观察
             weights = [0.05, 0.05, 0.05, 0.05, 0.8]
             diffs = [
                 Position(0, 1),
@@ -118,8 +118,8 @@ class Grid:
                     valid_position = new_position
                     break
 
-                # Impossible situation for obstacle - stay in place
-                #   -> this can happen if the oaths of other obstacles this one
+                # 障碍物陷入无法移动的情形——留在原地
+                #   -> 若其他障碍物的路径挡住了该障碍物，则可能发生这种情况
                 if valid_position is None:
                     valid_position = positions[-1]
 
@@ -145,17 +145,17 @@ class Grid:
             path = [position]
 
             for t in range(1, self.time_limit - 1):
-                # sit in place every other time step
+                # 每隔一个时间步停留原地
                 if t % 2 == 0:
                     path.append(position)
                     continue
 
-                # first check if we should switch direction (at edge of grid)
+                # 首先检查是否应改变方向（位于栅格边缘时）
                 if (moving_right and position.x == self.grid_size[0] - 1) or (
                     not moving_right and position.x == 0
                 ):
                     moving_right = not moving_right
-                # step in direction
+                # 沿该方向前进一步
                 position = Position(
                     position.x + (1 if moving_right else -1), position.y
                 )
@@ -173,11 +173,11 @@ class Grid:
                 break
 
             if y == self.grid_size[1] // 2:
-                # Skip the middle row
+                # 跳过中间一行
                 continue
 
             obstacle_path = []
-            x = self.grid_size[0] // 2 # middle of the grid
+            x = self.grid_size[0] // 2 # 栅格中部
             for t in range(0, self.time_limit - 1):
                 obstacle_path.append(Position(x, y))
 
@@ -196,11 +196,11 @@ class Grid:
         bool: True if position/time combination is valid, False otherwise
     """
     def valid_position(self, position: Position, t: int) -> bool:
-        # Check if position is in grid
+        # 检查位置是否在栅格内
         if not self.inside_grid_bounds(position):
             return False
 
-        # Check if position is not occupied at time t
+        # 检查位置在时刻 t 是否未被占用
         return self.reservation_matrix[position.x, position.y, t] == 0
 
     """
@@ -263,30 +263,30 @@ class Grid:
     """
     def get_safe_intervals_at_cell(self, cell: Position) -> list[Interval]:
         vals = self.reservation_matrix[cell.x, cell.y, :]
-        # Find where the array is zero
+        # 找出数组中为零的位置
         zero_mask = (vals == 0)
 
-        # Identify transitions between zero and nonzero elements
+        # 识别零元素与非零元素之间的跳变
         diff = np.diff(zero_mask.astype(int))
 
-        # Start indices: where zeros begin (1 after a nonzero)
+        # 起始索引：零段开始处（非零之后的下一位）
         start_indices = np.where(diff == 1)[0] + 1
 
-        # End indices: where zeros stop (just before a nonzero)
+        # 结束索引：零段结束处（非零之前的一位）
         end_indices = np.where(diff == -1)[0]
 
-        # Handle edge cases if the array starts or ends with zeros
-        if zero_mask[0]:  # If the first element is zero, add index 0 to start_indices
+        # 处理数组以零开始或结束的边界情形
+        if zero_mask[0]:  # 若第一个元素为零，将索引 0 加入 start_indices
             start_indices = np.insert(start_indices, 0, 0)
-        if zero_mask[-1]:  # If the last element is zero, add the last index to end_indices
+        if zero_mask[-1]:  # 若最后一个元素为零，将最后一个索引加入 end_indices
             end_indices = np.append(end_indices, len(vals) - 1)
 
-        # Create pairs of (first zero, last zero)
+        # 构造（第一个零，最后一个零）配对
         intervals = [Interval(int(start), int(end)) for start, end in zip(start_indices, end_indices)]
 
-        # Remove intervals where a cell is only free for one time step. Those intervals not provide enough time to
-        # move into and out of the cell each take 1 time step, and the cell is considered occupied during
-        # both the time step when it is entering the cell,  and the time step when it is leaving the cell.
+        # 去掉仅在一个时间步内空闲的区间。这类区间没有足够时间，
+        # 因为进入和离开栅格各需要 1 个时间步，并且在
+        # 进入该栅格的时间步以及离开该栅格的时间步，该栅格都被视为占用。
         intervals = [interval for interval in intervals if interval.start_time != interval.end_time]
         return intervals
     
@@ -354,7 +354,7 @@ def main():
     ax.set_yticks(np.arange(0, 11, 1))
     (obs_points,) = ax.plot([], [], "ro", ms=15)
 
-    # for stopping simulation with the esc key.
+    # 按 esc 键停止仿真。
     plt.gcf().canvas.mpl_connect(
         "key_release_event", lambda event: [exit(0) if event.key == "escape" else None]
     )

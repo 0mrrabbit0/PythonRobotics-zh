@@ -29,7 +29,7 @@ def PlotNodePath(grid: Grid, start: Position, goal: Position, path: NodePath):
     (path_points,) = ax.plot([], [], "bo", ms=10, label="Path Found")
     ax.legend(bbox_to_anchor=(1.05, 1))
 
-    # for stopping simulation with the esc key.
+    # 按 esc 键停止仿真。
     plt.gcf().canvas.mpl_connect(
         "key_release_event",
         lambda event: [exit(0) if event.key == "escape" else None]
@@ -63,11 +63,11 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
     ax.set_xticks(np.arange(0, grid.grid_size[0], 1))
     ax.set_yticks(np.arange(0, grid.grid_size[1], 1))
 
-    # Plot start and goal positions for each agent
-    colors = [] # generated randomly in loop
-    markers = ['D', 's', '^', 'o', 'p']  # Different markers for visual distinction
+    # 绘制每个智能体的起点和目标点位置
+    colors = [] # 在循环中随机生成
+    markers = ['D', 's', '^', 'o', 'p']  # 不同标记，便于视觉区分
 
-    # Create plots for start and goal positions
+    # 创建起点和目标点的绘图对象
     start_and_goal_plots = []
     for i, path in enumerate(paths):
         marker_idx = i % len(markers)
@@ -82,10 +82,10 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
         sg_plot.set_data([start.x, goal.x], [start.y, goal.y])
         start_and_goal_plots.append(sg_plot)
 
-    # Plot for obstacles
+    # 障碍物绘图对象
     (obs_points,) = ax.plot([], [], "ro", ms=15, label="Obstacles")
 
-    # Create plots for each agent's path
+    # 为每个智能体的路径创建绘图对象
     path_plots = []
     for i, path in enumerate(paths):
         agent_id = start_and_goals[i].index
@@ -95,23 +95,23 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
 
     ax.legend(bbox_to_anchor=(1.05, 1))
 
-    # For stopping simulation with the esc key
+    # 按 esc 键停止仿真
     plt.gcf().canvas.mpl_connect(
         "key_release_event",
         lambda event: [exit(0) if event.key == "escape" else None]
         if isinstance(event, KeyEvent) else None
     )
 
-    # Find the maximum time across all paths
+    # 找出所有路径中的最大时间
     max_time = max(path.goal_reached_time() for path in paths)
 
-    # Animation loop
+    # 动画循环
     for i in range(0, max_time + 1):
-        # Update obstacle positions
+        # 更新障碍物位置
         obs_positions = grid.get_obstacle_positions_at_time(i)
         obs_points.set_data(obs_positions[0], obs_positions[1])
         
-        # Update each agent's position
+        # 更新每个智能体的位置
         for (j, path) in enumerate(paths):
             path_positions = []
             if i <= path.goal_reached_time():
@@ -123,7 +123,7 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
                 if not path_position:
                     raise Exception(f"Path position not found for time {i}.")
 
-                # Verify position is valid
+                # 校验位置是否有效
                 assert not path_position in obs_positions
                 assert not path_position in path_positions
                 path_positions.append(path_position)

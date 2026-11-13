@@ -1,8 +1,8 @@
 """
 
-Car model for Hybrid A* path planning
+用于 Hybrid A* 路径规划的车辆模型
 
-author: Zheng Zh (@Zhengzh)
+作者: Zheng Zh (@Zhengzh)
 
 """
 
@@ -18,16 +18,16 @@ import numpy as np
 
 from utils.angle import rot_mat_2d
 
-WB = 3.0  # rear to front wheel
-W = 2.0  # width of car
-LF = 3.3  # distance from rear to vehicle front end
-LB = 1.0  # distance from rear to vehicle back end
-MAX_STEER = 0.6  # [rad] maximum steering angle
+WB = 3.0  # 后轴到前轴
+W = 2.0  # 车宽
+LF = 3.3  # 后轴到车头的距离
+LB = 1.0  # 后轴到车尾的距离
+MAX_STEER = 0.6  # [rad] 最大转向角
 
-BUBBLE_DIST = (LF - LB) / 2.0  # distance from rear to center of vehicle.
-BUBBLE_R = np.hypot((LF + LB) / 2.0, W / 2.0)  # bubble radius
+BUBBLE_DIST = (LF - LB) / 2.0  # 后轴到车辆中心的距离。
+BUBBLE_R = np.hypot((LF + LB) / 2.0, W / 2.0)  # 包围圆半径
 
-# vehicle rectangle vertices
+# 车辆矩形顶点
 VRX = [LF, LF, -LB, -LB, LF]
 VRY = [W / 2, -W / 2, -W / 2, W / 2, W / 2]
 
@@ -44,13 +44,13 @@ def check_car_collision(x_list, y_list, yaw_list, ox, oy, kd_tree):
 
         if not rectangle_check(i_x, i_y, i_yaw,
                                [ox[i] for i in ids], [oy[i] for i in ids]):
-            return False  # collision
+            return False  # 碰撞
 
-    return True  # no collision
+    return True  # 无碰撞
 
 
 def rectangle_check(x, y, yaw, ox, oy):
-    # transform obstacles to base link frame
+    # 将障碍物变换到车体基坐标系
     rot = rot_mat_2d(yaw)
     for iox, ioy in zip(ox, oy):
         tx = iox - x
@@ -59,13 +59,13 @@ def rectangle_check(x, y, yaw, ox, oy):
         rx, ry = converted_xy[0], converted_xy[1]
 
         if not (rx > LF or rx < -LB or ry > W / 2.0 or ry < -W / 2.0):
-            return False  # collision
+            return False  # 碰撞
 
-    return True  # no collision
+    return True  # 无碰撞
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
-    """Plot arrow."""
+    """绘制箭头。"""
     if not isinstance(x, float):
         for (i_x, i_y, i_yaw) in zip(x, y, yaw):
             plot_arrow(i_x, i_y, i_yaw)
@@ -97,7 +97,7 @@ def pi_2_pi(angle):
 def move(x, y, yaw, distance, steer, L=WB):
     x += distance * cos(yaw)
     y += distance * sin(yaw)
-    yaw = pi_2_pi(yaw + distance * tan(steer) / L)  # distance/2
+    yaw = pi_2_pi(yaw + distance * tan(steer) / L)  # 距离/2
 
     return x, y, yaw
 

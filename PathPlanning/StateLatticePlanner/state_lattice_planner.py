@@ -1,17 +1,16 @@
 """
 
-State lattice planner with model predictive trajectory generator
+结合模型预测轨迹生成器的状态格规划器
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
 
-- plookuptable.csv is generated with this script:
+- plookuptable.csv 由以下脚本生成：
 https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning
 /ModelPredictiveTrajectoryGenerator/lookup_table_generator.py
 
 Reference:
 
-- State Space Sampling of Feasible Motions for High-Performance Mobile Robot
-Navigation in Complex Environments
+- 复杂环境中高性能移动机器人可行运动的状态空间采样
 https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf
 &doi=e2256b5b24137f89e473f01df288cb3aa72e56a0
 
@@ -55,7 +54,7 @@ def get_lookup_table(table_path):
 
 
 def generate_path(target_states, k0):
-    # x, y, yaw, s, km, kf
+    # x, y, yaw（航向角）, s, km, kf
     lookup_table = get_lookup_table(TABLE_PATH)
     result = []
 
@@ -84,19 +83,19 @@ def calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max):
     Parameters
     ----------
     nxy :
-        number of position sampling
+        位置采样数量
     nh :
-        number of heading sampleing
+        航向采样数量
     d :
-        distance of terminal state
+        终端状态的距离
     a_min :
-        position sampling min angle
+        位置采样的最小角度
     a_max :
-        position sampling max angle
+        位置采样的最大角度
     p_min :
-        heading sampling min angle
+        航向采样的最小角度
     p_max :
-        heading sampling max angle
+        航向采样的最大角度
 
     Returns
     -------
@@ -110,19 +109,19 @@ def calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max):
 
 def calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max):
     """
-    calc biased state
+    计算有偏状态
 
-    :param goal_angle: goal orientation for biased sampling
-    :param ns: number of biased sampling
-    :param nxy: number of position sampling
-    :param nxy: number of position sampling
-    :param nh: number of heading sampleing
-    :param d: distance of terminal state
-    :param a_min: position sampling min angle
-    :param a_max: position sampling max angle
-    :param p_min: heading sampling min angle
-    :param p_max: heading sampling max angle
-    :return: states list
+    :param goal_angle: 有偏采样所用的目标航向
+    :param ns: 有偏采样的数量
+    :param nxy: 位置采样数量
+    :param nxy: 位置采样数量
+    :param nh: 航向采样数量
+    :param d: 终端状态的距离
+    :param a_min: 位置采样的最小角度
+    :param a_max: 位置采样的最大角度
+    :param p_min: 航向采样的最小角度
+    :param p_max: 航向采样的最大角度
+    :return: 状态列表
     """
 
     asi = [a_min + (a_max - a_min) * i / (ns - 1) for i in range(ns - 1)]
@@ -131,7 +130,7 @@ def calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_
     cnav_sum = sum(cnav)
     cnav_max = max(cnav)
 
-    # normalize
+    # 归一化
     cnav = [(cnav_max - cnav[i]) / (cnav_max * ns - cnav_sum)
             for i in range(ns - 1)]
 
@@ -153,15 +152,15 @@ def calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_
 def calc_lane_states(l_center, l_heading, l_width, v_width, d, nxy):
     """
 
-    calc lane states
+    计算车道状态
 
-    :param l_center: lane lateral position
-    :param l_heading:  lane heading
-    :param l_width:  lane width
-    :param v_width: vehicle width
-    :param d: longitudinal position
-    :param nxy: sampling number
-    :return: state list
+    :param l_center: 车道横向位置
+    :param l_heading: 车道航向角
+    :param l_width: 车道宽度
+    :param v_width: 车辆宽度
+    :param d: 纵向位置
+    :param nxy: 采样数量
+    :return: 状态列表
     """
     xc = d
     yc = l_center

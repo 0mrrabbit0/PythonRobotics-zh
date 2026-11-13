@@ -1,10 +1,10 @@
 """
 
-Quintic Polynomials Planner
+五次多项式规划器
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者: Atsushi Sakai (@Atsushi_twi)
 
-Reference:
+参考文献:
 
 - [Local Path planning And Motion Control For Agv In Positioning](https://ieeexplore.ieee.org/document/637936/)
 
@@ -15,9 +15,9 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-# parameter
-MAX_T = 100.0  # maximum time to the goal [s]
-MIN_T = 5.0  # minimum time to the goal[s]
+# 参数
+MAX_T = 100.0  # 到达目标点的最长时间 [s]
+MIN_T = 5.0  # 到达目标点的最短时间[s]
 
 show_animation = True
 
@@ -25,8 +25,8 @@ show_animation = True
 class QuinticPolynomial:
 
     def __init__(self, xs, vxs, axs, xe, vxe, axe, time):
-        # calc coefficient of quintic polynomial
-        # See jupyter notebook document for derivation of this equation.
+        # 计算五次多项式系数
+        # 该方程的推导见 Jupyter notebook 文档。
         self.a0 = xs
         self.a1 = vxs
         self.a2 = axs / 2.0
@@ -68,28 +68,28 @@ class QuinticPolynomial:
 
 def quintic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt):
     """
-    quintic polynomial planner
+    五次多项式规划器
 
-    input
-        s_x: start x position [m]
-        s_y: start y position [m]
-        s_yaw: start yaw angle [rad]
-        sa: start accel [m/ss]
-        gx: goal x position [m]
-        gy: goal y position [m]
-        gyaw: goal yaw angle [rad]
-        ga: goal accel [m/ss]
-        max_accel: maximum accel [m/ss]
-        max_jerk: maximum jerk [m/sss]
-        dt: time tick [s]
+    输入
+        s_x: 起点 x 位置 [m]
+        s_y: 起点 y 位置 [m]
+        s_yaw: 起点航向角 [rad]
+        sa: 起点加速度 [m/ss]
+        gx: 目标点 x 位置 [m]
+        gy: 目标点 y 位置 [m]
+        gyaw: 目标点航向角 [rad]
+        ga: 目标点加速度 [m/ss]
+        max_accel: 最大加速度 [m/ss]
+        max_jerk: 最大加加速度 [m/sss]
+        dt: 时间步长 [s]
 
-    return
-        time: time result
-        rx: x position result list
-        ry: y position result list
-        ryaw: yaw angle result list
-        rv: velocity result list
-        ra: accel result list
+    返回
+        time: 时间结果
+        rx: x 位置结果列表
+        ry: y 位置结果列表
+        ryaw: 航向角结果列表
+        rv: 速度结果列表
+        ra: 加速度结果列表
 
     """
 
@@ -144,7 +144,7 @@ def quintic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_
     if show_animation:  # pragma: no cover
         for i, _ in enumerate(time):
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 Esc 键停止仿真。
             plt.gcf().canvas.mpl_connect('key_release_event',
                                          lambda event: [exit(0) if event.key == 'escape' else None])
             plt.grid(True)
@@ -164,7 +164,7 @@ def quintic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
     """
-    Plot arrow
+    绘制箭头
     """
 
     if not isinstance(x, float):
@@ -179,19 +179,19 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no 
 def main():
     print(__file__ + " start!!")
 
-    sx = 10.0  # start x position [m]
-    sy = 10.0  # start y position [m]
-    syaw = np.deg2rad(10.0)  # start yaw angle [rad]
-    sv = 1.0  # start speed [m/s]
-    sa = 0.1  # start accel [m/ss]
-    gx = 30.0  # goal x position [m]
-    gy = -10.0  # goal y position [m]
-    gyaw = np.deg2rad(20.0)  # goal yaw angle [rad]
-    gv = 1.0  # goal speed [m/s]
-    ga = 0.1  # goal accel [m/ss]
-    max_accel = 1.0  # max accel [m/ss]
-    max_jerk = 0.5  # max jerk [m/sss]
-    dt = 0.1  # time tick [s]
+    sx = 10.0  # 起点 x 位置 [m]
+    sy = 10.0  # 起点 y 位置 [m]
+    syaw = np.deg2rad(10.0)  # 起点航向角 [rad]
+    sv = 1.0  # 起点速度 [m/s]
+    sa = 0.1  # 起点加速度 [m/ss]
+    gx = 30.0  # 目标点 x 位置 [m]
+    gy = -10.0  # 目标点 y 位置 [m]
+    gyaw = np.deg2rad(20.0)  # 目标点航向角 [rad]
+    gv = 1.0  # 目标点速度 [m/s]
+    ga = 0.1  # 目标点加速度 [m/ss]
+    max_accel = 1.0  # 最大加速度 [m/ss]
+    max_jerk = 0.5  # 最大加加速度 [m/sss]
+    dt = 0.1  # 时间步长 [s]
 
     time, x, y, yaw, v, a, j = quintic_polynomials_planner(
         sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt)

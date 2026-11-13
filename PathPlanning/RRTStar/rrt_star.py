@@ -1,8 +1,8 @@
 """
 
-Path planning Sample Code with RRT*
+RRT* 路径规划示例代码
 
-author: Atsushi Sakai(@Atsushi_twi)
+作者: Atsushi Sakai(@Atsushi_twi)
 
 """
 
@@ -19,7 +19,7 @@ show_animation = True
 
 class RRTStar(RRT):
     """
-    Class for RRT Star planning
+    RRT* 规划类
     """
 
     class Node(RRT.Node):
@@ -40,12 +40,12 @@ class RRTStar(RRT):
                  search_until_max_iter=False,
                  robot_radius=0.0):
         """
-        Setting Parameter
+        参数设置
 
-        start:Start Position [x,y]
-        goal:Goal Position [x,y]
-        obstacleList:obstacle Positions [[x,y,size],...]
-        randArea:Random Sampling Area [min,max]
+        start:起点位置 [x,y]
+        goal:目标点位置 [x,y]
+        obstacleList:障碍物位置 [[x,y,尺寸],...]
+        randArea:随机采样区域 [min,max]
 
         """
         super().__init__(start, goal, obstacle_list, rand_area, expand_dis,
@@ -58,9 +58,9 @@ class RRTStar(RRT):
 
     def planning(self, animation=True):
         """
-        rrt star path planning
+        RRT* 路径规划
 
-        animation: flag for animation on or off .
+        animation: 是否开启动画的标志。
         """
 
         self.node_list = [self.start]
@@ -90,7 +90,7 @@ class RRTStar(RRT):
                 self.draw_graph(rnd)
 
             if ((not self.search_until_max_iter)
-                    and new_node):  # if reaches goal
+                    and new_node):  # 若到达目标点
                 last_index = self.search_best_goal_node()
                 if last_index is not None:
                     return self.generate_final_course(last_index)
@@ -105,24 +105,24 @@ class RRTStar(RRT):
 
     def choose_parent(self, new_node, near_inds):
         """
-        Computes the cheapest point to new_node contained in the list
-        near_inds and set such a node as the parent of new_node.
+        在 near_inds 列表中计算到达 new_node 代价最小的点，
+        并将该节点设为 new_node 的父节点。
             Arguments:
             --------
                 new_node, Node
-                    randomly generated node with a path from its neared point
-                    There are not coalitions between this node and th tree.
+                    从其邻近点连出路径的随机生成节点。
+                    该节点与树之间不存在碰撞。
                 near_inds: list
-                    Indices of indices of the nodes what are near to new_node
+                    靠近 new_node 的节点索引
 
             Returns.
             ------
-                Node, a copy of new_node
+                Node, new_node 的一个副本
         """
         if not near_inds:
             return None
 
-        # search nearest cost in near_inds
+        # 在 near_inds 中搜索最小代价
         costs = []
         for i in near_inds:
             near_node = self.node_list[i]
@@ -131,7 +131,7 @@ class RRTStar(RRT):
                     t_node, self.obstacle_list, self.robot_radius):
                 costs.append(self.calc_new_cost(near_node, new_node))
             else:
-                costs.append(float("inf"))  # the cost of collision node
+                costs.append(float("inf"))  # 碰撞节点的代价
         min_cost = min(costs)
 
         if min_cost == float("inf"):
@@ -176,23 +176,21 @@ class RRTStar(RRT):
 
     def find_near_nodes(self, new_node):
         """
-        1) defines a ball centered on new_node
-        2) Returns all nodes of the three that are inside this ball
+        1) 定义一个以 new_node 为中心的球
+        2) 返回该球内树上的全部节点
             Arguments:
             ---------
                 new_node: Node
-                    new randomly generated node, without collisions between
-                    its nearest node
+                    新随机生成的节点，与其最近节点之间无碰撞
             Returns:
             -------
                 list
-                    List with the indices of the nodes inside the ball of
-                    radius r
+                    半径为 r 的球内节点的索引列表
         """
         nnode = len(self.node_list) + 1
         r = self.connect_circle_dist * math.sqrt(math.log(nnode) / nnode)
-        # if expand_dist exists, search vertices in a range no more than
-        # expand_dist
+        # 若存在 expand_dist，则在不超过
+        # expand_dist 的范围内搜索顶点
         if hasattr(self, 'expand_dis'):
             r = min(r, self.expand_dis)
         dist_list = [(node.x - new_node.x)**2 + (node.y - new_node.y)**2
@@ -202,19 +200,17 @@ class RRTStar(RRT):
 
     def rewire(self, new_node, near_inds):
         """
-            For each node in near_inds, this will check if it is cheaper to
-            arrive to them from new_node.
-            In such a case, this will re-assign the parent of the nodes in
-            near_inds to new_node.
+            对 near_inds 中的每个节点，检查从 new_node 到达它们
+            是否代价更低。
+            若是，则将这些节点的父节点重新指定为 new_node。
             Parameters:
             ----------
                 new_node, Node
-                    Node randomly added which can be joined to the tree
+                    随机加入、可连接到树上的节点
 
-                near_inds, list of uints
-                    A list of indices of the self.new_node which contains
-                    nodes within a circle of a given radius.
-            Remark: parent is designated in choose_parent.
+                near_inds, 无符号整数列表
+                    self.new_node 的索引列表，包含给定半径圆内的节点。
+            备注: 父节点在 choose_parent 中指定。
 
         """
         for i in near_inds:
@@ -250,7 +246,7 @@ class RRTStar(RRT):
 def main():
     print("Start " + __file__)
 
-    # ====Search Path with RRT====
+    # ====使用 RRT 搜索路径====
     obstacle_list = [
         (5, 5, 1),
         (3, 6, 2),
@@ -260,9 +256,9 @@ def main():
         (9, 5, 2),
         (8, 10, 1),
         (6, 12, 1),
-    ]  # [x,y,size(radius)]
+    ]  # [x,y,尺寸(半径)]
 
-    # Set Initial parameters
+    # 设置初始参数
     rrt_star = RRTStar(
         start=[0, 0],
         goal=[6, 10],
@@ -277,7 +273,7 @@ def main():
     else:
         print("found path!!")
 
-        # Draw final path
+        # 绘制最终路径
         if show_animation:
             rrt_star.draw_graph()
             plt.plot([x for (x, y) in path], [y for (x, y) in path], 'r--')

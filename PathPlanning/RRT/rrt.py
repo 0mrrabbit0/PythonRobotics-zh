@@ -1,8 +1,8 @@
 """
 
-Path planning Sample Code with Randomized Rapidly-Exploring Random Trees (RRT)
+使用随机快速扩展随机树（RRT）的路径规划示例代码
 
-author: AtsushiSakai(@Atsushi_twi)
+作者: AtsushiSakai(@Atsushi_twi)
 
 """
 
@@ -17,12 +17,12 @@ show_animation = True
 
 class RRT:
     """
-    Class for RRT planning
+    RRT 路径规划类
     """
 
     class Node:
         """
-        RRT Node
+        RRT 节点
         """
 
         def __init__(self, x, y):
@@ -54,14 +54,14 @@ class RRT:
                  robot_radius=0.0,
                  ):
         """
-        Setting Parameter
+        参数设置
 
-        start:Start Position [x,y]
-        goal:Goal Position [x,y]
-        obstacleList:obstacle Positions [[x,y,size],...]
-        randArea:Random Sampling Area [min,max]
-        play_area:stay inside this area [xmin,xmax,ymin,ymax]
-        robot_radius: robot body modeled as circle with given radius
+        start:起点位置 [x,y]
+        goal:目标点位置 [x,y]
+        obstacleList:障碍物位置 [[x,y,size],...]
+        randArea:随机采样区域 [min,max]
+        play_area:必须停留在该区域内 [xmin,xmax,ymin,ymax]
+        robot_radius: 机器人本体建模为给定半径的圆
 
         """
         self.start = self.Node(start[0], start[1])
@@ -82,9 +82,9 @@ class RRT:
 
     def planning(self, animation=True):
         """
-        rrt path planning
+        RRT 路径规划
 
-        animation: flag for animation on or off
+        animation: 动画开关标志
         """
 
         self.node_list = [self.start]
@@ -114,7 +114,7 @@ class RRT:
             if animation and i % 5:
                 self.draw_graph(rnd_node)
 
-        return None  # cannot find path
+        return None  # 找不到路径
 
     def steer(self, from_node, to_node, extend_length=float("inf")):
 
@@ -166,13 +166,13 @@ class RRT:
             rnd = self.Node(
                 random.uniform(self.min_rand, self.max_rand),
                 random.uniform(self.min_rand, self.max_rand))
-        else:  # goal point sampling
+        else:  # 目标点采样
             rnd = self.Node(self.end.x, self.end.y)
         return rnd
 
     def draw_graph(self, rnd=None):
         plt.clf()
-        # for stopping simulation with the esc key.
+        # 按 esc 键停止仿真。
         plt.gcf().canvas.mpl_connect(
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
@@ -223,13 +223,13 @@ class RRT:
     def check_if_outside_play_area(node, play_area):
 
         if play_area is None:
-            return True  # no play_area was defined, every pos should be ok
+            return True  # 未定义 play_area，任意位置均可
 
         if node.x < play_area.xmin or node.x > play_area.xmax or \
            node.y < play_area.ymin or node.y > play_area.ymax:
-            return False  # outside - bad
+            return False  # 在区域外，不可用
         else:
-            return True  # inside - ok
+            return True  # 在区域内，可用
 
     @staticmethod
     def check_collision(node, obstacleList, robot_radius):
@@ -243,9 +243,9 @@ class RRT:
             d_list = [dx * dx + dy * dy for (dx, dy) in zip(dx_list, dy_list)]
 
             if min(d_list) <= (size+robot_radius)**2:
-                return False  # collision
+                return False  # 碰撞
 
-        return True  # safe
+        return True  # 安全
 
     @staticmethod
     def calc_distance_and_angle(from_node, to_node):
@@ -259,10 +259,10 @@ class RRT:
 def main(gx=6.0, gy=10.0):
     print("start " + __file__)
 
-    # ====Search Path with RRT====
+    # ====使用 RRT 搜索路径====
     obstacleList = [(5, 5, 1), (3, 6, 2), (3, 8, 2), (3, 10, 2), (7, 5, 2),
-                    (9, 5, 2), (8, 10, 1)]  # [x, y, radius]
-    # Set Initial parameters
+                    (9, 5, 2), (8, 10, 1)]  # [x, y, 半径]
+    # 设置初始参数
     rrt = RRT(
         start=[0, 0],
         goal=[gx, gy],
@@ -278,12 +278,12 @@ def main(gx=6.0, gy=10.0):
     else:
         print("found path!!")
 
-        # Draw final path
+        # 绘制最终路径
         if show_animation:
             rrt.draw_graph()
             plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
             plt.grid(True)
-            plt.pause(0.01)  # Need for Mac
+            plt.pause(0.01)  # Mac 上需要
             plt.show()
 
 

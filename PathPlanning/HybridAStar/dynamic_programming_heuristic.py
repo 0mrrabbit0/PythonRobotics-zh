@@ -1,10 +1,10 @@
 """
 
-A* grid based planning
+基于栅格的 A* 路径规划
 
-author: Nikos Kanargias (nkana@tee.gr)
+作者: Nikos Kanargias (nkana@tee.gr)
 
-See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
+参见维基百科条目 (https://en.wikipedia.org/wiki/A*_search_algorithm)
 
 """
 
@@ -30,7 +30,7 @@ class Node:
 
 
 def calc_final_path(goal_node, closed_node_set, resolution):
-    # generate final course
+    # 生成最终路径
     rx, ry = [goal_node.x * resolution], [goal_node.y * resolution]
     parent_index = goal_node.parent_index
     while parent_index != -1:
@@ -44,12 +44,12 @@ def calc_final_path(goal_node, closed_node_set, resolution):
 
 def calc_distance_heuristic(gx, gy, ox, oy, resolution, rr):
     """
-    gx: goal x position [m]
-    gx: goal x position [m]
-    ox: x position list of Obstacles [m]
-    oy: y position list of Obstacles [m]
-    resolution: grid resolution [m]
-    rr: robot radius[m]
+    gx: 目标点 x 位置 [m]
+    gx: 目标点 x 位置 [m]
+    ox: 障碍物的 x 位置列表 [m]
+    oy: 障碍物的 y 位置列表 [m]
+    resolution: 栅格分辨率 [m]
+    rr: 机器人半径[m]
     """
 
     goal_node = Node(round(gx / resolution), round(gy / resolution), 0.0, -1)
@@ -76,19 +76,19 @@ def calc_distance_heuristic(gx, gy, ox, oy, resolution, rr):
         else:
             continue
 
-        # show graph
+        # 显示图形
         if show_animation:  # pragma: no cover
             plt.plot(current.x * resolution, current.y * resolution, "xc")
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
             if len(closed_set.keys()) % 10 == 0:
                 plt.pause(0.001)
 
-        # Remove the item from the open set
+        # 从开集中移除该项
 
-        # expand search grid based on motion model
+        # 基于运动模型扩展搜索栅格
         for i, _ in enumerate(motion):
             node = Node(current.x + motion[i][0],
                         current.y + motion[i][1],
@@ -102,13 +102,13 @@ def calc_distance_heuristic(gx, gy, ox, oy, resolution, rr):
                 continue
 
             if n_id not in open_set:
-                open_set[n_id] = node  # Discover a new node
+                open_set[n_id] = node  # 发现新节点
                 heapq.heappush(
                     priority_queue,
                     (node.cost, calc_index(node, x_w, min_x, min_y)))
             else:
                 if open_set[n_id].cost >= node.cost:
-                    # This path is the best until now. record it!
+                    # 这是目前最优路径，记录它！
                     open_set[n_id] = node
                     heapq.heappush(
                         priority_queue,
@@ -142,7 +142,7 @@ def calc_obstacle_map(ox, oy, resolution, vr):
     x_width = round(max_x - min_x)
     y_width = round(max_y - min_y)
 
-    # obstacle map generation
+    # 生成障碍物地图
     obstacle_map = [[False for _ in range(y_width)] for _ in range(x_width)]
     for ix in range(x_width):
         x = ix + min_x
@@ -163,7 +163,7 @@ def calc_index(node, x_width, x_min, y_min):
 
 
 def get_motion_model():
-    # dx, dy, cost
+    # dx, dy, 代价
     motion = [[1, 0, 1],
               [0, 1, 1],
               [-1, 0, 1],

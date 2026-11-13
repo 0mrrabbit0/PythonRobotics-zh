@@ -1,10 +1,10 @@
 """
 
-Bidirectional Breadth-First grid planning
+双向广度优先栅格规划
 
-author: Erwin Lejeune (@spida_rwin)
+作者: Erwin Lejeune (@spida_rwin)
 
-See Wikipedia article (https://en.wikipedia.org/wiki/Breadth-first_search)
+参见维基百科条目 (https://en.wikipedia.org/wiki/Breadth-first_search)
 
 """
 
@@ -19,12 +19,12 @@ class BidirectionalBreadthFirstSearchPlanner:
 
     def __init__(self, ox, oy, resolution, rr):
         """
-        Initialize grid map for bfs planning
+        为广度优先搜索规划初始化栅格地图
 
-        ox: x position list of Obstacles [m]
-        oy: y position list of Obstacles [m]
-        resolution: grid resolution [m]
-        rr: robot radius[m]
+        ox: 障碍物的 x 位置列表 [m]
+        oy: 障碍物的 y 位置列表 [m]
+        resolution: 栅格分辨率 [m]
+        rr: 机器人半径[m]
         """
 
         self.min_x, self.min_y = None, None
@@ -37,8 +37,8 @@ class BidirectionalBreadthFirstSearchPlanner:
 
     class Node:
         def __init__(self, x, y, cost, parent_index, parent):
-            self.x = x  # index of grid
-            self.y = y  # index of grid
+            self.x = x  # 栅格索引
+            self.y = y  # 栅格索引
             self.cost = cost
             self.parent_index = parent_index
             self.parent = parent
@@ -49,17 +49,17 @@ class BidirectionalBreadthFirstSearchPlanner:
 
     def planning(self, sx, sy, gx, gy):
         """
-        Bidirectional Breadth First search based planning
+        基于双向广度优先搜索的规划
 
-        input:
-            s_x: start x position [m]
-            s_y: start y position [m]
-            gx: goal x position [m]
-            gy: goal y position [m]
+        输入:
+            s_x: 起点 x 位置 [m]
+            s_y: 起点 y 位置 [m]
+            gx: 目标点 x 位置 [m]
+            gy: 目标点 y 位置 [m]
 
-        output:
-            rx: x position list of the final path
-            ry: y position list of the final path
+        输出:
+            rx: 最终路径的 x 位置列表
+            ry: 最终路径的 y 位置列表
         """
 
         start_node = self.Node(self.calc_xy_index(sx, self.min_x),
@@ -94,7 +94,7 @@ class BidirectionalBreadthFirstSearchPlanner:
             closed_set_A[c_id_A] = current_A
             closed_set_B[c_id_B] = current_B
 
-            # show graph
+            # 显示搜索图
             if show_animation:  # pragma: no cover
                 plt.plot(self.calc_grid_position(current_A.x, self.min_x),
                          self.calc_grid_position(current_A.y, self.min_y),
@@ -102,7 +102,7 @@ class BidirectionalBreadthFirstSearchPlanner:
                 plt.plot(self.calc_grid_position(current_B.x, self.min_x),
                          self.calc_grid_position(current_B.y, self.min_y),
                          "xc")
-                # for stopping simulation with the esc key.
+                # 按 Esc 键停止仿真。
                 plt.gcf().canvas.mpl_connect(
                     'key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
@@ -121,7 +121,7 @@ class BidirectionalBreadthFirstSearchPlanner:
                 meet_point_B = closed_set_B[c_id_B]
                 break
 
-            # expand_grid search grid based on motion model
+            # 基于运动模型扩展搜索栅格
             for i, _ in enumerate(self.motion):
                 breakA = False
                 breakB = False
@@ -138,7 +138,7 @@ class BidirectionalBreadthFirstSearchPlanner:
                 n_id_A = self.calc_grid_index(node_A)
                 n_id_B = self.calc_grid_index(node_B)
 
-                # If the node is not safe, do nothing
+                # 若节点不安全，则不做处理
                 if not self.verify_node(node_A):
                     breakA = True
 
@@ -159,7 +159,7 @@ class BidirectionalBreadthFirstSearchPlanner:
             meet_point_A, meet_point_B, closed_set_A, closed_set_B)
         return rx, ry
 
-    # takes both set and meeting nodes and calculate optimal path
+    # 根据两侧集合与汇合节点计算最优路径
     def calc_final_path_bidir(self, n1, n2, setA, setB):
         rxA, ryA = self.calc_final_path(n1, setA)
         rxB, ryB = self.calc_final_path(n2, setB)
@@ -173,7 +173,7 @@ class BidirectionalBreadthFirstSearchPlanner:
         return rx, ry
 
     def calc_final_path(self, goal_node, closed_set):
-        # generate final course
+        # 生成最终路径
         rx, ry = [self.calc_grid_position(goal_node.x, self.min_x)], [
             self.calc_grid_position(goal_node.y, self.min_y)]
         n = closed_set[goal_node.parent_index]
@@ -186,7 +186,7 @@ class BidirectionalBreadthFirstSearchPlanner:
 
     def calc_grid_position(self, index, min_position):
         """
-        calc grid position
+        计算栅格位置
 
         :param index:
         :param min_position:
@@ -214,7 +214,7 @@ class BidirectionalBreadthFirstSearchPlanner:
         elif py >= self.max_y:
             return False
 
-        # collision check
+        # 碰撞检测
         if self.obstacle_map[node.x][node.y]:
             return False
 
@@ -236,7 +236,7 @@ class BidirectionalBreadthFirstSearchPlanner:
         print("x_width:", self.x_width)
         print("y_width:", self.y_width)
 
-        # obstacle map generation
+        # 生成障碍物地图
         self.obstacle_map = [[False for _ in range(self.y_width)]
                              for _ in range(self.x_width)]
         for ix in range(self.x_width):
@@ -251,7 +251,7 @@ class BidirectionalBreadthFirstSearchPlanner:
 
     @staticmethod
     def get_motion_model():
-        # dx, dy, cost
+        # dx, dy, 代价
         motion = [[1, 0, 1],
                   [0, 1, 1],
                   [-1, 0, 1],
@@ -267,7 +267,7 @@ class BidirectionalBreadthFirstSearchPlanner:
 def main():
     print(__file__ + " start!!")
 
-    # start and goal position
+    # 起点与目标点位置
     sx = 10.0  # [m]
     sy = 10.0  # [m]
     gx = 50.0  # [m]
@@ -275,7 +275,7 @@ def main():
     grid_size = 2.0  # [m]
     robot_radius = 1.0  # [m]
 
-    # set obstacle positions
+    # 设置障碍物位置
     ox, oy = [], []
     for i in range(-10, 60):
         ox.append(i)

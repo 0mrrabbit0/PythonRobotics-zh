@@ -1,7 +1,7 @@
 """
-Cubic spline planner
+三次样条规划器
 
-Author: Atsushi Sakai(@Atsushi_twi)
+作者：Atsushi Sakai(@Atsushi_twi)
 
 """
 import math
@@ -11,20 +11,20 @@ import bisect
 
 class CubicSpline1D:
     """
-    1D Cubic Spline class
+    一维三次样条类
 
     Parameters
     ----------
     x : list
-        x coordinates for data points. This x coordinates must be
-        sorted
-        in ascending order.
+        数据点的 x 坐标。这些 x 坐标必须
+        按升序
+        排列。
     y : list
-        y coordinates for data points
+        数据点的 y 坐标
 
     Examples
     --------
-    You can interpolate 1D data points.
+    可以对一维数据点进行插值。
 
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
@@ -52,17 +52,17 @@ class CubicSpline1D:
         self.a, self.b, self.c, self.d = [], [], [], []
         self.x = x
         self.y = y
-        self.nx = len(x)  # dimension of x
+        self.nx = len(x)  # x 的维数
 
-        # calc coefficient a
+        # 计算系数 a
         self.a = [iy for iy in y]
 
-        # calc coefficient c
+        # 计算系数 c
         A = self.__calc_A(h)
         B = self.__calc_B(h, self.a)
         self.c = np.linalg.solve(A, B)
 
-        # calc spline coefficient b and d
+        # 计算样条系数 b 和 d
         for i in range(self.nx - 1):
             d = (self.c[i + 1] - self.c[i]) / (3.0 * h[i])
             b = 1.0 / h[i] * (self.a[i + 1] - self.a[i]) \
@@ -72,19 +72,19 @@ class CubicSpline1D:
 
     def calc_position(self, x):
         """
-        Calc `y` position for given `x`.
+        计算给定 `x` 处的 `y` 位置。
 
-        if `x` is outside the data point's `x` range, return None.
+        若 `x` 超出数据点的 `x` 范围，则返回 None。
 
         Parameters
         ----------
         x : float
-            x position to calculate y.
+            用于计算 y 的 x 位置。
 
         Returns
         -------
         y : float
-            y position for given x.
+            给定 x 对应的 y 位置。
         """
         if x < self.x[0]:
             return None
@@ -100,19 +100,19 @@ class CubicSpline1D:
 
     def calc_first_derivative(self, x):
         """
-        Calc first derivative at given x.
+        计算给定 x 处的一阶导数。
 
-        if x is outside the input x, return None
+        若 x 超出输入 x 的范围，则返回 None
 
         Parameters
         ----------
         x : float
-            x position to calculate first derivative.
+            用于计算一阶导数的 x 位置。
 
         Returns
         -------
         dy : float
-            first derivative for given x.
+            给定 x 对应的一阶导数。
         """
 
         if x < self.x[0]:
@@ -127,19 +127,19 @@ class CubicSpline1D:
 
     def calc_second_derivative(self, x):
         """
-        Calc second derivative at given x.
+        计算给定 x 处的二阶导数。
 
-        if x is outside the input x, return None
+        若 x 超出输入 x 的范围，则返回 None
 
         Parameters
         ----------
         x : float
-            x position to calculate second derivative.
+            用于计算二阶导数的 x 位置。
 
         Returns
         -------
         ddy : float
-            second derivative for given x.
+            给定 x 对应的二阶导数。
         """
 
         if x < self.x[0]:
@@ -154,19 +154,19 @@ class CubicSpline1D:
 
     def calc_third_derivative(self, x):
         """
-        Calc third derivative at given x.
+        计算给定 x 处的三阶导数。
 
-        if x is outside the input x, return None
+        若 x 超出输入 x 的范围，则返回 None
 
         Parameters
         ----------
         x : float
-            x position to calculate third derivative.
+            用于计算三阶导数的 x 位置。
 
         Returns
         -------
         dddy : float
-            third derivative for given x.
+            给定 x 对应的三阶导数。
         """
         if x < self.x[0]:
             return None
@@ -179,13 +179,13 @@ class CubicSpline1D:
 
     def __search_index(self, x):
         """
-        search data segment index
+        搜索数据段索引
         """
         return bisect.bisect(self.x, x) - 1
 
     def __calc_A(self, h):
         """
-        calc matrix A for spline coefficient c
+        计算样条系数 c 所用的矩阵 A
         """
         A = np.zeros((self.nx, self.nx))
         A[0, 0] = 1.0
@@ -202,7 +202,7 @@ class CubicSpline1D:
 
     def __calc_B(self, h, a):
         """
-        calc matrix B for spline coefficient c
+        计算样条系数 c 所用的矩阵 B
         """
         B = np.zeros(self.nx)
         for i in range(self.nx - 2):
@@ -213,18 +213,18 @@ class CubicSpline1D:
 
 class CubicSpline2D:
     """
-    Cubic CubicSpline2D class
+    二维三次样条 CubicSpline2D 类
 
     Parameters
     ----------
     x : list
-        x coordinates for data points.
+        数据点的 x 坐标。
     y : list
-        y coordinates for data points.
+        数据点的 y 坐标。
 
     Examples
     --------
-    You can interpolate a 2D data points.
+    可以对二维数据点进行插值。
 
     >>> import matplotlib.pyplot as plt
     >>> x = [-2.5, 0.0, 2.5, 5.0, 7.5, 3.0, -1.0]
@@ -285,20 +285,20 @@ class CubicSpline2D:
 
     def calc_position(self, s):
         """
-        calc position
+        计算位置
 
         Parameters
         ----------
         s : float
-            distance from the start point. if `s` is outside the data point's
-            range, return None.
+            距起点的距离。若 `s` 超出数据点
+            范围，则返回 None。
 
         Returns
         -------
         x : float
-            x position for given s.
+            给定 s 对应的 x 位置。
         y : float
-            y position for given s.
+            给定 s 对应的 y 位置。
         """
         x = self.sx.calc_position(s)
         y = self.sy.calc_position(s)
@@ -307,18 +307,18 @@ class CubicSpline2D:
 
     def calc_curvature(self, s):
         """
-        calc curvature
+        计算曲率
 
         Parameters
         ----------
         s : float
-            distance from the start point. if `s` is outside the data point's
-            range, return None.
+            距起点的距离。若 `s` 超出数据点
+            范围，则返回 None。
 
         Returns
         -------
         k : float
-            curvature for given s.
+            给定 s 对应的曲率。
         """
         dx = self.sx.calc_first_derivative(s)
         ddx = self.sx.calc_second_derivative(s)
@@ -329,18 +329,18 @@ class CubicSpline2D:
 
     def calc_curvature_rate(self, s):
         """
-        calc curvature rate
+        计算曲率变化率
 
         Parameters
         ----------
         s : float
-            distance from the start point. if `s` is outside the data point's
-            range, return None.
+            距起点的距离。若 `s` 超出数据点
+            范围，则返回 None。
 
         Returns
         -------
         k : float
-            curvature rate for given s.
+            给定 s 对应的曲率变化率。
         """
         dx = self.sx.calc_first_derivative(s)
         dy = self.sy.calc_first_derivative(s)
@@ -356,18 +356,18 @@ class CubicSpline2D:
 
     def calc_yaw(self, s):
         """
-        calc yaw
+        计算航向角
 
         Parameters
         ----------
         s : float
-            distance from the start point. if `s` is outside the data point's
-            range, return None.
+            距起点的距离。若 `s` 超出数据点
+            范围，则返回 None。
 
         Returns
         -------
         yaw : float
-            yaw angle (tangent vector) for given s.
+            给定 s 对应的航向角（切向量）。
         """
         dx = self.sx.calc_first_derivative(s)
         dy = self.sy.calc_first_derivative(s)
@@ -411,7 +411,7 @@ def main_2d():  # pragma: no cover
     import matplotlib.pyplot as plt
     x = [-2.5, 0.0, 2.5, 5.0, 7.5, 3.0, -1.0]
     y = [0.7, -6, 5, 6.5, 0.0, 5.0, -2.0]
-    ds = 0.1  # [m] distance of each interpolated points
+    ds = 0.1  # [m] 各插值点之间的距离
 
     sp = CubicSpline2D(x, y)
     s = np.arange(0, sp.s[-1], ds)

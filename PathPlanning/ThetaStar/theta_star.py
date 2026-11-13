@@ -1,10 +1,10 @@
 """
 
-Theta* grid planning
+Theta* 栅格路径规划
 
-author: Musab Kasbati (@Musab1Blaser)
+作者：Musab Kasbati (@Musab1Blaser)
 
-See Wikipedia article (https://cdn.aaai.org/AAAI/2007/AAAI07-187.pdf)
+参见论文 (https://cdn.aaai.org/AAAI/2007/AAAI07-187.pdf)
 
 """
 
@@ -20,12 +20,12 @@ class ThetaStarPlanner:
 
     def __init__(self, ox, oy, resolution, rr):
         """
-        Initialize grid map for theta star planning
+        为 Theta* 规划初始化栅格地图
 
-        ox: x position list of Obstacles [m]
-        oy: y position list of Obstacles [m]
-        resolution: grid resolution [m]
-        rr: robot radius[m]
+        ox：障碍物的 x 坐标列表 [m]
+        oy：障碍物的 y 坐标列表 [m]
+        resolution：栅格分辨率 [m]
+        rr：机器人半径 [m]
         """
 
         self.resolution = resolution
@@ -39,8 +39,8 @@ class ThetaStarPlanner:
 
     class Node:
         def __init__(self, x, y, cost, parent_index):
-            self.x = x  # index of grid
-            self.y = y  # index of grid
+            self.x = x  # 栅格索引
+            self.y = y  # 栅格索引
             self.cost = cost
             self.parent_index = parent_index
 
@@ -50,17 +50,17 @@ class ThetaStarPlanner:
 
     def planning(self, sx, sy, gx, gy): 
         """
-        Theta star path search
+        Theta* 路径搜索
 
-        input:
-            s_x: start x position [m]
-            s_y: start y position [m]
-            gx: goal x position [m]
-            gy: goal y position [m]
+        输入：
+            s_x：起点 x 坐标 [m]
+            s_y：起点 y 坐标 [m]
+            gx：目标点 x 坐标 [m]
+            gy：目标点 y 坐标 [m]
 
-        output:
-            rx: x position list of the final path
-            ry: y position list of the final path
+        输出：
+            rx：最终路径的 x 坐标列表
+            ry：最终路径的 y 坐标列表
         """
 
         start_node = self.Node(self.calc_xy_index(sx, self.min_x),
@@ -83,32 +83,32 @@ class ThetaStarPlanner:
                                                                          o]))
             current = open_set[c_id]
 
-            # show graph
+            # 显示搜索过程
             if show_animation:  # pragma: no cover
                 x = self.calc_grid_position(current.x, self.min_x)
                 y = self.calc_grid_position(current.y, self.min_y)
 
-                # Draw an arrow toward the parent
+                # 绘制指向父节点的箭头
                 if current.parent_index != -1 and current.parent_index in closed_set:
                     parent = closed_set[current.parent_index]
                     px = self.calc_grid_position(parent.x, self.min_x)
                     py = self.calc_grid_position(parent.y, self.min_y)
 
-                    # Vector from current to parent
+                    # 从当前节点指向父节点的向量
                     dx = px - x
                     dy = py - y
 
-                    # scale down vector for visibility
+                    # 缩小向量以便观察
                     norm = math.hypot(dx, dy)
                     dx /= norm
                     dy /= norm
 
-                    # Draw a small arrow (scale it down for visibility)
+                    # 绘制小箭头（缩小以便观察）
                     plt.arrow(x, y, dx, dy,
                             head_width=0.5, head_length=0.5,
                             fc='c', ec='c', alpha=0.7)
 
-                # For stopping simulation with the esc key
+                # 按 Esc 键停止仿真
                 plt.gcf().canvas.mpl_connect(
                     'key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None]
@@ -123,17 +123,17 @@ class ThetaStarPlanner:
                 goal_node.cost = current.cost
                 break
 
-            # Remove the item from the open set
+            # 从开集中移除该项
             del open_set[c_id]
 
-            # Add it to the closed set
+            # 将其加入闭集
             closed_set[c_id] = current
 
-            # expand_grid search grid based on motion model
+            # 根据运动模型扩展搜索栅格
             for i, _ in enumerate(self.motion):
                 node = self.Node(current.x + self.motion[i][0],
                                     current.y + self.motion[i][1],
-                                    current.cost + self.motion[i][2], c_id)  # cost may later be updated by theta star path compression
+                                    current.cost + self.motion[i][2], c_id)  # 代价稍后可能被 Theta* 路径压缩更新
                 n_id = self.calc_grid_index(node)
 
                 if not self.verify_node(node):
@@ -142,19 +142,19 @@ class ThetaStarPlanner:
                 if n_id in closed_set:
                     continue
 
-                # Theta* modification:
+                # Theta* 修改：
                 if use_theta_star and current.parent_index != -1 and current.parent_index in closed_set:
                     grandparent = closed_set[current.parent_index]
                     if self.line_of_sight(grandparent, node):
-                        # If parent(current) has line of sight to neighbor
+                        # 若当前节点的父节点与邻居之间存在视线
                         node.cost = grandparent.cost + math.hypot(node.x - grandparent.x, node.y - grandparent.y)
-                        node.parent_index = current.parent_index # compress path directly to grandparent
+                        node.parent_index = current.parent_index # 将路径直接压缩到祖父节点
 
                 if n_id not in open_set:
                     open_set[n_id] = node
                 else:
                     if open_set[n_id].cost > node.cost:
-                        # This path is the best until now. record it
+                        # 这是迄今最优路径，记录它
                         open_set[n_id] = node 
 
 
@@ -163,7 +163,7 @@ class ThetaStarPlanner:
         return rx, ry
 
     def calc_final_path(self, goal_node, closed_set):
-        # generate final course
+        # 生成最终路径
         rx, ry = [self.calc_grid_position(goal_node.x, self.min_x)], [
             self.calc_grid_position(goal_node.y, self.min_y)]
         parent_index = goal_node.parent_index
@@ -177,13 +177,13 @@ class ThetaStarPlanner:
 
     @staticmethod
     def calc_heuristic(n1, n2):
-        w = 1.0  # weight of heuristic
+        w = 1.0  # 启发式权重
         d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
         return d
 
     def calc_grid_position(self, index, min_position):
         """
-        calc grid position
+        计算栅格位置
 
         :param index:
         :param min_position:
@@ -200,8 +200,8 @@ class ThetaStarPlanner:
 
     def line_of_sight(self, node1, node2):
         """
-        Check if there is a direct line of sight between two nodes.
-        Uses Bresenham’s line algorithm for grid traversal.
+        检查两个节点之间是否存在直接视线。
+        使用 Bresenham 直线算法遍历栅格。
         """
         x0 = node1.x
         y0 = node1.y
@@ -243,7 +243,7 @@ class ThetaStarPlanner:
         elif py >= self.max_y:
             return False
 
-        # collision check
+        # 碰撞检查
         if self.obstacle_map[node.x][node.y]:
             return False
 
@@ -265,7 +265,7 @@ class ThetaStarPlanner:
         print("x_width:", self.x_width)
         print("y_width:", self.y_width)
 
-        # obstacle map generation
+        # 生成障碍物地图
         self.obstacle_map = [[False for _ in range(self.y_width)]
                              for _ in range(self.x_width)]
         for ix in range(self.x_width):
@@ -280,7 +280,7 @@ class ThetaStarPlanner:
 
     @staticmethod
     def get_motion_model():
-        # dx, dy, cost
+        # dx, dy, 代价
         motion = [[1, 0, 1],
                   [0, 1, 1],
                   [-1, 0, 1],
@@ -296,7 +296,7 @@ class ThetaStarPlanner:
 def main():
     print(__file__ + " start!!")
 
-    # start and goal position
+    # 起点与目标点位置
     sx = 10.0  # [m]
     sy = 10.0  # [m]
     gx = 50.0  # [m]
@@ -304,7 +304,7 @@ def main():
     grid_size = 2.0  # [m]
     robot_radius = 1.0  # [m]
 
-    # set obstacle positions
+    # 设置障碍物位置
     ox, oy = [], []
     for i in range(-10, 60):
         ox.append(i)

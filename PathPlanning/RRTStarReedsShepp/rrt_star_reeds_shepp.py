@@ -1,8 +1,8 @@
 """
 
-Path planning Sample Code with RRT with Reeds-Shepp path
+使用 RRT 与 Reeds-Shepp 路径的路径规划示例代码
 
-author: AtsushiSakai(@Atsushi_twi)
+作者: AtsushiSakai(@Atsushi_twi)
 
 """
 import copy
@@ -22,12 +22,12 @@ show_animation = True
 
 class RRTStarReedsShepp(RRTStar):
     """
-    Class for RRT star planning with Reeds Shepp path
+    使用 Reeds-Shepp 路径进行 RRT* 规划的类
     """
 
     class Node(RRTStar.Node):
         """
-        RRT Node
+        RRT 节点
         """
 
         def __init__(self, x, y, yaw):
@@ -41,13 +41,13 @@ class RRTStarReedsShepp(RRTStar):
                  robot_radius=0.0
                  ):
         """
-        Setting Parameter
+        参数设置
 
-        start:Start Position [x,y]
-        goal:Goal Position [x,y]
-        obstacleList:obstacle Positions [[x,y,size],...]
-        randArea:Random Sampling Area [min,max]
-        robot_radius: robot body modeled as circle with given radius
+        start:起点位置 [x,y]
+        goal:目标点位置 [x,y]
+        obstacleList:障碍物位置 [[x,y,尺寸],...]
+        randArea:随机采样区域 [min,max]
+        robot_radius: 将机器人本体建模为给定半径的圆
 
         """
         self.start = self.Node(start[0], start[1], start[2])
@@ -69,9 +69,9 @@ class RRTStarReedsShepp(RRTStar):
 
     def planning(self, animation=True, search_until_max_iter=True):
         """
-        planning
+        规划
 
-        animation: flag for animation on or off
+        animation: 是否开启动画的标志
         """
 
         self.node_list = [self.start]
@@ -94,7 +94,7 @@ class RRTStarReedsShepp(RRTStar):
                 self.plot_start_goal_arrow()
                 self.draw_graph(rnd)
 
-            if (not search_until_max_iter) and new_node:  # check reaching the goal
+            if (not search_until_max_iter) and new_node:  # 检查是否到达目标点
                 last_index = self.search_best_goal_node()
                 if last_index:
                     return self.generate_final_course(last_index)
@@ -123,7 +123,7 @@ class RRTStarReedsShepp(RRTStar):
 
     def draw_graph(self, rnd=None):
         plt.clf()
-        # for stopping simulation with the esc key.
+        # 按 Esc 键停止仿真。
         plt.gcf().canvas.mpl_connect('key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
         if rnd is not None:
@@ -197,7 +197,7 @@ class RRTStarReedsShepp(RRTStar):
                 goal_indexes.append(i)
         print("goal_indexes:", len(goal_indexes))
 
-        # angle check
+        # 航向角检查
         final_goal_indexes = []
         for i in goal_indexes:
             if abs(self.node_list[i].yaw - self.end.yaw) <= self.goal_yaw_th:
@@ -230,7 +230,7 @@ class RRTStarReedsShepp(RRTStar):
 def main(max_iter=100):
     print("Start " + __file__)
 
-    # ====Search Path with RRT====
+    # ====使用 RRT 搜索路径====
     obstacleList = [
         (5, 5, 1),
         (4, 6, 1),
@@ -241,9 +241,9 @@ def main(max_iter=100):
         (8, 6, 1),
         (8, 8, 1),
         (8, 10, 1)
-    ]  # [x,y,size(radius)]
+    ]  # [x,y,尺寸(半径)]
 
-    # Set Initial parameters
+    # 设置初始参数
     start = [0.0, 0.0, np.deg2rad(0.0)]
     goal = [6.0, 7.0, np.deg2rad(90.0)]
 
@@ -252,7 +252,7 @@ def main(max_iter=100):
                                              [-2.0, 15.0], max_iter=max_iter)
     path = rrt_star_reeds_shepp.planning(animation=show_animation)
 
-    # Draw final path
+    # 绘制最终路径
     if path and show_animation:  # pragma: no cover
         rrt_star_reeds_shepp.draw_graph()
         plt.plot([x for (x, y, yaw) in path], [y for (x, y, yaw) in path], '-r')

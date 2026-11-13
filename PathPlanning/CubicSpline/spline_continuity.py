@@ -26,7 +26,7 @@ class Spline2D:
 def main():
     x = [-2.5, 0.0, 2.5, 5.0, 7.5, 3.0, -1.0]
     y = [0.7, -6, -5, -3.5, 0.0, 5.0, -2.0]
-    ds = 0.1  # [m] distance of each interpolated points
+    ds = 0.1  # [m] 各插值点之间的距离
 
     plt.subplots(1)
     plt.plot(x, y, "xb", label="Data points")

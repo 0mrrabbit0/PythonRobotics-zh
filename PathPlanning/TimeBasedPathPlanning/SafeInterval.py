@@ -1,9 +1,9 @@
 """
-Safe interval path planner
-    This script implements a safe-interval path planner for a 2d grid with dynamic obstacles. It is faster than
-    SpaceTime A* because it reduces the number of redundant node expansions by pre-computing regions of adjacent
-    time steps that are safe ("safe intervals") at each position. This allows the algorithm to skip expanding nodes
-    that are in intervals that have already been visited earlier.
+安全时间区间路径规划器
+    本脚本实现带动态障碍物的二维栅格安全时间区间路径规划器。它比
+    时空 A* 更快，因为通过预先计算每个位置上由相邻
+    安全时间步组成的区域（“安全时间区间”），减少了冗余节点扩展。这使得算法可以跳过扩展
+    那些位于先前已经访问过的区间内的节点。
 
     Reference: https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf
 """
@@ -26,10 +26,10 @@ from functools import total_ordering
 import time
 
 @dataclass()
-# Note: Total_ordering is used instead of adding `order=True` to the @dataclass decorator because
-#     this class needs to override the __lt__ and __eq__ methods to ignore parent_index. The Parent
-#     index and interval member variables are just used to track the path found by the algorithm,
-#     and has no effect on the quality of a node.
+# 注：使用 total_ordering，而不是在 @dataclass 装饰器中加入 `order=True`，因为
+#     该类需要重写 __lt__ 与 __eq__，以忽略 parent_index。父节点
+#     索引和区间成员变量仅用于记录算法找到的路径，
+#     不影响节点的优劣。
 @total_ordering
 class SIPPNode(Node):
     interval: Interval
@@ -42,9 +42,9 @@ class EntryTimeAndInterval:
 class SafeIntervalPathPlanner(SingleAgentPlanner):
 
     """
-    Generate a plan given the loaded problem statement. Raises an exception if it fails to find a path.
+    根据已加载的问题描述生成规划。若找不到路径则抛出异常。
     Arguments:
-        verbose (bool): set to True to print debug information
+        verbose (bool): 设为 True 时打印调试信息
     """
     @staticmethod
     def plan(grid: Grid, start: Position, goal: Position, verbose: bool = False) -> NodePath:
@@ -81,7 +81,7 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
                         break
                     path_walker = expanded_list[path_walker.parent_index]
 
-                # reverse path so it goes start -> goal
+                # 反转路径，使其从起点指向目标点
                 path.reverse()
                 return NodePath(path, len(expanded_list))
 
@@ -119,16 +119,16 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
 
             new_cell_intervals: list[Interval] = intervals[new_pos.x, new_pos.y]
             for interval in new_cell_intervals:
-                # if interval starts after current ends, break
-                # assumption: intervals are sorted by start time, so all future intervals will hit this condition as well
+                # 若该区间在当前区间结束之后才开始，则中断
+                # 假设：区间按开始时间排序，因此之后的所有区间也会满足该条件
                 if interval.start_time > current_interval.end_time:
                     break
 
-                # if interval ends before current starts, skip
+                # 若该区间在当前区间开始之前就结束，则跳过
                 if interval.end_time < current_interval.start_time:
                     continue
 
-                # if we have already expanded a node in this interval with a <= starting time, skip
+                # 若已在该区间内扩展过进入时间小于等于当前时间的节点，则跳过
                 better_node_expanded = False
                 for visited in visited_intervals[new_pos.x, new_pos.y]:
                     if interval == visited.interval and visited.entry_time <= parent_node.time + 1:
@@ -137,19 +137,19 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
                 if better_node_expanded:
                     continue
 
-                # We know there is a node worth expanding. Generate successor at the earliest possible time the
-                # new interval can be entered
+                # 此时已知存在值得扩展的节点。在能够进入
+                # 新区间的最早时刻生成后继
                 for possible_t in range(max(parent_node.time + 1, interval.start_time), min(current_interval.end_time, interval.end_time)):
                     if grid.valid_position(new_pos, possible_t):
                         new_nodes.append(SIPPNode(
                             new_pos,
-                            # entry is max of interval start and parent node time + 1 (get there as soon as possible)
+                            # 进入时刻取区间开始时间与父节点时间 + 1 的较大值（尽快到达）
                             max(interval.start_time, parent_node.time + 1),
                             SafeIntervalPathPlanner.calculate_heuristic(new_pos, goal),
                             parent_node_idx,
                             interval,
                         ))
-                        # break because all t's after this will make nodes with a higher cost, the same heuristic, and are in the same interval
+                        # 中断，因为此后的所有 t 都会产生代价更高、启发式相同且位于同一区间的节点
                         break
 
         return new_nodes
@@ -168,12 +168,12 @@ Adds a new entry to the visited intervals array. If the entry is already present
 entry time is better. Otherwise, the entry is added to `visited_intervals` at the position of `expanded_node`.
 """
 def add_entry_to_visited_intervals_array(entry_time_and_interval: EntryTimeAndInterval, visited_intervals: np.ndarray, expanded_node: SIPPNode):
-    # if entry is present, update entry time if better
+    # 若记录已存在，且新进入时间更优，则更新进入时间
     for existing_entry_and_interval in visited_intervals[expanded_node.position.x, expanded_node.position.y]:
         if existing_entry_and_interval.interval == entry_time_and_interval.interval:
             existing_entry_and_interval.entry_time = min(existing_entry_and_interval.entry_time, entry_time_and_interval.entry_time)
 
-    # Otherwise, append
+    # 否则追加
     visited_intervals[expanded_node.position.x, expanded_node.position.y].append(entry_time_and_interval)
 
 

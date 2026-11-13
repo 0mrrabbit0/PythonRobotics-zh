@@ -1,8 +1,8 @@
 """
 
-Hybrid A* path planning
+Hybrid A* 路径规划
 
-author: Zheng Zh (@Zhengzh)
+作者: Zheng Zh (@Zhengzh)
 
 """
 
@@ -21,14 +21,14 @@ from car import move, check_car_collision, MAX_STEER, WB, plot_car, BUBBLE_R
 
 XY_GRID_RESOLUTION = 2.0  # [m]
 YAW_GRID_RESOLUTION = np.deg2rad(15.0)  # [rad]
-MOTION_RESOLUTION = 0.1  # [m] path interpolate resolution
-N_STEER = 20  # number of steer command
+MOTION_RESOLUTION = 0.1  # [m] 路径插值分辨率
+N_STEER = 20  # 转向指令数量
 
-SB_COST = 100.0  # switch back penalty cost
-BACK_COST = 5.0  # backward penalty cost
-STEER_CHANGE_COST = 5.0  # steer angle change penalty cost
-STEER_COST = 1.0  # steer angle change penalty cost
-H_COST = 5.0  # Heuristic cost
+SB_COST = 100.0  # 换向惩罚代价
+BACK_COST = 5.0  # 倒车惩罚代价
+STEER_CHANGE_COST = 5.0  # 转向角变化惩罚代价
+STEER_COST = 1.0  # 转向角变化惩罚代价
+H_COST = 5.0  # 启发式代价
 
 show_animation = True
 
@@ -126,10 +126,10 @@ def calc_next_node(current, steer, direction, config, ox, oy, kd_tree):
     if d != current.direction:
         added_cost += SB_COST
 
-    # steer penalty
+    # 转向惩罚
     added_cost += STEER_COST * abs(steer)
 
-    # steer change penalty
+    # 转向变化惩罚
     added_cost += STEER_CHANGE_COST * abs(current.steer - steer)
 
     cost = current.cost + added_cost + arc_l
@@ -209,24 +209,24 @@ def update_node_with_analytic_expansion(current, goal,
 def calc_rs_path_cost(reed_shepp_path):
     cost = 0.0
     for length in reed_shepp_path.lengths:
-        if length >= 0:  # forward
+        if length >= 0:  # 前进
             cost += length
-        else:  # back
+        else:  # 倒车
             cost += abs(length) * BACK_COST
 
-    # switch back penalty
+    # 换向惩罚
     for i in range(len(reed_shepp_path.lengths) - 1):
-        # switch back
+        # 换向
         if reed_shepp_path.lengths[i] * reed_shepp_path.lengths[i + 1] < 0.0:
             cost += SB_COST
 
-    # steer penalty
+    # 转向惩罚
     for course_type in reed_shepp_path.ctypes:
-        if course_type != "S":  # curve
+        if course_type != "S":  # 曲线
             cost += STEER_COST * abs(MAX_STEER)
 
-    # ==steer change penalty
-    # calc steer profile
+    # ==转向变化惩罚
+    # 计算转向角曲线
     n_ctypes = len(reed_shepp_path.ctypes)
     u_list = [0.0] * n_ctypes
     for i in range(n_ctypes):
@@ -243,12 +243,12 @@ def calc_rs_path_cost(reed_shepp_path):
 
 def hybrid_a_star_planning(start, goal, ox, oy, xy_resolution, yaw_resolution):
     """
-    start: start node
-    goal: goal node
-    ox: x position list of Obstacles [m]
-    oy: y position list of Obstacles [m]
-    xy_resolution: grid resolution [m]
-    yaw_resolution: yaw angle resolution [rad]
+    start: 起点节点
+    goal: 目标点节点
+    ox: 障碍物的 x 位置列表 [m]
+    oy: 障碍物的 y 位置列表 [m]
+    xy_resolution: 栅格分辨率 [m]
+    yaw_resolution: 航向角分辨率 [rad]
     """
 
     start[2], goal[2] = rs.pi_2_pi(start[2]), rs.pi_2_pi(goal[2])
@@ -293,7 +293,7 @@ def hybrid_a_star_planning(start, goal, ox, oy, xy_resolution, yaw_resolution):
 
         if show_animation:  # pragma: no cover
             plt.plot(current.x_list[-1], current.y_list[-1], "xc")
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
@@ -326,7 +326,7 @@ def hybrid_a_star_planning(start, goal, ox, oy, xy_resolution, yaw_resolution):
 def calc_cost(n, h_dp, c):
     ind = (n.y_index - c.min_y) * c.x_w + (n.x_index - c.min_x)
     if ind not in h_dp:
-        return n.cost + 999999999  # collision cost
+        return n.cost + 999999999  # 碰撞代价
     return n.cost + H_COST * h_dp[ind].cost
 
 
@@ -352,7 +352,7 @@ def get_final_path(closed, goal_node):
     reversed_yaw = list(reversed(reversed_yaw))
     direction = list(reversed(direction))
 
-    # adjust first direction
+    # 调整第一个方向
     direction[0] = direction[1]
 
     path = Path(reversed_x, reversed_y, reversed_yaw, direction, final_cost)
@@ -402,7 +402,7 @@ def main():
         ox.append(40.0)
         oy.append(60.0 - i)
 
-    # Set Initial parameters
+    # 设置初始参数
     start = [10.0, 10.0, np.deg2rad(90.0)]
     goal = [50.0, 50.0, np.deg2rad(-90.0)]
 

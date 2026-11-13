@@ -1,12 +1,12 @@
 """
 
-A converter between Cartesian and Frenet coordinate systems
+笛卡尔坐标系与 Frenet 坐标系之间的转换器
 
-author: Wang Zheng (@Aglargil)
+作者: Wang Zheng (@Aglargil)
 
 Reference:
 
-- [Optimal Trajectory Generation for Dynamic Street Scenarios in a Frenet Frame]
+- [Frenet 坐标系下动态街道场景的最优轨迹生成]
 (https://www.researchgate.net/profile/Moritz_Werling/publication/224156269_Optimal_Trajectory_Generation_for_Dynamic_Street_Scenarios_in_a_Frenet_Frame/links/54f749df0cf210398e9277af.pdf)
 
 """
@@ -16,26 +16,26 @@ import math
 
 class CartesianFrenetConverter:
     """
-    A class for converting states between Cartesian and Frenet coordinate systems
+    在笛卡尔坐标系与 Frenet 坐标系之间转换状态的类
     """
 
     @ staticmethod
     def cartesian_to_frenet(rs, rx, ry, rtheta, rkappa, rdkappa, x, y, v, a, theta, kappa):
         """
-        Convert state from Cartesian coordinate to Frenet coordinate
+        将状态从笛卡尔坐标转换到 Frenet 坐标
 
         Parameters
         ----------
-            rs: reference line s-coordinate
-            rx, ry: reference point coordinates
-            rtheta: reference point heading
-            rkappa: reference point curvature
-            rdkappa: reference point curvature rate
-            x, y: current position
-            v: velocity
-            a: acceleration
-            theta: heading angle
-            kappa: curvature
+            rs: 参考线 s 坐标
+            rx, ry: 参考点坐标
+            rtheta: 参考点航向角
+            rkappa: 参考点曲率
+            rdkappa: 参考点曲率变化率
+            x, y: 当前位置
+            v: 速度
+            a: 加速度
+            theta: 航向角
+            kappa: 曲率
 
         Returns
         -------
@@ -77,25 +77,25 @@ class CartesianFrenetConverter:
     @ staticmethod
     def frenet_to_cartesian(rs, rx, ry, rtheta, rkappa, rdkappa, s_condition, d_condition):
         """
-        Convert state from Frenet coordinate to Cartesian coordinate
+        将状态从 Frenet 坐标转换到笛卡尔坐标
 
         Parameters
         ----------
-            rs: reference line s-coordinate
-            rx, ry: reference point coordinates
-            rtheta: reference point heading
-            rkappa: reference point curvature
-            rdkappa: reference point curvature rate
+            rs: 参考线 s 坐标
+            rx, ry: 参考点坐标
+            rtheta: 参考点航向角
+            rkappa: 参考点曲率
+            rdkappa: 参考点曲率变化率
             s_condition: [s(t), s'(t), s''(t)]
             d_condition: [d(s), d'(s), d''(s)]
 
         Returns
         -------
-            x, y: position
-            theta: heading angle
-            kappa: curvature
-            v: velocity
-            a: acceleration
+            x, y: 位置
+            theta: 航向角
+            kappa: 曲率
+            v: 速度
+            a: 加速度
         """
         if abs(rs - s_condition[0]) >= 1.0e-6:
             raise ValueError(
@@ -136,7 +136,7 @@ class CartesianFrenetConverter:
     @ staticmethod
     def normalize_angle(angle):
         """
-        Normalize angle to [-pi, pi]
+        将角度归一化到 [-pi, pi]
         """
         a = math.fmod(angle + math.pi, 2.0 * math.pi)
         if a < 0.0:

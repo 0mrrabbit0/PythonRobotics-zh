@@ -1,8 +1,8 @@
 """
 
-Path Planner with B-Spline
+B 样条路径规划器
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者: Atsushi Sakai (@Atsushi_twi)
 
 """
 import sys
@@ -23,35 +23,34 @@ def approximate_b_spline_path(x: list,
                               s=None,
                               ) -> tuple:
     """
-    Approximate points with a B-Spline path
+    用 B 样条路径逼近点列
 
     Parameters
     ----------
     x : array_like
-        x position list of approximated points
+        被逼近点的 x 位置列表
     y : array_like
-        y position list of approximated points
+        被逼近点的 y 位置列表
     n_path_points : int
-        number of path points
-    degree : int, optional
-        B Spline curve degree. Must be 2<= k <= 5. Default: 3.
-    s : int, optional
-        smoothing parameter. If this value is bigger, the path will be
-        smoother, but it will be less accurate. If this value is smaller,
-        the path will be more accurate, but it will be less smooth.
-        When `s` is 0, it is equivalent to the interpolation. Default is None,
-        in this case `s` will be `len(x)`.
+        路径点数量
+    degree : int, 可选
+        B 样条曲线次数。必须满足 2<= k <= 5。默认值：3。
+    s : int, 可选
+        平滑参数。该值越大，路径越平滑，但精度越低。该值越小，
+        路径越精确，但越不平滑。
+        当 `s` 为 0 时，等价于插值。默认值为 None，
+        此时 `s` 取 `len(x)`。
 
     Returns
     -------
     x : array
-        x positions of the result path
+        结果路径的 x 坐标
     y : array
-        y positions of the result path
+        结果路径的 y 坐标
     heading : array
-        heading of the result path
+        结果路径的航向
     curvature : array
-        curvature of the result path
+        结果路径的曲率
 
     """
     distances = _calc_distance_vector(x, y)
@@ -67,29 +66,29 @@ def interpolate_b_spline_path(x, y,
                               n_path_points: int,
                               degree: int = 3) -> tuple:
     """
-    Interpolate x-y points with a B-Spline path
+    用 B 样条路径插值 x-y 点列
 
     Parameters
     ----------
     x : array_like
-        x positions of interpolated points
+        插值点的 x 坐标
     y : array_like
-        y positions of interpolated points
+        插值点的 y 坐标
     n_path_points : int
-        number of path points
-    degree : int, optional
-        B-Spline degree. Must be 2<= k <= 5. Default: 3
+        路径点数量
+    degree : int, 可选
+        B 样条次数。必须满足 2<= k <= 5。默认值：3
 
     Returns
     -------
     x : array
-        x positions of the result path
+        结果路径的 x 坐标
     y : array
-        y positions of the result path
+        结果路径的 y 坐标
     heading : array
-        heading of the result path
+        结果路径的航向
     curvature : array
-        curvature of the result path
+        结果路径的曲率
 
     """
     return approximate_b_spline_path(x, y, n_path_points, degree, s=0.0)
@@ -117,10 +116,10 @@ def _evaluate_spline(sampled, spl_i_x, spl_i_y):
 
 def main():
     print(__file__ + " start!!")
-    # way points
+    # 路径点
     way_point_x = [-1.0, 3.0, 4.0, 2.0, 1.0]
     way_point_y = [0.0, -3.0, 1.0, 1.0, 3.0]
-    n_course_point = 50  # sampling number
+    n_course_point = 50  # 采样点数
 
     plt.subplots()
     rax, ray, heading, curvature = approximate_b_spline_path(

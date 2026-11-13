@@ -1,8 +1,8 @@
 """
 
-Path tracking simulation with pure pursuit steering control and PID speed control.
+使用纯追踪转向控制与 PID 速度控制的路径跟踪仿真。
 
-author: Atsushi Sakai
+作者：Atsushi Sakai
 
 """
 import math
@@ -16,9 +16,9 @@ sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
 from ClosedLoopRRTStar import unicycle_model
 
-Kp = 2.0  # speed propotional gain
-Lf = 0.5  # look-ahead distance
-T = 100.0  # max simulation time
+Kp = 2.0  # 速度比例增益
+Lf = 0.5  # 前视距离
+T = 100.0  # 最大仿真时间
 goal_dis = 0.5
 stop_speed = 0.5
 
@@ -55,7 +55,7 @@ def pure_pursuit_control(state, cx, cy, pind):
 
     alpha = math.atan2(ty - state.y, tx - state.x) - state.yaw
 
-    if state.v <= 0.0:  # back
+    if state.v <= 0.0:  # 后退
         alpha = math.pi - alpha
 
     delta = math.atan2(2.0 * unicycle_model.L * math.sin(alpha) / Lf, 1.0)
@@ -122,7 +122,7 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
 
         time = time + unicycle_model.dt
 
-        # check goal
+        # 检查是否到达目标点
         dx = state.x - goal[0]
         dy = state.y - goal[1]
         if math.hypot(dx, dy) <= goal_dis:
@@ -139,7 +139,7 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
 
         if target_ind % 1 == 0 and animation:  # pragma: no cover
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 Esc 键停止仿真。
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(cx, cy, "-r", label="course")
@@ -164,7 +164,7 @@ def set_stop_point(target_speed, cx, cy, cyaw):
     d = []
     is_back = False
 
-    # Set stop point
+    # 设置停止点
     for i in range(len(cx) - 1):
         dx = cx[i + 1] - cx[i]
         dy = cy[i + 1] - cy[i]
@@ -231,13 +231,13 @@ def extend_path(cx, cy, cyaw):
 
 
 def main():  # pragma: no cover
-    #  target course
+    # 目标航线
     cx = np.arange(0, 50, 0.1)
     cy = [math.sin(ix / 5.0) * ix / 2.0 for ix in cx]
 
     target_speed = 5.0 / 3.6
 
-    T = 15.0  # max simulation time
+    T = 15.0  # 最大仿真时间
 
     state = unicycle_model.State(x=-0.0, y=-3.0, yaw=0.0, v=0.0)
     #  state = unicycle_model.State(x=-1.0, y=-5.0, yaw=0.0, v=-30.0 / 3.6)

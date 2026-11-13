@@ -1,9 +1,9 @@
 """
-Space-time A* Algorithm
-    This script demonstrates the Space-time A* algorithm for path planning in a grid world with moving obstacles.
-    This algorithm is different from normal 2D A* in one key way - the cost (often notated as g(n)) is
-    the number of time steps it took to get to a given node, instead of the number of cells it has
-    traversed. This ensures the path is time-optimal, while respecting any dynamic obstacles in the environment.
+时空 A* 算法
+    本脚本演示在含运动障碍物的栅格世界中进行路径规划的时空 A* 算法。
+    该算法与普通二维 A* 的关键区别在于：代价（通常记为 g(n)）是
+    到达给定节点所花费的时间步数，而不是已经经过的栅格
+    数量。这在遵守环境中任意动态障碍物约束的同时，保证路径在时间上最优。
 
     Reference: https://www.davidsilver.uk/wp-content/uploads/2020/03/coop-path-AIWisdom.pdf
 """
@@ -54,7 +54,7 @@ class SpaceTimeAStar(SingleAgentPlanner):
                         break
                     path_walker = expanded_list[path_walker.parent_index]
 
-                # reverse path so it goes start -> goal
+                # 反转路径，使其从起点指向目标点
                 path.reverse()
                 return NodePath(path, len(expanded_set))
 
@@ -93,7 +93,7 @@ class SpaceTimeAStar(SingleAgentPlanner):
             if new_node in expanded_set:
                 continue
 
-            # Check if the new node is valid for the next 2 time steps - one step to enter, and another to leave
+            # 检查新节点在接下来 2 个时间步内是否有效——一步用于进入，另一步用于离开
             if all([grid.valid_position(new_pos, parent_node.time + dt) for dt in [1, 2]]):
                 if verbose:
                     print("\tNew successor node: ", new_node)

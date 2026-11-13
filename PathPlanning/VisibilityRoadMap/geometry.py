@@ -23,8 +23,7 @@ class Geometry:
                 return 2
             return 0
 
-        # Find the 4 orientations required for
-        # the general and special cases
+        # 求一般情况与特殊情况所需的 4 个方向
         o1 = orientation(p1, q1, p2)
         o2 = orientation(p1, q1, q2)
         o3 = orientation(p2, q2, p1)

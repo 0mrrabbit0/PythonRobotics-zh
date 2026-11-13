@@ -1,7 +1,7 @@
 """
-a star variants
-author: Sarim Mehdi(muhammadsarim.mehdi@studio.unibo.it)
-Source: http://theory.stanford.edu/~amitp/GameProgramming/Variations.html
+A* 变体
+作者: Sarim Mehdi(muhammadsarim.mehdi@studio.unibo.it)
+来源: http://theory.stanford.edu/~amitp/GameProgramming/Variations.html
 """
 
 import numpy as np
@@ -178,8 +178,8 @@ class SearchAlgo:
         return i_temp - 2*i, j_temp - 2*j, counter, got_goal
 
     def jump_point(self):
-        """Jump point: Instead of exploring all empty spaces of the
-        map, just explore the corners."""
+        """Jump Point：不探索地图上所有空闲栅格，
+        只探索拐角。"""
 
         goal_found = False
         while len(self.open_set) > 0:
@@ -265,22 +265,20 @@ class SearchAlgo:
             plt.show()
 
     def a_star(self):
-        """Beam search: Maintain an open list of just 30 nodes.
-        If more than 30 nodes, then get rid of nodes with high
-        f values.
-        Iterative deepening: At every iteration, get a cut-off
-        value for the f cost. This cut-off is minimum of the f
-        value of all nodes whose f value is higher than the
-        current cut-off value. Nodes with f value higher than
-        the current cut off value are not put in the open set.
-        Dynamic weighting: Multiply heuristic with the following:
-        (1 + epsilon - (epsilon*d)/N) where d is the current
-        iteration of loop and N is upper bound on number of
-        iterations.
-        Theta star: Same as A star but you don't need to move
-        one neighbor at a time. In fact, you can look for the
-        next node as far out as you can as long as there is a
-        clear line of sight from your current node to that node."""
+        """波束搜索：开集只保留 30 个节点。
+        若超过 30 个节点，则丢弃 f 值较高的
+        节点。
+        迭代加深：每次迭代为 f 代价确定一个截断
+        值。该截断值是所有 f 值高于
+        当前截断值的节点中的最小 f 值。f 值高于
+        当前截断值的节点不会放入开集。
+        动态加权：将启发式乘以如下系数：
+        (1 + epsilon - (epsilon*d)/N)，其中 d 为当前
+        循环迭代次数，N 为迭代次数上界。
+        Theta*：与 A* 相同，但不必每次只移动
+        一个邻居。事实上，只要从当前节点到该节点
+        存在清晰视线，就可以尽可能远地寻找
+        下一个节点。"""
         if show_animation:
             if use_beam_search:
                 plt.title('A* with beam search')
@@ -431,7 +429,7 @@ class SearchAlgo:
 
 
 def main():
-    # set obstacle positions
+    # 设置障碍物位置
     obs_dict = {}
     for i in range(51):
         for j in range(51):
@@ -443,13 +441,13 @@ def main():
     g_x = 35.0
     g_y = 45.0
 
-    # draw outer border of maze
+    # 绘制迷宫外边界
     draw_vertical_line(0, 0, 50, o_x, o_y, obs_dict)
     draw_vertical_line(48, 0, 50, o_x, o_y, obs_dict)
     draw_horizontal_line(0, 0, 50, o_x, o_y, obs_dict)
     draw_horizontal_line(0, 48, 50, o_x, o_y, obs_dict)
 
-    # draw inner walls
+    # 绘制内部墙壁
     all_x = [10, 10, 10, 15, 20, 20, 30, 30, 35, 30, 40, 45]
     all_y = [10, 30, 45, 20, 5, 40, 10, 40, 5, 40, 10, 25]
     all_len = [10, 10, 5, 10, 10, 5, 20, 10, 25, 10, 35, 15]

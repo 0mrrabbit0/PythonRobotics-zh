@@ -1,8 +1,8 @@
 """
 
-Path planning Sample Code with Closed loop RRT for car like robot.
+类车机器人的闭环 RRT 路径规划示例代码。
 
-author: AtsushiSakai(@Atsushi_twi)
+作者：AtsushiSakai(@Atsushi_twi)
 
 """
 import matplotlib.pyplot as plt
@@ -22,7 +22,7 @@ show_animation = True
 
 class ClosedLoopRRTStar(RRTStarReedsShepp):
     """
-    Class for Closed loop RRT star planning
+    闭环 RRT* 规划类
     """
 
     def __init__(self, start, goal, obstacle_list, rand_area,
@@ -43,14 +43,14 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
 
     def planning(self, animation=True):
         """
-        do planning
+        执行规划
 
-        animation: flag for animation on or off
+        animation：是否开启动画的标志
         """
-        # planning with RRTStarReedsShepp
+        # 使用 RRTStarReedsShepp 进行规划
         super().planning(animation=animation)
 
-        # generate coruse
+        # 生成路径
         path_indexs = self.get_goal_indexes()
 
         flag, x, y, yaw, v, t, a, d = self.search_best_feasible_path(
@@ -66,7 +66,7 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
 
         fx, fy, fyaw, fv, ft, fa, fd = None, None, None, None, None, None, None
 
-        # pure pursuit tracking
+        # 纯追踪跟踪
         for ind in path_indexs:
             path = self.generate_final_course(ind)
 
@@ -137,7 +137,7 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
         print("OK XY TH num is")
         print(len(goalinds))
 
-        # angle check
+        # 航向角检查
         fgoalinds = []
         for i in goalinds:
             if abs(self.node_list[i].yaw - self.end.yaw) <= self.yaw_th:
@@ -150,7 +150,7 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
 
 def main(gx=6.0, gy=7.0, gyaw=np.deg2rad(90.0), max_iter=100):
     print("Start" + __file__)
-    # ====Search Path with RRT====
+    # ====使用 RRT 搜索路径====
     obstacle_list = [
         (5, 5, 1),
         (4, 6, 1),
@@ -161,9 +161,9 @@ def main(gx=6.0, gy=7.0, gyaw=np.deg2rad(90.0), max_iter=100):
         (8, 6, 1),
         (8, 8, 1),
         (8, 10, 1)
-    ]  # [x,y,size(radius)]
+    ]  # [x, y, 尺寸（半径）]
 
-    # Set Initial parameters
+    # 设置初始参数
     start = [0.0, 0.0, np.deg2rad(0.0)]
     goal = [gx, gy, gyaw]
 
@@ -177,7 +177,7 @@ def main(gx=6.0, gy=7.0, gyaw=np.deg2rad(90.0), max_iter=100):
     if not flag:
         print("cannot find feasible path")
 
-    # Draw final path
+    # 绘制最终路径
     if show_animation:
         closed_loop_rrt_star.draw_graph()
         plt.plot(x, y, '-r')

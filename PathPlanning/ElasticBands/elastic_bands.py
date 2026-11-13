@@ -1,9 +1,9 @@
 """
-Elastic Bands
+弹性带
 
-author: Wang Zheng (@Aglargil)
+作者: Wang Zheng (@Aglargil)
 
-Reference:
+参考文献:
 
 - [Elastic Bands: Connecting Path Planning and Control]
 (http://www8.cs.umu.se/research/ifor/dl/Control/elastic%20bands.pdf)
@@ -19,30 +19,30 @@ sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 from Mapping.DistanceMap.distance_map import compute_sdf_scipy
 
-# Elastic Bands Params
+# 弹性带参数
 MAX_BUBBLE_RADIUS = 100
 MIN_BUBBLE_RADIUS = 10
-RHO0 = 20.0  # Maximum distance for applying repulsive force
-KC = 0.05  # Contraction force gain
-KR = -0.1  # Repulsive force gain
-LAMBDA = 0.7  # Overlap constraint factor
-STEP_SIZE = 3.0  # Step size for calculating gradient
+RHO0 = 20.0  # 施加斥力的最大距离
+KC = 0.05  # 收缩力增益
+KR = -0.1  # 斥力增益
+LAMBDA = 0.7  # 重叠约束因子
+STEP_SIZE = 3.0  # 计算梯度的步长
 
-# Visualization Params
+# 可视化参数
 ENABLE_PLOT = True
-# ENABLE_INTERACTIVE is True allows user to add obstacles by left clicking
-# and add path points by right clicking and start planning by middle clicking
+# ENABLE_INTERACTIVE 为 True 时，用户可左键添加障碍物，
+# 右键添加路径点，中键开始规划
 ENABLE_INTERACTIVE = False
-# ENABLE_SAVE_DATA is True allows saving the path and obstacles which added
-# by user in interactive mode to file
+# ENABLE_SAVE_DATA 为 True 时，可将交互模式下用户添加的
+# 路径与障碍物保存到文件
 ENABLE_SAVE_DATA = False
 MAX_ITER = 50
 
 
 class Bubble:
     def __init__(self, position, radius):
-        self.pos = np.array(position)  # Bubble center coordinates [x, y]
-        self.radius = radius  # Safety distance radius ρ(b)
+        self.pos = np.array(position)  # 气泡中心坐标 [x, y]
+        self.radius = radius  # 安全距离半径 ρ(b)
         if self.radius > MAX_BUBBLE_RADIUS:
             self.radius = MAX_BUBBLE_RADIUS
         if self.radius < MIN_BUBBLE_RADIUS:
@@ -63,20 +63,20 @@ class ElasticBands:
         self.distance_map = compute_sdf_scipy(obstacles)
         self.bubbles = [
             Bubble(p, self.compute_rho(p)) for p in initial_path
-        ]  # Initialize bubble chain
-        self.kc = kc  # Contraction force gain
-        self.kr = kr  # Repulsive force gain
-        self.rho0 = rho0  # Maximum distance for applying repulsive force
-        self.lambda_ = lambda_  # Overlap constraint factor
-        self.step_size = step_size  # Step size for calculating gradient
+        ]  # 初始化气泡链
+        self.kc = kc  # 收缩力增益
+        self.kr = kr  # 斥力增益
+        self.rho0 = rho0  # 施加斥力的最大距离
+        self.lambda_ = lambda_  # 重叠约束因子
+        self.step_size = step_size  # 计算梯度的步长
         self._maintain_overlap()
 
     def compute_rho(self, position):
-        """Compute the distance field value at the position"""
+        """计算该位置的距离场值"""
         return self.distance_map[int(position[0]), int(position[1])]
 
     def contraction_force(self, i):
-        """Calculate internal contraction force for the i-th bubble"""
+        """计算第 i 个气泡的内部收缩力"""
         if i == 0 or i == len(self.bubbles) - 1:
             return np.zeros(2)
 
@@ -90,15 +90,15 @@ class ElasticBands:
         return self.kc * (dir_prev + dir_next)
 
     def repulsive_force(self, i):
-        """Calculate external repulsive force for the i-th bubble"""
-        h = self.step_size  # Step size
+        """计算第 i 个气泡的外部斥力"""
+        h = self.step_size  # 步长
         b = self.bubbles[i].pos
         rho = self.bubbles[i].radius
 
         if rho >= self.rho0:
             return np.zeros(2)
 
-        # Finite difference approximation of the gradient ∂ρ/∂b
+        # 梯度 ∂ρ/∂b 的有限差分近似
         dx = np.array([h, 0])
         dy = np.array([0, h])
         grad_x = (self.compute_rho(b - dx) - self.compute_rho(b + dx)) / (2 * h)
@@ -108,25 +108,25 @@ class ElasticBands:
         return self.kr * (self.rho0 - rho) * grad
 
     def update_bubbles(self):
-        """Update bubble positions"""
+        """更新气泡位置"""
         new_bubbles = []
         for i in range(len(self.bubbles)):
             if i == 0 or i == len(self.bubbles) - 1:
-                new_bubbles.append(self.bubbles[i])  # Fixed start and end points
+                new_bubbles.append(self.bubbles[i])  # 固定起点与终点
                 continue
 
             f_total = self.contraction_force(i) + self.repulsive_force(i)
             v = self.bubbles[i - 1].pos - self.bubbles[i + 1].pos
 
-            # Remove tangential component
+            # 去除切向分量
             f_star = f_total - f_total * v * v / (np.linalg.norm(v) ** 2 + 1e-6)
 
-            alpha = self.bubbles[i].radius  # Adaptive step size
+            alpha = self.bubbles[i].radius  # 自适应步长
             new_pos = self.bubbles[i].pos + alpha * f_star
             new_pos = np.clip(new_pos, 0, 499)
             new_radius = self.compute_rho(new_pos)
 
-            # Update bubble and maintain overlap constraint
+            # 更新气泡并维持重叠约束
             new_bubble = Bubble(new_pos, new_radius)
             new_bubbles.append(new_bubble)
 
@@ -134,8 +134,8 @@ class ElasticBands:
         self._maintain_overlap()
 
     def _maintain_overlap(self):
-        """Maintain bubble chain continuity (simplified insertion/deletion mechanism)"""
-        # Insert bubbles
+        """维持气泡链连续性（简化的插入/删除机制）"""
+        # 插入气泡
         i = 0
         while i < len(self.bubbles) - 1:
             bi, bj = self.bubbles[i], self.bubbles[i + 1]
@@ -144,20 +144,20 @@ class ElasticBands:
                 new_pos = (bi.pos + bj.pos) / 2
                 rho = self.compute_rho(
                     new_pos
-                )  # Calculate new radius using environment model
+                )  # 使用环境模型计算新半径
                 self.bubbles.insert(i + 1, Bubble(new_pos, rho))
-                i += 2  # Skip the processed region
+                i += 2  # 跳过已处理区域
             else:
                 i += 1
 
-        # Delete redundant bubbles
+        # 删除冗余气泡
         i = 1
         while i < len(self.bubbles) - 1:
             prev = self.bubbles[i - 1]
             next_ = self.bubbles[i + 1]
             dist = np.linalg.norm(prev.pos - next_.pos)
             if dist <= self.lambda_ * (prev.radius + next_.radius):
-                del self.bubbles[i]  # Delete if redundant
+                del self.bubbles[i]  # 若冗余则删除
             else:
                 i += 1
 
@@ -177,8 +177,8 @@ class ElasticBandsVisualizer:
             self.ax.set_ylim(0, 500)
 
         if ENABLE_INTERACTIVE:
-            self.path_points = []  # Add a list to store path points
-            # Connect mouse events
+            self.path_points = []  # 添加用于存储路径点的列表
+            # 连接鼠标事件
             self.fig.canvas.mpl_connect("button_press_event", self.on_click)
         else:
             self.path_points = np.load(pathlib.Path(__file__).parent / "path.npy")
@@ -192,12 +192,12 @@ class ElasticBandsVisualizer:
         self.plot_background()
 
     def on_close(self, event):
-        """Handle window close event"""
+        """处理窗口关闭事件"""
         self.running = False
-        plt.close("all")  # Close all figure windows
+        plt.close("all")  # 关闭所有图形窗口
 
     def plot_background(self):
-        """Plot the background grid"""
+        """绘制背景栅格"""
         if not ENABLE_PLOT or not self.running:
             return
 
@@ -245,8 +245,8 @@ class ElasticBandsVisualizer:
         plt.pause(0.01)
 
     def add_obstacle(self, x, y):
-        """Add an obstacle at the given coordinates"""
-        size = 30  # Side length of the square
+        """在给定坐标处添加障碍物"""
+        size = 30  # 正方形边长
         half_size = size // 2
         x_start = max(0, x - half_size)
         x_end = min(self.obstacles.shape[0], x + half_size)
@@ -255,20 +255,20 @@ class ElasticBandsVisualizer:
         self.obstacles[x_start:x_end, y_start:y_end] = 1
 
     def on_click(self, event):
-        """Handle mouse click events"""
+        """处理鼠标点击事件"""
         if event.inaxes != self.ax:
             return
 
         x, y = int(event.xdata), int(event.ydata)
 
-        if event.button == 1:  # Left click to add obstacles
+        if event.button == 1:  # 左键添加障碍物
             self.add_obstacle(x, y)
             self.obstacles_points.append([x, y])
 
-        elif event.button == 3:  # Right click to add path points
+        elif event.button == 3:  # 右键添加路径点
             self.path_points.append([x, y])
 
-        elif event.button == 2:  # Middle click to end path input and start planning
+        elif event.button == 2:  # 中键结束路径输入并开始规划
             if len(self.path_points) >= 2:
                 if ENABLE_SAVE_DATA:
                     np.save(
@@ -283,10 +283,10 @@ class ElasticBandsVisualizer:
         self.plot_background()
 
     def plan_path(self):
-        """Plan the path"""
+        """规划路径"""
 
         initial_path = self.path_points
-        # Create an elastic band object and optimize
+        # 创建弹性带对象并优化
         self.elastic_band = ElasticBands(initial_path, self.obstacles)
         for _ in range(MAX_ITER):
             self.elastic_band.update_bubbles()

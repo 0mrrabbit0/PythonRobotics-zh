@@ -1,13 +1,13 @@
 """
-D* Lite grid planning
-author: vss2sn (28676655+vss2sn@users.noreply.github.com)
-Link to papers:
-D* Lite (Link: http://idm-lab.org/bib/abstracts/papers/aaai02b.pdf)
-Improved Fast Replanning for Robot Navigation in Unknown Terrain
-(Link: http://www.cs.cmu.edu/~maxim/files/dlite_icra02.pdf)
-Implemented maintaining similarity with the pseudocode for understanding.
-Code can be significantly optimized by using a priority queue for U, etc.
-Avoiding additional imports based on repository philosophy.
+D* Lite 栅格路径规划
+作者：vss2sn (28676655+vss2sn@users.noreply.github.com)
+论文链接：
+D* Lite（链接：http://idm-lab.org/bib/abstracts/papers/aaai02b.pdf）
+未知地形中机器人导航的改进快速重规划
+（链接：http://www.cs.cmu.edu/~maxim/files/dlite_icra02.pdf）
+实现时尽量与伪代码保持相似，便于理解。
+代码可通过为 U 使用优先队列等方式大幅优化。
+按照仓库的理念，避免额外的 import。
 """
 import math
 import matplotlib.pyplot as plt
@@ -40,8 +40,8 @@ def compare_coordinates(node1: Node, node2: Node):
 
 class DStarLite:
 
-    # Please adjust the heuristic function (h) if you change the list of
-    # possible motions
+    # 若修改可行运动列表，
+    # 请同时调整启发式函数 h
     motions = [
         Node(1, 0, 1),
         Node(0, 1, 1),
@@ -54,9 +54,9 @@ class DStarLite:
     ]
 
     def __init__(self, ox: list, oy: list):
-        # Ensure that within the algorithm implementation all node coordinates
-        # are indices in the grid and extend
-        # from 0 to abs(<axis>_max - <axis>_min)
+        # 确保算法实现中所有节点坐标
+        # 都是栅格索引，并且范围
+        # 从 0 到 abs(<axis>_max - <axis>_min)
         self.x_min_world = int(min(ox))
         self.y_min_world = int(min(oy))
         self.x_max = int(abs(max(ox) - self.x_min_world))
@@ -88,7 +88,7 @@ class DStarLite:
 
     def c(self, node1: Node, node2: Node):
         if self.is_obstacle(node2):
-            # Attempting to move from or to an obstacle
+            # 试图从障碍物出发或进入障碍物
             return math.inf
         new_node = Node(node1.x-node2.x, node1.y-node2.y)
         detected_motion = list(filter(lambda motion:
@@ -97,16 +97,15 @@ class DStarLite:
         return detected_motion[0].cost
 
     def h(self, s: Node):
-        # Cannot use the 2nd euclidean norm as this might sometimes generate
-        # heuristics that overestimate the cost, making them inadmissible,
-        # due to rounding errors etc (when combined with calculate_key)
-        # To be admissible heuristic should
-        # never overestimate the cost of a move
-        # hence not using the line below
+        # 不能使用二范数（欧氏距离），因为舍入误差等
+        # 有时会使启发式高估代价，从而变得不可采纳
+        # （与 calculate_key 结合时）
+        # 可采纳启发式应当
+        # 从不高估一次移动的代价
+        # 因此不使用下面这一行
         # return math.hypot(self.start.x - s.x, self.start.y - s.y)
 
-        # Below is the same as 1; modify if you modify the cost of each move in
-        # motion
+        # 下面等价于 1；若修改 motion 中每次移动的代价，请同步修改
         # return max(abs(self.start.x - s.x), abs(self.start.y - s.y))
         return 1
 
@@ -124,11 +123,11 @@ class DStarLite:
                 if self.is_valid(add_coordinates(u, motion))]
 
     def pred(self, u: Node):
-        # Grid, so each vertex is connected to the ones around it
+        # 栅格图中每个顶点与其周围顶点相连
         return self.get_neighbours(u)
 
     def succ(self, u: Node):
-        # Grid, so each vertex is connected to the ones around it
+        # 栅格图中每个顶点与其周围顶点相连
         return self.get_neighbours(u)
 
     def initialize(self, start: Node, goal: Node):
@@ -139,7 +138,7 @@ class DStarLite:
         if not self.initialized:
             self.initialized = True
             print('Initializing')
-            self.U = list()  # Would normally be a priority queue
+            self.U = list()  # 通常应为优先队列
             self.km = 0.0
             self.rhs = self.create_grid(math.inf)
             self.g = self.create_grid(math.inf)
@@ -214,7 +213,7 @@ class DStarLite:
                     plt.pause(pause_time)
             self.spoofed_obstacles.pop(0)
 
-        # Allows random generation of obstacles
+        # 允许随机生成障碍物
         random.seed()
         if random.random() > 1 - p_create_random_obstacle:
             x = random.randint(0, self.x_max - 1)
@@ -330,13 +329,13 @@ class DStarLite:
 
 def main():
 
-    # start and goal position
+    # 起点与目标点位置
     sx = 10  # [m]
     sy = 10  # [m]
     gx = 50  # [m]
     gy = 50  # [m]
 
-    # set obstacle positions
+    # 设置障碍物位置
     ox, oy = [], []
     for i in range(-10, 60):
         ox.append(i)
@@ -378,19 +377,19 @@ def main():
         plt.plot()
         plt.pause(pause_time)
 
-    # Obstacles discovered at time = row
-    # time = 1, obstacles discovered at (0, 2), (9, 2), (4, 0)
-    # time = 2, obstacles discovered at (0, 1), (7, 7)
+    # 在时刻等于行号时发现的障碍物
+    # 时刻 = 1，在 (0, 2)、(9, 2)、(4, 0) 发现障碍物
+    # 时刻 = 2，在 (0, 1)、(7, 7) 发现障碍物
     # ...
-    # when the spoofed obstacles are:
+    # 当模拟注入的障碍物为：
     # spoofed_ox = [[0, 9, 4], [0, 7], [], [], [], [], [], [5]]
     # spoofed_oy = [[2, 2, 0], [1, 7], [], [], [], [], [], [4]]
 
-    # Reroute
+    # 重新规划路线
     # spoofed_ox = [[], [], [], [], [], [], [], [40 for _ in range(10, 21)]]
     # spoofed_oy = [[], [], [], [], [], [], [], [i for i in range(10, 21)]]
 
-    # Obstacles that demostrate large rerouting
+    # 用于演示大规模重规划的障碍物
     spoofed_ox = [[], [], [],
                   [i for i in range(0, 21)] + [0 for _ in range(0, 20)]]
     spoofed_oy = [[], [], [],

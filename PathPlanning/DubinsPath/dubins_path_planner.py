@@ -1,8 +1,8 @@
 """
 
-Dubins path planner sample code
+Dubins 路径规划器示例代码
 
-author Atsushi Sakai(@Atsushi_twi)
+作者 Atsushi Sakai(@Atsushi_twi)
 
 """
 import sys
@@ -19,48 +19,48 @@ show_animation = True
 def plan_dubins_path(s_x, s_y, s_yaw, g_x, g_y, g_yaw, curvature,
                      step_size=0.1, selected_types=None):
     """
-    Plan dubins path
+    规划 Dubins 路径
 
     Parameters
     ----------
     s_x : float
-        x position of the start point [m]
+        起点的 x 位置 [m]
     s_y : float
-        y position of the start point [m]
+        起点的 y 位置 [m]
     s_yaw : float
-        yaw angle of the start point [rad]
+        起点的航向角 [rad]
     g_x : float
-        x position of the goal point [m]
+        目标点的 x 位置 [m]
     g_y : float
-        y position of the end point [m]
+        终点的 y 位置 [m]
     g_yaw : float
-        yaw angle of the end point [rad]
+        终点的航向角 [rad]
     curvature : float
-        curvature for curve [1/m]
-    step_size : float (optional)
-        step size between two path points [m]. Default is 0.1
-    selected_types : a list of string or None
-        selected path planning types. If None, all types are used for
-        path planning, and minimum path length result is returned.
-        You can select used path plannings types by a string list.
-        e.g.: ["RSL", "RSR"]
+        曲线曲率 [1/m]
+    step_size : float (可选)
+        相邻路径点之间的步长 [m]。默认值为 0.1
+    selected_types : 字符串列表或 None
+        选定的路径规划类型。若为 None，则使用全部类型进行
+        路径规划，并返回路径长度最小的结果。
+        可通过字符串列表选择所使用的路径规划类型。
+        例如：["RSL", "RSR"]
 
     Returns
     -------
     x_list: array
-        x positions of the path
+        路径的 x 坐标
     y_list: array
-        y positions of the path
+        路径的 y 坐标
     yaw_list: array
-        yaw angles of the path
+        路径的航向角
     modes: array
-        mode list of the path
+        路径的模式列表
     lengths: array
-        arrow_length list of the path segments.
+        路径各段的长度列表。
 
     Examples
     --------
-    You can generate a dubins path.
+    可以生成一条 Dubins 路径。
 
     >>> start_x = 1.0  # [m]
     >>> start_y = 1.0  # [m]
@@ -86,7 +86,7 @@ def plan_dubins_path(s_x, s_y, s_yaw, g_x, g_y, g_yaw, curvature,
     else:
         planning_funcs = [_PATH_TYPE_MAP[ptype] for ptype in selected_types]
 
-    # calculate local goal x, y, yaw
+    # 计算局部坐标系下目标点的 x、y、航向角
     l_rot = rot_mat_2d(s_yaw)
     le_xy = np.stack([g_x - s_x, g_y - s_y]).T @ l_rot
     local_goal_x = le_xy[0]
@@ -97,7 +97,7 @@ def plan_dubins_path(s_x, s_y, s_yaw, g_x, g_y, g_yaw, curvature,
         local_goal_x, local_goal_y, local_goal_yaw, curvature, step_size,
         planning_funcs)
 
-    # Convert a local coordinate path to the global coordinate
+    # 将局部坐标路径转换到全局坐标
     rot = rot_mat_2d(-s_yaw)
     converted_xy = np.stack([lp_x, lp_y]).T @ rot
     x_list = converted_xy[:, 0] + s_x
@@ -124,7 +124,7 @@ def _LSL(alpha, beta, d):
     sin_a, sin_b, cos_a, cos_b, cos_ab = _calc_trig_funcs(alpha, beta)
     mode = ["L", "S", "L"]
     p_squared = 2 + d ** 2 - (2 * cos_ab) + (2 * d * (sin_a - sin_b))
-    if p_squared < 0:  # invalid configuration
+    if p_squared < 0:  # 无效构型
         return None, None, None, mode
     tmp = atan2((cos_b - cos_a), d + sin_a - sin_b)
     d1 = _mod2pi(-alpha + tmp)
@@ -219,7 +219,7 @@ def _dubins_path_planning_from_origin(end_x, end_y, end_yaw, curvature,
             continue
 
         cost = (abs(d1) + abs(d2) + abs(d3))
-        if best_cost > cost:  # Select minimum length one.
+        if best_cost > cost:  # 选择长度最短的一条。
             b_d1, b_d2, b_d3, b_mode, best_cost = d1, d2, d3, mode, cost
 
     lengths = [b_d1, b_d2, b_d3]
@@ -237,21 +237,21 @@ def _interpolate(length, mode, max_curvature, origin_x, origin_y,
         path_x.append(origin_x + length / max_curvature * cos(origin_yaw))
         path_y.append(origin_y + length / max_curvature * sin(origin_yaw))
         path_yaw.append(origin_yaw)
-    else:  # curve
+    else:  # 曲线
         ldx = sin(length) / max_curvature
         ldy = 0.0
-        if mode == "L":  # left turn
+        if mode == "L":  # 左转
             ldy = (1.0 - cos(length)) / max_curvature
-        elif mode == "R":  # right turn
+        elif mode == "R":  # 右转
             ldy = (1.0 - cos(length)) / -max_curvature
         gdx = cos(-origin_yaw) * ldx + sin(-origin_yaw) * ldy
         gdy = -sin(-origin_yaw) * ldx + cos(-origin_yaw) * ldy
         path_x.append(origin_x + gdx)
         path_y.append(origin_y + gdy)
 
-        if mode == "L":  # left turn
+        if mode == "L":  # 左转
             path_yaw.append(origin_yaw + length)
-        elif mode == "R":  # right turn
+        elif mode == "R":  # 右转
             path_yaw.append(origin_yaw - length)
 
     return path_x, path_y, path_yaw
@@ -264,7 +264,7 @@ def _generate_local_course(lengths, modes, max_curvature, step_size):
         if length == 0.0:
             continue
 
-        # set origin state
+        # 设置原点状态
         origin_x, origin_y, origin_yaw = p_x[-1], p_y[-1], p_yaw[-1]
 
         current_length = step_size

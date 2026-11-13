@@ -1,7 +1,7 @@
 """
-flowfield pathfinding
-author: Sarim Mehdi (muhammadsarim.mehdi@studio.unibo.it)
-Source: https://leifnode.com/2013/12/flow-field-pathfinding/
+流场寻路
+作者: Sarim Mehdi (muhammadsarim.mehdi@studio.unibo.it)
+来源: https://leifnode.com/2013/12/flow-field-pathfinding/
 """
 
 import numpy as np
@@ -44,8 +44,7 @@ class FlowField:
         self.follow_vectors()
 
     def create_cost_field(self):
-        """Assign cost to each grid which defines the energy
-        it would take to get there."""
+        """为每个栅格分配代价，该代价表示到达该栅格所需的能量。"""
         for i in range(self.limit_x):
             for j in range(self.limit_y):
                 if self.obs_grid[(i, j)] == 'free':
@@ -61,20 +60,14 @@ class FlowField:
                     self.cost_field[(i, j)] = 0
 
     def create_integration_field(self):
-        """Start from the goal node and calculate the value
-        of the integration field at each node. Start by
-        assigning a value of infinity to every node except
-        the goal node which is assigned a value of 0. Put the
-        goal node in the open list and then get its neighbors
-        (must not be obstacles). For each neighbor, the new
-        cost is equal to the cost of the current node in the
-        integration field (in the beginning, this will simply
-        be the goal node) + the cost of the neighbor in the
-        cost field + the extra cost (optional). The new cost
-        is only assigned if it is less than the previously
-        assigned cost of the node in the integration field and,
-        when that happens, the neighbor is put on the open list.
-        This process continues until the open list is empty."""
+        """从目标节点出发，计算每个节点的积分场值。首先
+        将除目标节点以外的每个节点赋值为无穷大，目标节点
+        赋值为 0。将目标节点放入开放列表，然后获取其邻居
+        （不得为障碍物）。对每个邻居，新代价等于当前节点在
+        积分场中的代价（一开始就是目标节点）加上该邻居在
+        代价场中的代价，再加上额外代价（可选）。仅当新代价
+        小于该节点在积分场中先前已分配的代价时才赋值，并且
+        此时将该邻居放入开放列表。该过程持续到开放列表为空。"""
         for i in range(self.limit_x):
             for j in range(self.limit_y):
                 if self.obs_grid[(i, j)] == 'obs':
@@ -105,9 +98,8 @@ class FlowField:
             del open_list[0]
 
     def assign_vectors(self):
-        """For each node, assign a vector from itself to the node with
-        the lowest cost in the integration field. An agent will simply
-        follow this vector field to the goal"""
+        """对每个节点，分配一个从自身指向积分场中代价最低节点的向量。
+        智能体只需沿该向量场前往目标点"""
         for i in range(self.limit_x):
             for j in range(self.limit_y):
                 if self.obs_grid[(i, j)] == 'obs':
@@ -140,7 +132,7 @@ class FlowField:
 
 
 def main():
-    # set obstacle positions
+    # 设置障碍物位置
     obs_dict = {}
     for i in range(51):
         for j in range(51):
@@ -152,13 +144,13 @@ def main():
     g_x = 35.0
     g_y = 45.0
 
-    # draw outer border of maze
+    # 绘制迷宫外边界
     draw_vertical_line(0, 0, 50, o_x, o_y, obs_dict, 'obs')
     draw_vertical_line(48, 0, 50, o_x, o_y, obs_dict, 'obs')
     draw_horizontal_line(0, 0, 50, o_x, o_y, obs_dict, 'obs')
     draw_horizontal_line(0, 48, 50, o_x, o_y, obs_dict, 'obs')
 
-    # draw inner walls
+    # 绘制内部墙壁
     all_x = [10, 10, 10, 15, 20, 20, 30, 30, 35, 30, 40, 45]
     all_y = [10, 30, 45, 20, 5, 40, 10, 40, 5, 40, 10, 25]
     all_len = [10, 10, 5, 10, 10, 5, 20, 10, 25, 10, 35, 15]
@@ -172,16 +164,13 @@ def main():
     for x, y, l in zip(all_x, all_y, all_len):
         draw_horizontal_line(x, y, l, o_x, o_y, obs_dict, 'obs')
 
-    # Some points are assigned a slightly higher energy value in the cost
-    # field. For example, if an agent wishes to go to a point, it might
-    # encounter different kind of terrain like grass and dirt. Grass is
-    # assigned medium difficulty of passage (color coded as green on the
-    # map here). Dirt is assigned hard difficulty of passage (color coded
-    # as brown here). Hence, this algorithm will take into account how
-    # difficult it is to go through certain areas of a map when deciding
-    # the shortest path.
+    # 某些点在代价场中被赋予略高的能量值。例如，智能体前往某点时
+    # 可能遇到草地、泥土等不同地形。草地被赋予中等通行难度
+    # （此处地图上以绿色编码）。泥土被赋予困难通行难度（此处以
+    # 棕色编码）。因此，该算法在决定最短路径时会考虑穿越地图
+    # 某些区域的困难程度。
 
-    # draw paths that have medium difficulty (in terms of going through them)
+    # 绘制中等通行难度的路径
     all_x[:], all_y[:], all_len[:] = [], [], []
     all_x = [10, 45]
     all_y = [22, 20]
@@ -196,7 +185,7 @@ def main():
     for x, y, l in zip(all_x, all_y, all_len):
         draw_horizontal_line(x, y, l, m_x, m_y, obs_dict, 'medium')
 
-    # draw paths that have hard difficulty (in terms of going through them)
+    # 绘制困难通行难度的路径
     all_x[:], all_y[:], all_len[:] = [], [], []
     all_x = [15, 20, 35]
     all_y = [45, 20, 35]

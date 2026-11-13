@@ -1,8 +1,8 @@
 """
 
-Dijkstra Search library
+Dijkstra 搜索库
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
 
 """
 
@@ -14,7 +14,7 @@ import numpy as np
 class DijkstraSearch:
     class Node:
         """
-        Node class for dijkstra search
+        Dijkstra 搜索的节点类
         """
 
         def __init__(self, x, y, cost=None, parent=None, edge_ids=None):
@@ -33,15 +33,15 @@ class DijkstraSearch:
 
     def search(self, sx, sy, gx, gy, node_x, node_y, edge_ids_list):
         """
-        Search shortest path
+        搜索最短路径
 
-        s_x: start x positions [m]
-        s_y: start y positions [m]
-        gx: goal x position [m]
-        gx: goal x position [m]
-        node_x: node x position
-        node_y: node y position
-        edge_ids_list: edge_list each item includes a list of edge ids
+        s_x：起点的 x 坐标 [m]
+        s_y：起点的 y 坐标 [m]
+        gx：目标点的 x 坐标 [m]
+        gx：目标点的 x 坐标 [m]
+        node_x：节点的 x 坐标
+        node_y：节点的 y 坐标
+        edge_ids_list：边列表，每一项包含一组边的 id
         """
 
         start_node = self.Node(sx, sy, 0.0, -1)
@@ -64,22 +64,22 @@ class DijkstraSearch:
             current_id = min(open_set, key=lambda o: open_set[o].cost)
             current_node = open_set[current_id]
 
-            # show graph
+            # 显示搜索过程
             if self.show_animation and len(
                     close_set.keys()) % 2 == 0:  # pragma: no cover
                 plt.plot(current_node.x, current_node.y, "xg")
-                # for stopping simulation with the esc key.
+                # 按 Esc 键停止仿真。
                 plt.gcf().canvas.mpl_connect(
                     'key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
                 plt.pause(0.1)
 
-            # Remove the item from the open set
+            # 从开集中移除该项
             del open_set[current_id]
-            # Add it to the closed set
+            # 将其加入闭集
             close_set[current_id] = current_node
 
-            # expand search grid based on motion model
+            # 根据运动模型扩展搜索栅格
             for i in range(len(edge_ids_list[current_id])):
                 n_id = edge_ids_list[current_id][i]
                 dx = node_x[n_id] - current_node.x
@@ -90,14 +90,14 @@ class DijkstraSearch:
 
                 if n_id in close_set:
                     continue
-                # Otherwise if it is already in the open set
+                # 否则，若它已在开集中
                 if n_id in open_set:
                     if open_set[n_id].cost > node.cost:
                         open_set[n_id] = node
                 else:
                     open_set[n_id] = node
 
-        # generate final course
+        # 生成最终路径
         rx, ry = self.generate_final_path(close_set, goal_node)
 
         return rx, ry
@@ -111,7 +111,7 @@ class DijkstraSearch:
             rx.append(n.x)
             ry.append(n.y)
             parent = n.parent
-        rx, ry = rx[::-1], ry[::-1]  # reverse it
+        rx, ry = rx[::-1], ry[::-1]  # 反转
         return rx, ry
 
     def has_node_in_set(self, target_set, node):

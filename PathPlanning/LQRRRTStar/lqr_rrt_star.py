@@ -1,8 +1,8 @@
 """
 
-Path planning code with LQR RRT*
+使用 LQR RRT* 的路径规划代码
 
-author: AtsushiSakai(@Atsushi_twi)
+作者: AtsushiSakai(@Atsushi_twi)
 
 """
 import copy
@@ -22,7 +22,7 @@ show_animation = True
 
 class LQRRRTStar(RRTStar):
     """
-    Class for RRT star planning with LQR planning
+    使用 LQR 规划进行 RRT* 规划的类
     """
 
     def __init__(self, start, goal, obstacle_list, rand_area,
@@ -33,13 +33,13 @@ class LQRRRTStar(RRTStar):
                  robot_radius=0.0,
                  ):
         """
-        Setting Parameter
+        参数设置
 
-        start:Start Position [x,y]
-        goal:Goal Position [x,y]
-        obstacleList:obstacle Positions [[x,y,size],...]
-        randArea:Random Sampling Area [min,max]
-        robot_radius: robot body modeled as circle with given radius
+        start:起点位置 [x,y]
+        goal:目标点位置 [x,y]
+        obstacleList:障碍物位置 [[x,y,尺寸],...]
+        randArea:随机采样区域 [min,max]
+        robot_radius: 将机器人本体建模为给定半径的圆
 
         """
         self.start = self.Node(start[0], start[1])
@@ -60,9 +60,9 @@ class LQRRRTStar(RRTStar):
 
     def planning(self, animation=True, search_until_max_iter=True):
         """
-        RRT Star planning
+        RRT* 规划
 
-        animation: flag for animation on or off
+        animation: 是否开启动画的标志
         """
 
         self.node_list = [self.start]
@@ -83,7 +83,7 @@ class LQRRRTStar(RRTStar):
             if animation and i % 5 == 0:
                 self.draw_graph(rnd)
 
-            if (not search_until_max_iter) and new_node:  # check reaching the goal
+            if (not search_until_max_iter) and new_node:  # 检查是否到达目标点
                 last_index = self.search_best_goal_node()
                 if last_index:
                     return self.generate_final_course(last_index)
@@ -100,7 +100,7 @@ class LQRRRTStar(RRTStar):
 
     def draw_graph(self, rnd=None):
         plt.clf()
-        # for stopping simulation with the esc key.
+        # 按 Esc 键停止仿真。
         plt.gcf().canvas.mpl_connect('key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
         if rnd is not None:
@@ -150,7 +150,7 @@ class LQRRRTStar(RRTStar):
             rnd = self.Node(random.uniform(self.min_rand, self.max_rand),
                             random.uniform(self.min_rand, self.max_rand)
                             )
-        else:  # goal point sampling
+        else:  # 目标点采样
             rnd = self.Node(self.end.x, self.end.y)
 
         return rnd
@@ -207,7 +207,7 @@ class LQRRRTStar(RRTStar):
 def main(maxIter=200):
     print("Start " + __file__)
 
-    # ====Search Path with RRT====
+    # ====使用 RRT 搜索路径====
     obstacleList = [
         (5, 5, 1),
         (4, 6, 1),
@@ -215,9 +215,9 @@ def main(maxIter=200):
         (4, 9, 1),
         (6, 5, 1),
         (7, 5, 1)
-    ]  # [x,y,size]
+    ]  # [x,y,尺寸]
 
-    # Set Initial parameters
+    # 设置初始参数
     start = [0.0, 0.0]
     goal = [6.0, 7.0]
 
@@ -226,7 +226,7 @@ def main(maxIter=200):
                               [-2.0, 15.0])
     path = lqr_rrt_star.planning(animation=show_animation)
 
-    # Draw final path
+    # 绘制最终路径
     if show_animation:  # pragma: no cover
         lqr_rrt_star.draw_graph()
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')

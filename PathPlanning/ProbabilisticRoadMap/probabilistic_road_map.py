@@ -1,8 +1,8 @@
 """
 
-Probabilistic Road Map (PRM) Planner
+概率路线图（PRM）规划器
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者: Atsushi Sakai (@Atsushi_twi)
 
 """
 
@@ -11,17 +11,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import KDTree
 
-# parameter
-N_SAMPLE = 500  # number of sample_points
-N_KNN = 10  # number of edge from one sampled point
-MAX_EDGE_LEN = 30.0  # [m] Maximum edge length
+# 参数
+N_SAMPLE = 500  # 采样点数量
+N_KNN = 10  # 每个采样点引出的边数
+MAX_EDGE_LEN = 30.0  # [m] 最大边长
 
 show_animation = True
 
 
 class Node:
     """
-    Node class for dijkstra search
+    用于 Dijkstra 搜索的节点类
     """
 
     def __init__(self, x, y, cost, parent_index):
@@ -38,16 +38,16 @@ class Node:
 def prm_planning(start_x, start_y, goal_x, goal_y,
                  obstacle_x_list, obstacle_y_list, robot_radius, *, rng=None):
     """
-    Run probabilistic road map planning
+    运行概率路线图规划
 
-    :param start_x: start x position
-    :param start_y: start y position
-    :param goal_x: goal x position
-    :param goal_y: goal y position
-    :param obstacle_x_list: obstacle x positions
-    :param obstacle_y_list: obstacle y positions
-    :param robot_radius: robot radius
-    :param rng: (Optional) Random generator
+    :param start_x: 起点 x 位置
+    :param start_y: 起点 y 位置
+    :param goal_x: 目标点 x 位置
+    :param goal_y: 目标点 y 位置
+    :param obstacle_x_list: 障碍物 x 位置
+    :param obstacle_y_list: 障碍物 y 位置
+    :param robot_radius: 机器人半径
+    :param rng: （可选）随机数生成器
     :return:
     """
     obstacle_kd_tree = KDTree(np.vstack((obstacle_x_list, obstacle_y_list)).T)
@@ -85,26 +85,26 @@ def is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree):
     for i in range(n_step):
         dist, _ = obstacle_kd_tree.query([x, y])
         if dist <= rr:
-            return True  # collision
+            return True  # 碰撞
         x += D * math.cos(yaw)
         y += D * math.sin(yaw)
 
-    # goal point check
+    # 目标点检测
     dist, _ = obstacle_kd_tree.query([gx, gy])
     if dist <= rr:
-        return True  # collision
+        return True  # 碰撞
 
-    return False  # OK
+    return False  # 可行
 
 
 def generate_road_map(sample_x, sample_y, rr, obstacle_kd_tree):
     """
-    Road map generation
+    路线图生成
 
-    sample_x: [m] x positions of sampled points
-    sample_y: [m] y positions of sampled points
-    robot_radius: Robot Radius[m]
-    obstacle_kd_tree: KDTree object of obstacles
+    sample_x: [m] 采样点的 x 位置
+    sample_y: [m] 采样点的 y 位置
+    robot_radius: 机器人半径[m]
+    obstacle_kd_tree: 障碍物的 KDTree 对象
     """
 
     road_map = []
@@ -135,18 +135,18 @@ def generate_road_map(sample_x, sample_y, rr, obstacle_kd_tree):
 
 def dijkstra_planning(sx, sy, gx, gy, road_map, sample_x, sample_y):
     """
-    s_x: start x position [m]
-    s_y: start y position [m]
-    goal_x: goal x position [m]
-    goal_y: goal y position [m]
-    obstacle_x_list: x position list of Obstacles [m]
-    obstacle_y_list: y position list of Obstacles [m]
-    robot_radius: robot radius [m]
+    s_x: 起点 x 位置 [m]
+    s_y: 起点 y 位置 [m]
+    goal_x: 目标点 x 位置 [m]
+    goal_y: 目标点 y 位置 [m]
+    obstacle_x_list: 障碍物的 x 位置列表 [m]
+    obstacle_y_list: 障碍物的 y 位置列表 [m]
+    robot_radius: 机器人半径 [m]
     road_map: ??? [m]
     sample_x: ??? [m]
     sample_y: ??? [m]
 
-    @return: Two lists of path coordinates ([x1, x2, ...], [y1, y2, ...]), empty list when no path was found
+    @return: 路径坐标的两个列表（[x1, x2, ...]、[y1, y2, ...]），未找到路径时为空列表
     """
 
     start_node = Node(sx, sy, 0.0, -1)
@@ -166,9 +166,9 @@ def dijkstra_planning(sx, sy, gx, gy, road_map, sample_x, sample_y):
         c_id = min(open_set, key=lambda o: open_set[o].cost)
         current = open_set[c_id]
 
-        # show graph
+        # 显示搜索图
         if show_animation and len(closed_set.keys()) % 2 == 0:
-            # for stopping simulation with the esc key.
+            # 按 Esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
@@ -181,12 +181,12 @@ def dijkstra_planning(sx, sy, gx, gy, road_map, sample_x, sample_y):
             goal_node.cost = current.cost
             break
 
-        # Remove the item from the open set
+        # 从开放集合中移除该项
         del open_set[c_id]
-        # Add it to the closed set
+        # 将其加入关闭集合
         closed_set[c_id] = current
 
-        # expand search grid based on motion model
+        # 基于运动模型扩展搜索栅格
         for i in range(len(road_map[c_id])):
             n_id = road_map[c_id][i]
             dx = sample_x[n_id] - current.x
@@ -197,7 +197,7 @@ def dijkstra_planning(sx, sy, gx, gy, road_map, sample_x, sample_y):
 
             if n_id in closed_set:
                 continue
-            # Otherwise if it is already in the open set
+            # 否则，若其已在开放集合中
             if n_id in open_set:
                 if open_set[n_id].cost > node.cost:
                     open_set[n_id].cost = node.cost
@@ -208,7 +208,7 @@ def dijkstra_planning(sx, sy, gx, gy, road_map, sample_x, sample_y):
     if path_found is False:
         return [], []
 
-    # generate final course
+    # 生成最终路径
     rx, ry = [goal_node.x], [goal_node.y]
     parent_index = goal_node.parent_index
     while parent_index != -1:
@@ -262,7 +262,7 @@ def sample_points(sx, sy, gx, gy, rr, ox, oy, obstacle_kd_tree, rng):
 def main(rng=None):
     print(__file__ + " start!!")
 
-    # start and goal position
+    # 起点与目标点位置
     sx = 10.0  # [m]
     sy = 10.0  # [m]
     gx = 50.0  # [m]

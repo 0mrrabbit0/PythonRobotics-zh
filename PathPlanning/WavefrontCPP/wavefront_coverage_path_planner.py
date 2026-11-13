@@ -1,10 +1,10 @@
 """
-Distance/Path Transform Wavefront Coverage Path Planner
+距离/路径变换波前覆盖路径规划器
 
-author: Todd Tang
-paper: Planning paths of complete coverage of an unstructured environment
+作者: Todd Tang
+论文: Planning paths of complete coverage of an unstructured environment
          by a mobile robot - Zelinsky et.al.
-link: https://pinkwink.kr/attachment/cfile3.uf@1354654A4E8945BD13FE77.pdf
+链接: https://pinkwink.kr/attachment/cfile3.uf@1354654A4E8945BD13FE77.pdf
 """
 
 import os
@@ -21,16 +21,15 @@ def transform(
         grid_map, src, distance_type='chessboard',
         transform_type='path', alpha=0.01
 ):
-    """transform
+    """变换
 
-    calculating transform of transform_type from src
-    in given distance_type
+    从源点 src 计算给定距离类型下、指定变换类型的变换
 
-    :param grid_map: 2d binary map
-    :param src: distance transform source
-    :param distance_type: type of distance used
-    :param transform_type: type of transform used
-    :param alpha: weight of Obstacle Transform used when using path_transform
+    :param grid_map: 二维二值地图
+    :param src: 距离变换的源点
+    :param distance_type: 所使用的距离类型
+    :param transform_type: 所使用的变换类型
+    :param alpha: 使用 path_transform 时障碍物变换的权重
     """
 
     n_rows, n_cols = grid_map.shape
@@ -56,7 +55,7 @@ def transform(
     else:
         sys.exit('Unsupported transform type.')
 
-    # set obstacle transform_matrix value to infinity
+    # 将障碍物的 transform_matrix 值设为无穷大
     for i in range(n_rows):
         for j in range(n_cols):
             if grid_map[i][j] == 1.0:
@@ -78,7 +77,7 @@ def transform(
             if is_valid_neighbor(ni, nj):
                 is_visited[i][j] = True
 
-                # update transform_matrix
+                # 更新 transform_matrix
                 transform_matrix[i][j] = min(
                     transform_matrix[i][j],
                     transform_matrix[ni][nj] + cost[k] + alpha * eT[ni][nj])
@@ -111,13 +110,13 @@ def get_search_order_increment(start, goal):
 
 
 def wavefront(transform_matrix, start, goal):
-    """wavefront
+    """波前
 
-    performing wavefront coverage path planning
+    执行波前覆盖路径规划
 
-    :param transform_matrix: the transform matrix
-    :param start: start point of planning
-    :param goal: goal point of planning
+    :param transform_matrix: 变换矩阵
+    :param start: 规划起点
+    :param goal: 规划目标点
     """
 
     path = []
@@ -145,7 +144,7 @@ def wavefront(transform_matrix, start, goal):
         i_max = (-1, -1)
         i_last = 0
         for i_last in range(len(path)):
-            current_node = path[-1 - i_last]  # get latest node in path
+            current_node = path[-1 - i_last]  # 获取路径中最新的节点
             for ci, cj in inc_order:
                 ni, nj = current_node[0] + ci, current_node[1] + cj
                 if is_valid_neighbor(ni, nj) and \
@@ -181,7 +180,7 @@ def visualize_path(grid_map, start, goal, path):  # pragma: no cover
     else:
         for ipx, ipy in zip(px, py):
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 Esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
@@ -198,17 +197,17 @@ def visualize_path(grid_map, start, goal, path):  # pragma: no cover
 def main():
     dir_path = os.path.dirname(os.path.realpath(__file__))
     img = plt.imread(os.path.join(dir_path, 'map', 'test.png'))
-    img = 1 - img  # revert pixel values
+    img = 1 - img  # 反转像素值
 
     start = (43, 0)
     goal = (0, 0)
 
-    # distance transform wavefront
+    # 距离变换波前
     DT = transform(img, goal, transform_type='distance')
     DT_path = wavefront(DT, start, goal)
     visualize_path(img, start, goal, DT_path)
 
-    # path transform wavefront
+    # 路径变换波前
     PT = transform(img, goal, transform_type='path', alpha=0.01)
     PT_path = wavefront(PT, start, goal)
     visualize_path(img, start, goal, PT_path)

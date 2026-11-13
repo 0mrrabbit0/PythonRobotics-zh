@@ -1,8 +1,8 @@
 """
 
-Mobile robot motion planning sample with Dynamic Window Approach
+使用动态窗口法的移动机器人运动规划示例
 
-author: Atsushi Sakai (@Atsushi_twi), Göktuğ Karakaşlı
+作者: Atsushi Sakai (@Atsushi_twi), Göktuğ Karakaşlı
 
 """
 
@@ -17,7 +17,7 @@ show_animation = True
 
 def dwa_control(x, config, goal, ob):
     """
-    Dynamic Window Approach control
+    动态窗口法控制
     """
     dw = calc_dynamic_window(x, config)
 
@@ -33,11 +33,11 @@ class RobotType(Enum):
 
 class Config:
     """
-    simulation parameter class
+    仿真参数类
     """
 
     def __init__(self):
-        # robot parameter
+        # 机器人参数
         self.max_speed = 1.0  # [m/s]
         self.min_speed = -0.5  # [m/s]
         self.max_yaw_rate = 40.0 * math.pi / 180.0  # [rad/s]
@@ -45,22 +45,22 @@ class Config:
         self.max_delta_yaw_rate = 40.0 * math.pi / 180.0  # [rad/ss]
         self.v_resolution = 0.01  # [m/s]
         self.yaw_rate_resolution = 0.1 * math.pi / 180.0  # [rad/s]
-        self.dt = 0.1  # [s] Time tick for motion prediction
+        self.dt = 0.1  # [s] 运动预测的时间步长
         self.predict_time = 3.0  # [s]
         self.to_goal_cost_gain = 0.15
         self.speed_cost_gain = 1.0
         self.obstacle_cost_gain = 1.0
-        self.robot_stuck_flag_cons = 0.001  # constant to prevent robot stucked
+        self.robot_stuck_flag_cons = 0.001  # 防止机器人卡住的常数
         self.robot_type = RobotType.circle
 
-        # if robot_type == RobotType.circle
-        # Also used to check if goal is reached in both types
-        self.robot_radius = 1.0  # [m] for collision check
+        # 若 robot_type == RobotType.circle
+        # 两种类型下也用于检查是否到达目标点
+        self.robot_radius = 1.0  # [m] 用于碰撞检测
 
-        # if robot_type == RobotType.rectangle
-        self.robot_width = 0.5  # [m] for collision check
-        self.robot_length = 1.2  # [m] for collision check
-        # obstacles [x(m) y(m), ....]
+        # 若 robot_type == RobotType.rectangle
+        self.robot_width = 0.5  # [m] 用于碰撞检测
+        self.robot_length = 1.2  # [m] 用于碰撞检测
+        # 障碍物 [x(m) y(m), ....]
         self.ob = np.array([[-1, -1],
                             [0, 2],
                             [4.0, 2.0],
@@ -94,7 +94,7 @@ config = Config()
 
 def motion(x, u, dt):
     """
-    motion model
+    运动模型
     """
 
     x[2] += u[1] * dt
@@ -108,20 +108,20 @@ def motion(x, u, dt):
 
 def calc_dynamic_window(x, config):
     """
-    calculation dynamic window based on current state x
+    根据当前状态 x 计算动态窗口
     """
 
-    # Dynamic window from robot specification
+    # 由机器人性能约束得到的动态窗口
     Vs = [config.min_speed, config.max_speed,
           -config.max_yaw_rate, config.max_yaw_rate]
 
-    # Dynamic window from motion model
+    # 由运动模型得到的动态窗口
     Vd = [x[3] - config.max_accel * config.dt,
           x[3] + config.max_accel * config.dt,
           x[4] - config.max_delta_yaw_rate * config.dt,
           x[4] + config.max_delta_yaw_rate * config.dt]
 
-    #  [v_min, v_max, yaw_rate_min, yaw_rate_max]
+    #  [最小线速度, 最大线速度, 最小航向角速度, 最大航向角速度]
     dw = [max(Vs[0], Vd[0]), min(Vs[1], Vd[1]),
           max(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
 
@@ -130,7 +130,7 @@ def calc_dynamic_window(x, config):
 
 def predict_trajectory(x_init, v, y, config):
     """
-    predict trajectory with an input
+    根据一组输入预测轨迹
     """
 
     x = np.array(x_init)
@@ -146,7 +146,7 @@ def predict_trajectory(x_init, v, y, config):
 
 def calc_control_and_trajectory(x, dw, config, goal, ob):
     """
-    calculation final input with dynamic window
+    用动态窗口计算最终输入
     """
 
     x_init = x[:]
@@ -154,36 +154,36 @@ def calc_control_and_trajectory(x, dw, config, goal, ob):
     best_u = [0.0, 0.0]
     best_trajectory = np.array([x])
 
-    # evaluate all trajectory with sampled input in dynamic window
+    # 用动态窗口内的采样输入评估全部轨迹
     for v in np.arange(dw[0], dw[1], config.v_resolution):
         for y in np.arange(dw[2], dw[3], config.yaw_rate_resolution):
 
             trajectory = predict_trajectory(x_init, v, y, config)
-            # calc cost
+            # 计算代价
             to_goal_cost = config.to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
             speed_cost = config.speed_cost_gain * (config.max_speed - trajectory[-1, 3])
             ob_cost = config.obstacle_cost_gain * calc_obstacle_cost(trajectory, ob, config)
 
             final_cost = to_goal_cost + speed_cost + ob_cost
 
-            # search minimum trajectory
+            # 搜索代价最小的轨迹
             if min_cost >= final_cost:
                 min_cost = final_cost
                 best_u = [v, y]
                 best_trajectory = trajectory
                 if abs(best_u[0]) < config.robot_stuck_flag_cons \
                         and abs(x[3]) < config.robot_stuck_flag_cons:
-                    # to ensure the robot do not get stuck in
-                    # best v=0 m/s (in front of an obstacle) and
-                    # best omega=0 rad/s (heading to the goal with
-                    # angle difference of 0)
+                    # 避免机器人卡在如下情况：
+                    # 最优 v=0 m/s（障碍物前方）且
+                    # 最优 omega=0 rad/s（朝向目标点且
+                    # 角度差为 0）
                     best_u[1] = -config.max_delta_yaw_rate
     return best_u, best_trajectory
 
 
 def calc_obstacle_cost(trajectory, ob, config):
     """
-    calc obstacle cost inf: collision
+    计算障碍物代价，inf 表示碰撞
     """
     ox = ob[:, 0]
     oy = ob[:, 1]
@@ -211,12 +211,12 @@ def calc_obstacle_cost(trajectory, ob, config):
             return float("Inf")
 
     min_r = np.min(r)
-    return 1.0 / min_r  # OK
+    return 1.0 / min_r  # 可行
 
 
 def calc_to_goal_cost(trajectory, goal):
     """
-        calc to goal cost with angle difference
+        用角度差计算到目标点的代价
     """
 
     dx = goal[0] - trajectory[-1, 0]
@@ -259,24 +259,24 @@ def plot_robot(x, y, yaw, config):  # pragma: no cover
 
 def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
     print(__file__ + " start!!")
-    # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
+    # 初始状态 [x(m), y(m), 航向角(rad), v(m/s), omega(rad/s)]
     x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
-    # goal position [x(m), y(m)]
+    # 目标点位置 [x(m), y(m)]
     goal = np.array([gx, gy])
 
-    # input [forward speed, yaw_rate]
+    # 输入 [前进速度, 航向角速度]
 
     config.robot_type = robot_type
     trajectory = np.array(x)
     ob = config.ob
     while True:
         u, predicted_trajectory = dwa_control(x, config, goal, ob)
-        x = motion(x, u, config.dt)  # simulate robot
-        trajectory = np.vstack((trajectory, x))  # store state history
+        x = motion(x, u, config.dt)  # 仿真机器人
+        trajectory = np.vstack((trajectory, x))  # 保存状态历史
 
         if show_animation:
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 Esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
@@ -290,7 +290,7 @@ def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
             plt.grid(True)
             plt.pause(0.0001)
 
-        # check reaching goal
+        # 检查是否到达目标点
         dist_to_goal = math.hypot(x[0] - goal[0], x[1] - goal[1])
         if dist_to_goal <= config.robot_radius:
             print("Goal!!")

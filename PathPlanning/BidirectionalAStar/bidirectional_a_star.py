@@ -1,10 +1,10 @@
 """
 
-Bidirectional A* grid planning
+双向 A* 栅格路径规划
 
-author: Erwin Lejeune (@spida_rwin)
+作者：Erwin Lejeune (@spida_rwin)
 
-See Wikipedia article (https://en.wikipedia.org/wiki/Bidirectional_search)
+参见维基百科条目 (https://en.wikipedia.org/wiki/Bidirectional_search)
 
 """
 
@@ -19,12 +19,12 @@ class BidirectionalAStarPlanner:
 
     def __init__(self, ox, oy, resolution, rr):
         """
-        Initialize grid map for a star planning
+        为 A* 规划初始化栅格地图
 
-        ox: x position list of Obstacles [m]
-        oy: y position list of Obstacles [m]
-        resolution: grid resolution [m]
-        rr: robot radius[m]
+        ox：障碍物的 x 坐标列表 [m]
+        oy：障碍物的 y 坐标列表 [m]
+        resolution：栅格分辨率 [m]
+        rr：机器人半径 [m]
         """
 
         self.min_x, self.min_y = None, None
@@ -37,8 +37,8 @@ class BidirectionalAStarPlanner:
 
     class Node:
         def __init__(self, x, y, cost, parent_index):
-            self.x = x  # index of grid
-            self.y = y  # index of grid
+            self.x = x  # 栅格索引
+            self.y = y  # 栅格索引
             self.cost = cost
             self.parent_index = parent_index
 
@@ -48,17 +48,17 @@ class BidirectionalAStarPlanner:
 
     def planning(self, sx, sy, gx, gy):
         """
-        Bidirectional A star path search
+        双向 A* 路径搜索
 
-        input:
-            s_x: start x position [m]
-            s_y: start y position [m]
-            gx: goal x position [m]
-            gy: goal y position [m]
+        输入：
+            s_x：起点 x 坐标 [m]
+            s_y：起点 y 坐标 [m]
+            gx：目标点 x 坐标 [m]
+            gy：目标点 y 坐标 [m]
 
-        output:
-            rx: x position list of the final path
-            ry: y position list of the final path
+        输出：
+            rx：最终路径的 x 坐标列表
+            ry：最终路径的 y 坐标列表
         """
 
         start_node = self.Node(self.calc_xy_index(sx, self.min_x),
@@ -96,7 +96,7 @@ class BidirectionalAStarPlanner:
 
             current_B = open_set_B[c_id_B]
 
-            # show graph
+            # 显示搜索过程
             if show_animation:  # pragma: no cover
                 plt.plot(self.calc_grid_position(current_A.x, self.min_x),
                          self.calc_grid_position(current_A.y, self.min_y),
@@ -104,7 +104,7 @@ class BidirectionalAStarPlanner:
                 plt.plot(self.calc_grid_position(current_B.x, self.min_x),
                          self.calc_grid_position(current_B.y, self.min_y),
                          "xc")
-                # for stopping simulation with the esc key.
+                # 按 Esc 键停止仿真。
                 plt.gcf().canvas.mpl_connect(
                     'key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
@@ -117,15 +117,15 @@ class BidirectionalAStarPlanner:
                 meet_point_B = current_B
                 break
 
-            # Remove the item from the open set
+            # 从开集中移除该项
             del open_set_A[c_id_A]
             del open_set_B[c_id_B]
 
-            # Add it to the closed set
+            # 将其加入闭集
             closed_set_A[c_id_A] = current_A
             closed_set_B[c_id_B] = current_B
 
-            # expand_grid search grid based on motion model
+            # 根据运动模型扩展搜索栅格
             for i, _ in enumerate(self.motion):
 
                 c_nodes = [self.Node(current_A.x + self.motion[i][0],
@@ -140,26 +140,26 @@ class BidirectionalAStarPlanner:
                 n_ids = [self.calc_grid_index(c_nodes[0]),
                          self.calc_grid_index(c_nodes[1])]
 
-                # If the node is not safe, do nothing
+                # 若节点不安全，则不做处理
                 continue_ = self.check_nodes_and_sets(c_nodes, closed_set_A,
                                                       closed_set_B, n_ids)
 
                 if not continue_[0]:
                     if n_ids[0] not in open_set_A:
-                        # discovered a new node
+                        # 发现新节点
                         open_set_A[n_ids[0]] = c_nodes[0]
                     else:
                         if open_set_A[n_ids[0]].cost > c_nodes[0].cost:
-                            # This path is the best until now. record it
+                            # 这是迄今最优路径，记录它
                             open_set_A[n_ids[0]] = c_nodes[0]
 
                 if not continue_[1]:
                     if n_ids[1] not in open_set_B:
-                        # discovered a new node
+                        # 发现新节点
                         open_set_B[n_ids[1]] = c_nodes[1]
                     else:
                         if open_set_B[n_ids[1]].cost > c_nodes[1].cost:
-                            # This path is the best until now. record it
+                            # 这是迄今最优路径，记录它
                             open_set_B[n_ids[1]] = c_nodes[1]
 
         rx, ry = self.calc_final_bidirectional_path(
@@ -167,7 +167,7 @@ class BidirectionalAStarPlanner:
 
         return rx, ry
 
-    # takes two sets and two meeting nodes and return the optimal path
+    # 根据两个集合与两个相遇节点返回最优路径
     def calc_final_bidirectional_path(self, n1, n2, setA, setB):
         rx_A, ry_A = self.calc_final_path(n1, setA)
         rx_B, ry_B = self.calc_final_path(n2, setB)
@@ -181,7 +181,7 @@ class BidirectionalAStarPlanner:
         return rx, ry
 
     def calc_final_path(self, goal_node, closed_set):
-        # generate final course
+        # 生成最终路径
         rx, ry = [self.calc_grid_position(goal_node.x, self.min_x)], \
                  [self.calc_grid_position(goal_node.y, self.min_y)]
         parent_index = goal_node.parent_index
@@ -205,7 +205,7 @@ class BidirectionalAStarPlanner:
 
     @staticmethod
     def calc_heuristic(n1, n2):
-        w = 1.0  # weight of heuristic
+        w = 1.0  # 启发式权重
         d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
         return d
 
@@ -217,7 +217,7 @@ class BidirectionalAStarPlanner:
 
     def calc_grid_position(self, index, min_position):
         """
-        calc grid position
+        计算栅格位置
 
         :param index:
         :param min_position:
@@ -245,7 +245,7 @@ class BidirectionalAStarPlanner:
         elif py >= self.max_y:
             return False
 
-        # collision check
+        # 碰撞检查
         if self.obstacle_map[node.x][node.y]:
             return False
 
@@ -267,7 +267,7 @@ class BidirectionalAStarPlanner:
         print("x_width:", self.x_width)
         print("y_width:", self.y_width)
 
-        # obstacle map generation
+        # 生成障碍物地图
         self.obstacle_map = [[False for _ in range(self.y_width)]
                              for _ in range(self.x_width)]
         for ix in range(self.x_width):
@@ -282,7 +282,7 @@ class BidirectionalAStarPlanner:
 
     @staticmethod
     def get_motion_model():
-        # dx, dy, cost
+        # dx, dy, 代价
         motion = [[1, 0, 1],
                   [0, 1, 1],
                   [-1, 0, 1],
@@ -298,7 +298,7 @@ class BidirectionalAStarPlanner:
 def main():
     print(__file__ + " start!!")
 
-    # start and goal position
+    # 起点与目标点位置
     sx = 10.0  # [m]
     sy = 10.0  # [m]
     gx = 50.0  # [m]
@@ -306,7 +306,7 @@ def main():
     grid_size = 2.0  # [m]
     robot_radius = 1.0  # [m]
 
-    # set obstacle positions
+    # 设置障碍物位置
     ox, oy = [], []
     for i in range(-10, 60):
         ox.append(i)

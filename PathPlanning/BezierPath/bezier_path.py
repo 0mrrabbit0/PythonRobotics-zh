@@ -1,8 +1,8 @@
 """
 
-Path planning with Bezier curve.
+使用贝塞尔曲线的路径规划。
 
-author: Atsushi Sakai(@Atsushi_twi)
+作者: Atsushi Sakai(@Atsushi_twi)
 
 """
 
@@ -15,14 +15,14 @@ show_animation = True
 
 def calc_4points_bezier_path(sx, sy, syaw, ex, ey, eyaw, offset):
     """
-    Compute control points and path given start and end position.
+    根据起点和终点计算控制点与路径。
 
-    :param sx: (float) x-coordinate of the starting point
-    :param sy: (float) y-coordinate of the starting point
-    :param syaw: (float) yaw angle at start
-    :param ex: (float) x-coordinate of the ending point
-    :param ey: (float) y-coordinate of the ending point
-    :param eyaw: (float) yaw angle at the end
+    :param sx: (float) 起点的 x 坐标
+    :param sy: (float) 起点的 y 坐标
+    :param syaw: (float) 起点航向角
+    :param ex: (float) 终点的 x 坐标
+    :param ey: (float) 终点的 y 坐标
+    :param eyaw: (float) 终点航向角
     :param offset: (float)
     :return: (numpy array, numpy array)
     """
@@ -40,10 +40,10 @@ def calc_4points_bezier_path(sx, sy, syaw, ex, ey, eyaw, offset):
 
 def calc_bezier_path(control_points, n_points=100):
     """
-    Compute bezier path (trajectory) given control points.
+    根据控制点计算贝塞尔曲线路径（轨迹）。
 
     :param control_points: (numpy array)
-    :param n_points: (int) number of points in the trajectory
+    :param n_points: (int) 轨迹中的点数
     :return: (numpy array)
     """
     traj = []
@@ -55,9 +55,9 @@ def calc_bezier_path(control_points, n_points=100):
 
 def bernstein_poly(n, i, t):
     """
-    Bernstein polynom.
+    Bernstein 多项式。
 
-    :param n: (int) polynom degree
+    :param n: (int) 多项式次数
     :param i: (int)
     :param t: (float)
     :return: (float)
@@ -67,11 +67,11 @@ def bernstein_poly(n, i, t):
 
 def bezier(t, control_points):
     """
-    Return one point on the bezier curve.
+    返回贝塞尔曲线上的一个点。
 
-    :param t: (float) number in [0, 1]
+    :param t: (float) [0, 1] 内的数值
     :param control_points: (numpy array)
-    :return: (numpy array) Coordinates of the point
+    :return: (numpy array) 该点的坐标
     """
     n = len(control_points) - 1
     return np.sum([bernstein_poly(n, i, t) * control_points[i] for i in range(n + 1)], axis=0)
@@ -79,15 +79,14 @@ def bezier(t, control_points):
 
 def bezier_derivatives_control_points(control_points, n_derivatives):
     """
-    Compute control points of the successive derivatives of a given bezier curve.
+    计算给定贝塞尔曲线各阶导数的控制点。
 
-    A derivative of a bezier curve is a bezier curve.
-    See https://pomax.github.io/bezierinfo/#derivatives
-    for detailed explanations
+    贝塞尔曲线的导数仍是贝塞尔曲线。
+    详细说明见 https://pomax.github.io/bezierinfo/#derivatives
 
     :param control_points: (numpy array)
     :param n_derivatives: (int)
-    e.g., n_derivatives=2 -> compute control points for first and second derivatives
+    例如，n_derivatives=2 -> 计算一阶与二阶导数的控制点
     :return: ([numpy array])
     """
     w = {0: control_points}
@@ -100,11 +99,11 @@ def bezier_derivatives_control_points(control_points, n_derivatives):
 
 def curvature(dx, dy, ddx, ddy):
     """
-    Compute curvature at one point given first and second derivatives.
+    由一阶与二阶导数计算某一点的曲率。
 
-    :param dx: (float) First derivative along x axis
+    :param dx: (float) 沿 x 轴的一阶导数
     :param dy: (float)
-    :param ddx: (float) Second derivative along x axis
+    :param ddx: (float) 沿 x 轴的二阶导数
     :param ddy: (float)
     :return: (float)
     """
@@ -112,7 +111,7 @@ def curvature(dx, dy, ddx, ddy):
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
-    """Plot arrow."""
+    """绘制箭头。"""
     if not isinstance(x, float):
         for (ix, iy, iyaw) in zip(x, y, yaw):
             plot_arrow(ix, iy, iyaw)
@@ -123,7 +122,7 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no 
 
 
 def main():
-    """Plot an example bezier curve."""
+    """绘制一条示例贝塞尔曲线。"""
     start_x = 10.0  # [m]
     start_y = 1.0  # [m]
     start_yaw = np.radians(180.0)  # [rad]
@@ -136,21 +135,21 @@ def main():
     path, control_points = calc_4points_bezier_path(
         start_x, start_y, start_yaw, end_x, end_y, end_yaw, offset)
 
-    # Note: alternatively, instead of specifying start and end position
-    # you can directly define n control points and compute the path:
+    # 注：也可以不指定起点和终点位置，
+    # 而直接定义 n 个控制点并计算路径：
     # control_points = np.array([[5., 1.], [-2.78, 1.], [-11.5, -4.5], [-6., -8.]])
     # path = calc_bezier_path(control_points, n_points=100)
 
-    # Display the tangent, normal and radius of cruvature at a given point
-    t = 0.86  # Number in [0, 1]
+    # 显示给定点处的切线、法线与曲率半径
+    t = 0.86  # [0, 1] 内的数值
     x_target, y_target = bezier(t, control_points)
     derivatives_cp = bezier_derivatives_control_points(control_points, 2)
     point = bezier(t, control_points)
     dt = bezier(t, derivatives_cp[1])
     ddt = bezier(t, derivatives_cp[2])
-    # Radius of curvature
+    # 曲率半径
     radius = 1 / curvature(dt[0], dt[1], ddt[0], ddt[1])
-    # Normalize derivative
+    # 归一化导数
     dt /= np.linalg.norm(dt, 2)
     tangent = np.array([point, point + dt])
     normal = np.array([point, point + [- dt[1], dt[0]]])
@@ -181,7 +180,7 @@ def main():
 
 
 def main2():
-    """Show the effect of the offset."""
+    """展示偏移量的影响。"""
     start_x = 10.0  # [m]
     start_y = 1.0  # [m]
     start_yaw = np.radians(180.0)  # [rad]

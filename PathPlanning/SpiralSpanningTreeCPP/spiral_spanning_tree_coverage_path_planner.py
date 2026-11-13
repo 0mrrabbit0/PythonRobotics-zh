@@ -1,10 +1,10 @@
 """
-Spiral Spanning Tree Coverage Path Planner
+螺旋生成树覆盖路径规划器
 
-author: Todd Tang
-paper: Spiral-STC: An On-Line Coverage Algorithm of Grid Environments
+作者: Todd Tang
+论文: Spiral-STC: An On-Line Coverage Algorithm of Grid Environments
          by a Mobile Robot - Gabriely et.al.
-link: https://ieeexplore.ieee.org/abstract/document/1013479
+链接: https://ieeexplore.ieee.org/abstract/document/1013479
 """
 
 import os
@@ -22,7 +22,7 @@ class SpiralSpanningTreeCoveragePlanner:
         self.origin_map_height = occ_map.shape[0]
         self.origin_map_width = occ_map.shape[1]
 
-        # original map resolution must be even
+        # 原始地图分辨率必须为偶数
         if self.origin_map_height % 2 == 1 or self.origin_map_width % 2 == 1:
             sys.exit('original map width/height must be even \
                 in grayscale .png format')
@@ -34,34 +34,34 @@ class SpiralSpanningTreeCoveragePlanner:
         self.edge = []
 
     def plan(self, start):
-        """plan
+        """规划
 
-        performing Spiral Spanning Tree Coverage path planning
+        执行螺旋生成树覆盖路径规划
 
-        :param start: the start node of Spiral Spanning Tree Coverage
+        :param start: 螺旋生成树覆盖的起始节点
         """
 
         visit_times = np.zeros(
             (self.merged_map_height, self.merged_map_width), dtype=int)
         visit_times[start[0]][start[1]] = 1
 
-        # generate route by
-        # recusively call perform_spanning_tree_coverage() from start node
+        # 从起始节点递归调用 perform_spanning_tree_coverage()
+        # 以生成路线
         route = []
         self.perform_spanning_tree_coverage(start, visit_times, route)
 
         path = []
-        # generate path from route
+        # 由路线生成路径
         for idx in range(len(route)-1):
             dp = abs(route[idx][0] - route[idx+1][0]) + \
                 abs(route[idx][1] - route[idx+1][1])
             if dp == 0:
-                # special handle for round-trip path
+                # 往返路径的特殊处理
                 path.append(self.get_round_trip_path(route[idx-1], route[idx]))
             elif dp == 1:
                 path.append(self.move(route[idx], route[idx+1]))
             elif dp == 2:
-                # special handle for non-adjacent route nodes
+                # 非相邻路线节点的特殊处理
                 mid_node = self.get_intermediate_node(route[idx], route[idx+1])
                 path.append(self.move(route[idx], mid_node))
                 path.append(self.move(mid_node, route[idx+1]))
@@ -73,16 +73,16 @@ class SpiralSpanningTreeCoveragePlanner:
     def perform_spanning_tree_coverage(self, current_node, visit_times, route):
         """perform_spanning_tree_coverage
 
-        recursive function for function <plan>
+        供函数 plan 调用的递归函数
 
-        :param current_node: current node
+        :param current_node: 当前节点
         """
 
         def is_valid_node(i, j):
             is_i_valid_bounded = 0 <= i < self.merged_map_height
             is_j_valid_bounded = 0 <= j < self.merged_map_width
             if is_i_valid_bounded and is_j_valid_bounded:
-                # free only when the 4 sub-cells are all free
+                # 仅当 4 个子单元全部空闲时才视为空闲
                 return bool(
                     self.occ_map[2*i][2*j]
                     and self.occ_map[2*i+1][2*j]
@@ -91,7 +91,7 @@ class SpiralSpanningTreeCoveragePlanner:
 
             return False
 
-        # counter-clockwise neighbor finding order
+        # 逆时针寻找邻居的顺序
         order = [[1, 0], [0, 1], [-1, 0], [0, -1]]
 
         found = False
@@ -106,12 +106,12 @@ class SpiralSpanningTreeCoveragePlanner:
                 self.perform_spanning_tree_coverage(
                     neighbor_node, visit_times, route)
 
-        # backtrace route from node with neighbors all visited
-        # to first node with unvisited neighbor
+        # 从邻居均已访问的节点回溯路线
+        # 直到第一个存在未访问邻居的节点
         if not found:
             has_node_with_unvisited_ngb = False
             for node in reversed(route):
-                # drop nodes that have been visited twice
+                # 跳过已被访问两次的节点
                 if visit_times[node[0]][node[1]] == 2:
                     continue
 
@@ -131,19 +131,19 @@ class SpiralSpanningTreeCoveragePlanner:
 
     def move(self, p, q):
         direction = self.get_vector_direction(p, q)
-        # move east
+        # 向东移动
         if direction == 'E':
             p = self.get_sub_node(p, 'SE')
             q = self.get_sub_node(q, 'SW')
-        # move west
+        # 向西移动
         elif direction == 'W':
             p = self.get_sub_node(p, 'NW')
             q = self.get_sub_node(q, 'NE')
-        # move south
+        # 向南移动
         elif direction == 'S':
             p = self.get_sub_node(p, 'SW')
             q = self.get_sub_node(q, 'NW')
-        # move north
+        # 向北移动
         elif direction == 'N':
             p = self.get_sub_node(p, 'NE')
             q = self.get_sub_node(q, 'SE')
@@ -169,16 +169,16 @@ class SpiralSpanningTreeCoveragePlanner:
             sys.exit('get_round_trip_path: last->pivot direction error.')
 
     def get_vector_direction(self, p, q):
-        # east
+        # 东
         if p[0] == q[0] and p[1] < q[1]:
             return 'E'
-        # west
+        # 西
         elif p[0] == q[0] and p[1] > q[1]:
             return 'W'
-        # south
+        # 南
         elif p[0] < q[0] and p[1] == q[1]:
             return 'S'
-        # north
+        # 北
         elif p[0] > q[0] and p[1] == q[1]:
             return 'N'
         else:
@@ -197,11 +197,11 @@ class SpiralSpanningTreeCoveragePlanner:
             sys.exit('get_sub_node: sub-node direction error.')
 
     def get_interpolated_path(self, p, q):
-        # direction p->q: southwest / northeast
+        # 方向 p->q：西南 / 东北
         if (p[0] < q[0]) ^ (p[1] < q[1]):
             ipx = [p[0], p[0], q[0]]
             ipy = [p[1], q[1], q[1]]
-        # direction p->q: southeast / northwest
+        # 方向 p->q：东南 / 西北
         else:
             ipx = [p[0], q[0], q[0]]
             ipy = [p[1], p[1], q[1]]
@@ -254,12 +254,12 @@ class SpiralSpanningTreeCoveragePlanner:
 
             for idx, state in enumerate(np.transpose(trajectory)):
                 plt.cla()
-                # for stopping simulation with the esc key.
+                # 按 Esc 键停止仿真。
                 plt.gcf().canvas.mpl_connect(
                     'key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
 
-                # draw spanning tree
+                # 绘制生成树
                 plt.imshow(self.occ_map, 'gray')
                 for p, q in edge:
                     p = coord_transform(p)
@@ -268,7 +268,7 @@ class SpiralSpanningTreeCoveragePlanner:
                 sx, sy = coord_transform(start)
                 plt.plot([sx], [sy], 'pr', markersize=10)
 
-                # draw move path
+                # 绘制移动路径
                 plt.plot(trajectory[0][:idx+1], trajectory[1][:idx+1], '-k')
                 plt.plot(state[0], state[1], 'or')
                 plt.axis('equal')
@@ -276,7 +276,7 @@ class SpiralSpanningTreeCoveragePlanner:
                 plt.pause(0.01)
 
         else:
-            # draw spanning tree
+            # 绘制生成树
             plt.imshow(self.occ_map, 'gray')
             for p, q in edge:
                 p = coord_transform(p)
@@ -285,7 +285,7 @@ class SpiralSpanningTreeCoveragePlanner:
             sx, sy = coord_transform(start)
             plt.plot([sx], [sy], 'pr', markersize=10)
 
-            # draw move path
+            # 绘制移动路径
             last = path[0][0]
             for p, q in path:
                 distance = math.hypot(p[0]-last[0], p[1]-last[1])

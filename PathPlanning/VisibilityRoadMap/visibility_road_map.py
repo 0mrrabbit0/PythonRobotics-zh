@@ -1,8 +1,8 @@
 """
 
-Visibility Road Map Planner
+可视图路线图规划器
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者: Atsushi Sakai (@Atsushi_twi)
 
 """
 
@@ -49,11 +49,11 @@ class VisibilityRoadMap:
     def generate_visibility_nodes(self, start_x, start_y, goal_x, goal_y,
                                   obstacles):
 
-        # add start and goal as nodes
+        # 将起点和目标点添加为节点
         nodes = [DijkstraSearch.Node(start_x, start_y),
                  DijkstraSearch.Node(goal_x, goal_y, 0, None)]
 
-        # add vertexes in configuration space as nodes
+        # 将构型空间中的顶点添加为节点
         for obstacle in obstacles:
 
             cvx_list, cvy_list = self.calc_vertexes_in_configuration_space(
@@ -168,7 +168,7 @@ class ObstaclePolygon:
         is_x_same = self.x_list[0] == self.x_list[-1]
         is_y_same = self.y_list[0] == self.y_list[-1]
         if is_x_same and is_y_same:
-            return  # no need to close
+            return  # 无需闭合
 
         self.x_list.append(self.x_list[0])
         self.y_list.append(self.y_list[0])
@@ -180,7 +180,7 @@ class ObstaclePolygon:
 def main():
     print(__file__ + " start!!")
 
-    # start and goal position
+    # 起点与目标点位置
     sx, sy = 10.0, 10.0  # [m]
     gx, gy = 50.0, 50.0  # [m]
 

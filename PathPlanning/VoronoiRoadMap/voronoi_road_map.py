@@ -1,8 +1,8 @@
 """
 
-Voronoi Road Map Planner
+维诺图路线图规划器
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
 
 """
 
@@ -22,9 +22,9 @@ show_animation = True
 class VoronoiRoadMapPlanner:
 
     def __init__(self):
-        # parameter
-        self.N_KNN = 10  # number of edge from one sampled point
-        self.MAX_EDGE_LEN = 30.0  # [m] Maximum edge length
+        # 参数
+        self.N_KNN = 10  # 每个采样点引出的边数
+        self.MAX_EDGE_LEN = 30.0  # [m] 最大边长
 
     def planning(self, sx, sy, gx, gy, ox, oy, robot_radius):
         obstacle_tree = cKDTree(np.vstack((ox, oy)).T)
@@ -58,25 +58,25 @@ class VoronoiRoadMapPlanner:
         for i in range(n_step):
             dist, _ = obstacle_kd_tree.query([x, y])
             if dist <= rr:
-                return True  # collision
+                return True  # 碰撞
             x += D * math.cos(yaw)
             y += D * math.sin(yaw)
 
-        # goal point check
+        # 检查目标点
         dist, _ = obstacle_kd_tree.query([gx, gy])
         if dist <= rr:
-            return True  # collision
+            return True  # 碰撞
 
-        return False  # OK
+        return False  # 无碰撞
 
     def generate_road_map_info(self, node_x, node_y, rr, obstacle_tree):
         """
-        Road map generation
+        生成路线图
 
-        node_x: [m] x positions of sampled points
-        node_y: [m] y positions of sampled points
-        rr: Robot Radius[m]
-        obstacle_tree: KDTree object of obstacles
+        node_x：[m] 采样点的 x 坐标
+        node_y：[m] 采样点的 y 坐标
+        rr：机器人半径 [m]
+        obstacle_tree：障碍物的 KDTree 对象
         """
 
         road_map = []
@@ -119,7 +119,7 @@ class VoronoiRoadMapPlanner:
     def voronoi_sampling(sx, sy, gx, gy, ox, oy):
         oxy = np.vstack((ox, oy)).T
 
-        # generate voronoi point
+        # 生成维诺图顶点
         vor = Voronoi(oxy)
         sample_x = [ix for [ix, _] in vor.vertices]
         sample_y = [iy for [_, iy] in vor.vertices]
@@ -135,7 +135,7 @@ class VoronoiRoadMapPlanner:
 def main():
     print(__file__ + " start!!")
 
-    # start and goal position
+    # 起点与目标点位置
     sx = 10.0  # [m]
     sy = 10.0  # [m]
     gx = 50.0  # [m]

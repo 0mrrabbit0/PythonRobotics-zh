@@ -1,8 +1,8 @@
 """
-Clothoid Path Planner
-Author: Daniel Ingram (daniel-s-ingram)
+回旋曲线路径规划器
+作者: Daniel Ingram (daniel-s-ingram)
         Atsushi Sakai (AtsushiSakai)
-Reference paper: Fast and accurate G1 fitting of clothoid curves
+参考文献: Fast and accurate G1 fitting of clothoid curves
 https://www.researchgate.net/publication/237062806
 """
 
@@ -23,16 +23,15 @@ def generate_clothoid_paths(start_point, start_yaw_list,
                             goal_point, goal_yaw_list,
                             n_path_points):
     """
-    Generate clothoid path list. This function generate multiple clothoid paths
-    from multiple orientations(yaw) at start points to multiple orientations
-    (yaw) at goal point.
+    生成回旋曲线路径列表。该函数由起点处的多个航向角生成
+    到目标点处多个航向角的多条回旋曲线路径。
 
-    :param start_point: Start point of the path
-    :param start_yaw_list: Orientation list at start point in radian
-    :param goal_point: Goal point of the path
-    :param goal_yaw_list: Orientation list at goal point in radian
-    :param n_path_points: number of path points
-    :return: clothoid path list
+    :param start_point: 路径起点
+    :param start_yaw_list: 起点处的航向角列表，单位为弧度
+    :param goal_point: 路径目标点
+    :param goal_yaw_list: 目标点处的航向角列表，单位为弧度
+    :param n_path_points: 路径点数量
+    :return: 回旋曲线路径列表
     """
     clothoids = []
     for start_yaw in start_yaw_list:
@@ -47,14 +46,14 @@ def generate_clothoid_paths(start_point, start_yaw_list,
 def generate_clothoid_path(start_point, start_yaw,
                            goal_point, goal_yaw, n_path_points):
     """
-    Generate a clothoid path list.
+    生成一条回旋曲线路径。
 
-    :param start_point: Start point of the path
-    :param start_yaw: Orientation at start point in radian
-    :param goal_point: Goal point of the path
-    :param goal_yaw: Orientation at goal point in radian
-    :param n_path_points: number of path points
-    :return: a clothoid path
+    :param start_point: 路径起点
+    :param start_yaw: 起点处的航向角，单位为弧度
+    :param goal_point: 路径目标点
+    :param goal_yaw: 目标点处的航向角，单位为弧度
+    :param n_path_points: 路径点数量
+    :return: 一条回旋曲线路径
     """
     dx = goal_point.x - start_point.x
     dy = goal_point.y - start_point.y
@@ -66,10 +65,10 @@ def generate_clothoid_path(start_point, start_yaw,
     delta = phi2 - phi1
 
     try:
-        # Step1: Solve g function
+        # 步骤 1：求解 g 函数
         A = solve_g_for_root(phi1, phi2, delta)
 
-        # Step2: Calculate path parameters
+        # 步骤 2：计算路径参数
         L = compute_path_length(r, phi1, delta, A)
         curvature = compute_curvature(delta, A, L)
         curvature_rate = compute_curvature_rate(A, L)
@@ -77,7 +76,7 @@ def generate_clothoid_path(start_point, start_yaw,
         print(f"Failed to generate clothoid points: {e}")
         return None
 
-    # Step3: Construct a path with Fresnel integral
+    # 步骤 3：用菲涅尔积分构造路径
     points = []
     for s in np.linspace(0, L, n_path_points):
         try:

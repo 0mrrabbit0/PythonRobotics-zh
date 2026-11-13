@@ -1,15 +1,15 @@
 """
 
-Frenet optimal trajectory generator
+Frenet 最优轨迹生成器
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者: Atsushi Sakai (@Atsushi_twi)
 
 Reference:
 
-- [Optimal Trajectory Generation for Dynamic Street Scenarios in a Frenet Frame]
+- [Frenet 坐标系下动态街道场景的最优轨迹生成]
 (https://www.researchgate.net/profile/Moritz_Werling/publication/224156269_Optimal_Trajectory_Generation_for_Dynamic_Street_Scenarios_in_a_Frenet_Frame/links/54f749df0cf210398e9277af.pdf)
 
-- [Optimal trajectory generation for dynamic street scenarios in a Frenet Frame]
+- [Frenet 坐标系下动态街道场景的最优轨迹生成]
 (https://www.youtube.com/watch?v=Cj6tAQe7UCY)
 
 """
@@ -41,20 +41,20 @@ class LongitudinalMovement(Enum):
     VELOCITY_KEEPING = auto()
 
 
-# Default Parameters
+# 默认参数
 
 LATERAL_MOVEMENT = LateralMovement.HIGH_SPEED
 LONGITUDINAL_MOVEMENT = LongitudinalMovement.VELOCITY_KEEPING
 
-MAX_SPEED = 50.0 / 3.6  # maximum speed [m/s]
-MAX_ACCEL = 5.0  # maximum acceleration [m/ss]
-MAX_CURVATURE = 1.0  # maximum curvature [1/m]
-DT = 0.2  # time tick [s]
-MAX_T = 5.0  # max prediction time [m]
-MIN_T = 4.0  # min prediction time [m]
-N_S_SAMPLE = 1  # sampling number of target speed
+MAX_SPEED = 50.0 / 3.6  # 最大速度 [m/s]
+MAX_ACCEL = 5.0  # 最大加速度 [m/ss]
+MAX_CURVATURE = 1.0  # 最大曲率 [1/m]
+DT = 0.2  # 时间步长 [s]
+MAX_T = 5.0  # 最大预测时间 [m]
+MIN_T = 4.0  # 最小预测时间 [m]
+N_S_SAMPLE = 1  # 目标速度采样数
 
-# cost weights
+# 代价权重
 K_J = 0.1
 K_T = 0.1
 K_S_DOT = 1.0
@@ -68,67 +68,67 @@ show_animation = True
 
 
 if LATERAL_MOVEMENT == LateralMovement.LOW_SPEED:
-    MAX_ROAD_WIDTH = 1.0  # maximum road width [m]
-    D_ROAD_W = 0.2  # road width sampling length [m]
-    TARGET_SPEED = 3.0 / 3.6  # maximum speed [m/s]
-    D_T_S = 0.5 / 3.6  # target speed sampling length [m/s]
-    # Waypoints
+    MAX_ROAD_WIDTH = 1.0  # 最大道路宽度 [m]
+    D_ROAD_W = 0.2  # 道路宽度采样间隔 [m]
+    TARGET_SPEED = 3.0 / 3.6  # 最大速度 [m/s]
+    D_T_S = 0.5 / 3.6  # 目标速度采样间隔 [m/s]
+    # 路点
     WX = [0.0, 2.0, 4.0, 6.0, 8.0, 10.0]
     WY = [0.0, 0.0, 1.0, 0.0, -1.0, -2.0]
     OBSTACLES = np.array([[3.0, 1.0], [5.0, -0.0], [6.0, 0.5], [8.0, -1.5]])
-    ROBOT_RADIUS = 0.5  # robot radius [m]
+    ROBOT_RADIUS = 0.5  # 机器人半径 [m]
 
-    # Initial state parameters
-    INITIAL_SPEED = 1.0 / 3.6  # current speed [m/s]
-    INITIAL_ACCEL = 0.0  # current acceleration [m/ss]
-    INITIAL_LAT_POSITION = 0.5  # current lateral position [m]
-    INITIAL_LAT_SPEED = 0.0  # current lateral speed [m/s]
-    INITIAL_LAT_ACCELERATION = 0.0  # current lateral acceleration [m/s]
-    INITIAL_COURSE_POSITION = 0.0  # current course position
+    # 初始状态参数
+    INITIAL_SPEED = 1.0 / 3.6  # 当前速度 [m/s]
+    INITIAL_ACCEL = 0.0  # 当前加速度 [m/ss]
+    INITIAL_LAT_POSITION = 0.5  # 当前横向位置 [m]
+    INITIAL_LAT_SPEED = 0.0  # 当前横向速度 [m/s]
+    INITIAL_LAT_ACCELERATION = 0.0  # 当前横向加速度 [m/s]
+    INITIAL_COURSE_POSITION = 0.0  # 当前路程位置
 
-    ANIMATION_AREA = 5.0  # Animation area length [m]
+    ANIMATION_AREA = 5.0  # 动画区域长度 [m]
 
-    STOP_S = 4.0  # Merge and stop distance [m]
-    D_S = 0.3  # Stop point sampling length [m]
-    N_STOP_S_SAMPLE = 3  # Stop point sampling number
+    STOP_S = 4.0  # 汇入并停车距离 [m]
+    D_S = 0.3  # 停车点采样间隔 [m]
+    N_STOP_S_SAMPLE = 3  # 停车点采样数
 else:
-    MAX_ROAD_WIDTH = 7.0  # maximum road width [m]
-    D_ROAD_W = 1.0  # road width sampling length [m]
-    TARGET_SPEED = 30.0 / 3.6  # target speed [m/s]
-    D_T_S = 5.0 / 3.6  # target speed sampling length [m/s]
-    # Waypoints
+    MAX_ROAD_WIDTH = 7.0  # 最大道路宽度 [m]
+    D_ROAD_W = 1.0  # 道路宽度采样间隔 [m]
+    TARGET_SPEED = 30.0 / 3.6  # 目标速度 [m/s]
+    D_T_S = 5.0 / 3.6  # 目标速度采样间隔 [m/s]
+    # 路点
     WX = [0.0, 10.0, 20.5, 35.0, 70.5]
     WY = [0.0, -6.0, 5.0, 6.5, 0.0]
-    # Obstacle list
+    # 障碍物列表
     OBSTACLES = np.array(
         [[20.0, 10.0], [30.0, 6.0], [30.0, 8.0], [35.0, 8.0], [50.0, 3.0]]
     )
-    ROBOT_RADIUS = 2.0  # robot radius [m]
+    ROBOT_RADIUS = 2.0  # 机器人半径 [m]
 
-    # Initial state parameters
-    INITIAL_SPEED = 10.0 / 3.6  # current speed [m/s]
-    INITIAL_ACCEL = 0.0  # current acceleration [m/ss]
-    INITIAL_LAT_POSITION = 2.0  # current lateral position [m]
-    INITIAL_LAT_SPEED = 0.0  # current lateral speed [m/s]
-    INITIAL_LAT_ACCELERATION = 0.0  # current lateral acceleration [m/s]
-    INITIAL_COURSE_POSITION = 0.0  # current course position
+    # 初始状态参数
+    INITIAL_SPEED = 10.0 / 3.6  # 当前速度 [m/s]
+    INITIAL_ACCEL = 0.0  # 当前加速度 [m/ss]
+    INITIAL_LAT_POSITION = 2.0  # 当前横向位置 [m]
+    INITIAL_LAT_SPEED = 0.0  # 当前横向速度 [m/s]
+    INITIAL_LAT_ACCELERATION = 0.0  # 当前横向加速度 [m/s]
+    INITIAL_COURSE_POSITION = 0.0  # 当前路程位置
 
-    ANIMATION_AREA = 20.0  # Animation area length [m]
-    STOP_S = 25.0  # Merge and stop distance [m]
-    D_S = 2  # Stop point sampling length [m]
-    N_STOP_S_SAMPLE = 4  # Stop point sampling number
+    ANIMATION_AREA = 20.0  # 动画区域长度 [m]
+    STOP_S = 25.0  # 汇入并停车距离 [m]
+    D_S = 2  # 停车点采样间隔 [m]
+    N_STOP_S_SAMPLE = 4  # 停车点采样数
 
 
 class LateralMovementStrategy:
     def calc_lateral_trajectory(self, fp, di, c_d, c_d_d, c_d_dd, Ti):
         """
-        Calculate the lateral trajectory
+        计算横向轨迹
         """
         raise NotImplementedError("calc_lateral_trajectory not implemented")
 
     def calc_cartesian_parameters(self, fp, csp):
         """
-        Calculate the cartesian parameters (x, y, yaw, curvature, v, a)
+        计算笛卡尔参数（x、y、航向角、曲率、v、a）
         """
         raise NotImplementedError("calc_cartesian_parameters not implemented")
 
@@ -149,14 +149,14 @@ class HighSpeedLateralMovementStrategy(LateralMovementStrategy):
         tp.d_dd = []
         tp.d_ddd = []
 
-        # Calculate all derivatives in a single loop to reduce iterations
+        # 在单次循环中计算全部导数，以减少迭代次数
         for i in range(len(fp.t)):
             t = fp.t[i]
             s_d = fp.s_d[i]
             s_dd = fp.s_dd[i]
 
-            s_d_inv = 1.0 / (s_d + 1e-6) + 1e-6  # Avoid division by zero
-            s_d_inv_sq = s_d_inv * s_d_inv  # Square of inverse
+            s_d_inv = 1.0 / (s_d + 1e-6) + 1e-6  # 避免除以零
+            s_d_inv_sq = s_d_inv * s_d_inv  # 倒数的平方
 
             d = lat_qp.calc_point(t)
             d_d = lat_qp.calc_first_derivative(t)
@@ -173,7 +173,7 @@ class HighSpeedLateralMovementStrategy(LateralMovementStrategy):
         return tp
 
     def calc_cartesian_parameters(self, fp, csp):
-        # calc global positions
+        # 计算全局位置
         for i in range(len(fp.s)):
             ix, iy = csp.calc_position(fp.s[i])
             if ix is None:
@@ -205,7 +205,7 @@ class LowSpeedLateralMovementStrategy(LateralMovementStrategy):
         s1 = fp.s[-1]
         tp = copy.deepcopy(fp)
         # d = d(s), d_d = d'(s), d_dd = d''(s)
-        # * shift s range from [s0, s1] to [0, s1 - s0]
+        # * 将 s 的范围从 [s0, s1] 平移到 [0, s1 - s0]
         lat_qp = QuinticPolynomial(c_d, c_d_d, c_d_dd, di, 0.0, 0.0, s1 - s0)
 
         tp.d = [lat_qp.calc_point(s - s0) for s in fp.s]
@@ -215,7 +215,7 @@ class LowSpeedLateralMovementStrategy(LateralMovementStrategy):
         return tp
 
     def calc_cartesian_parameters(self, fp, csp):
-        # calc global positions
+        # 计算全局位置
         for i in range(len(fp.s)):
             ix, iy = csp.calc_position(fp.s[i])
             if ix is None:
@@ -240,19 +240,19 @@ class LowSpeedLateralMovementStrategy(LateralMovementStrategy):
 class LongitudinalMovementStrategy:
     def calc_longitudinal_trajectory(self, c_speed, c_accel, Ti, s0):
         """
-        Calculate the longitudinal trajectory
+        计算纵向轨迹
         """
         raise NotImplementedError("calc_longitudinal_trajectory not implemented")
 
     def get_d_arrange(self, s0):
         """
-        Get the d sample range
+        获取 d 的采样范围
         """
         raise NotImplementedError("get_d_arrange not implemented")
 
     def calc_destination_cost(self, fp):
         """
-        Calculate the destination cost
+        计算终点代价
         """
         raise NotImplementedError("calc_destination_cost not implemented")
 
@@ -300,7 +300,7 @@ class MergingAndStoppingLongitudinalMovementStrategy(LongitudinalMovementStrateg
         return fplist
 
     def get_d_arrange(self, s0):
-        # Only if s0 is less than STOP_S / 3, then we sample the road width
+        # 仅当 s0 小于 STOP_S / 3 时，才对道路宽度进行采样
         if s0 < STOP_S / 3:
             return np.arange(-MAX_ROAD_WIDTH, MAX_ROAD_WIDTH, D_ROAD_W)
         else:
@@ -326,7 +326,7 @@ else:
 
 class QuarticPolynomial:
     def __init__(self, xs, vxs, axs, vxe, axe, time):
-        # calc coefficient of quartic polynomial
+        # 计算四次多项式系数
 
         self.a0 = xs
         self.a1 = vxs
@@ -366,7 +366,7 @@ class FrenetPath:
         self.d = []
         self.d_d = []  # d'(s)
         self.d_dd = []  # d''(s)
-        self.d_ddd = []  # d'''(t) in low speed / d'''(s) in high speed
+        self.d_ddd = []  # 低速时为 d'''(t)，高速时为 d'''(s)
         self.s = []
         self.s_d = []  # s'(t)
         self.s_dd = []  # s''(t)
@@ -411,8 +411,8 @@ def calc_frenet_paths(c_s_d, c_s_dd, c_d, c_d_d, c_d_dd, s0):
                     fp, di, c_d, c_d_d, c_d_dd, Ti
                 )
 
-                Jp = sum(np.power(tp.d_ddd, 2))  # square of jerk
-                Js = sum(np.power(tp.s_ddd, 2))  # square of jerk
+                Jp = sum(np.power(tp.d_ddd, 2))  # 加加速度的平方
+                Js = sum(np.power(tp.s_ddd, 2))  # 加加速度的平方
 
                 lat_cost = K_J * Jp + K_T * Ti + K_D * tp.d[-1] ** 2
                 lon_cost = (
@@ -456,11 +456,11 @@ def check_paths(fplist, ob):
         "ok": [],
     }
     for i, _ in enumerate(fplist):
-        if any([v > MAX_SPEED for v in fplist[i].v]):  # Max speed check
+        if any([v > MAX_SPEED for v in fplist[i].v]):  # 最大速度检查
             path_dict["max_speed_error"].append(fplist[i])
-        elif any([abs(a) > MAX_ACCEL for a in fplist[i].a]):  # Max accel check
+        elif any([abs(a) > MAX_ACCEL for a in fplist[i].a]):  # 最大加速度检查
             path_dict["max_accel_error"].append(fplist[i])
-        elif any([abs(c) > MAX_CURVATURE for c in fplist[i].c]):  # Max curvature check
+        elif any([abs(c) > MAX_CURVATURE for c in fplist[i].c]):  # 最大曲率检查
             path_dict["max_curvature_error"].append(fplist[i])
         elif not check_collision(fplist[i], ob):
             path_dict["collision_error"].append(fplist[i])
@@ -474,7 +474,7 @@ def frenet_optimal_planning(csp, s0, c_s_d, c_s_dd, c_d, c_d_d, c_d_dd, ob):
     fplist = calc_global_paths(fplist, csp)
     fpdict = check_paths(fplist, ob)
 
-    # find minimum cost path
+    # 寻找最小代价路径
     min_cost = float("inf")
     best_path = None
     for fp in fpdict["ok"]:
@@ -505,7 +505,7 @@ def main():
 
     tx, ty, tyaw, tc, csp = generate_target_course(WX, WY)
 
-    # Initialize state using global parameters
+    # 使用全局参数初始化状态
     c_s_d = INITIAL_SPEED
     c_s_dd = INITIAL_ACCEL
     c_d = INITIAL_LAT_POSITION
@@ -542,7 +542,7 @@ def main():
 
         if show_animation:  # pragma: no cover
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 "key_release_event",
                 lambda event: [exit(0) if event.key == "escape" else None],

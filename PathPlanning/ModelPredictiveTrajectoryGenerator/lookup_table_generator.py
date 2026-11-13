@@ -1,8 +1,8 @@
 """
 
-Lookup Table generation for model predictive trajectory generator
+模型预测轨迹生成器的查找表生成
 
-author: Atsushi Sakai
+作者：Atsushi Sakai
 
 """
 import sys
@@ -64,7 +64,7 @@ def generate_lookup_table():
     states = calc_states_list(max_yaw=np.deg2rad(-30.0))
     k0 = 0.0
 
-    # x, y, yaw, s, km, kf
+    # x, y, yaw（航向角）, s, km, kf
     lookup_table = [[1.0, 0.0, 0.0, 1.0, 0.0, 0.0]]
 
     for state in states:

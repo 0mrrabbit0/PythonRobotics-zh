@@ -1,11 +1,11 @@
 """
-Informed RRT* path planning
+Informed RRT* 路径规划
 
-author: Karan Chawla
+作者：Karan Chawla
         Atsushi Sakai(@Atsushi_twi)
 
-Reference: Informed RRT*: Optimal Sampling-based Path planning Focused via
-Direct Sampling of an Admissible Ellipsoidal Heuristic
+Reference: Informed RRT*：通过直接采样可采纳椭球启发式，
+实现聚焦的最优基于采样路径规划
 https://arxiv.org/pdf/1404.2334
 
 """
@@ -44,13 +44,13 @@ class InformedRRTStar:
     def informed_rrt_star_search(self, animation=True):
 
         self.node_list = [self.start]
-        # max length we expect to find in our 'informed' sample space,
-        # starts as infinite
+        # 期望在 informed 采样空间中找到的最大长度，
+        # 初始为无穷大
         c_best = float('inf')
         solution_set = set()
         path = None
 
-        # Computing the sampling space
+        # 计算采样空间
         c_min = math.hypot(self.start.x - self.goal.x,
                            self.start.y - self.goal.y)
         x_center = np.array([[(self.start.x + self.goal.x) / 2.0],
@@ -59,7 +59,7 @@ class InformedRRTStar:
                        [(self.goal.y - self.start.y) / c_min], [0]])
 
         e_theta = math.atan2(a1[1, 0], a1[0, 0])
-        # first column of identity matrix transposed
+        # 单位矩阵第一列的转置
         id1_t = np.array([1.0, 0.0, 0.0]).reshape(1, 3)
         m = a1 @ id1_t
         u, s, vh = np.linalg.svd(m, True, True)
@@ -68,15 +68,15 @@ class InformedRRTStar:
              np.linalg.det(u) * np.linalg.det(np.transpose(vh))]) @ vh
 
         for i in range(self.max_iter):
-            # Sample space is defined by c_best
-            # c_min is the minimum distance between the start point and
-            # the goal x_center is the midpoint between the start and the
-            # goal c_best changes when a new path is found
+            # 采样空间由 c_best 定义
+            # c_min 是起点与目标点之间的最短距离
+            # x_center 是起点与目标点的中点
+            # 找到新路径时 c_best 会更新
 
             rnd = self.informed_sample(c_best, c_min, x_center, c)
             n_ind = self.get_nearest_list_index(self.node_list, rnd)
             nearest_node = self.node_list[n_ind]
-            # steer
+            # 朝采样点扩展
             theta = math.atan2(rnd[1] - nearest_node.y,
                                rnd[0] - nearest_node.x)
             new_node = self.get_new_node(theta, n_ind, nearest_node)
@@ -233,17 +233,17 @@ class InformedRRTStar:
 
     @staticmethod
     def distance_squared_point_to_segment(v, w, p):
-        # Return minimum distance between line segment vw and point p
+        # 返回线段 vw 与点 p 之间的最小距离
         if np.array_equal(v, w):
-            return (p - v).dot(p - v)  # v == w case
-        l2 = (w - v).dot(w - v)  # i.e. |w-v|^2 -  avoid a sqrt
-        # Consider the line extending the segment,
-        # parameterized as v + t (w - v).
-        # We find projection of point p onto the line.
-        # It falls where t = [(p-v) . (w-v)] / |w-v|^2
-        # We clamp t from [0,1] to handle points outside the segment vw.
+            return (p - v).dot(p - v)  # v == w 的情形
+        l2 = (w - v).dot(w - v)  # 即 |w-v|^2，避免开方
+        # 考虑线段所在直线的延长线，
+        # 参数化为 v + t (w - v)。
+        # 求点 p 在该直线上的投影。
+        # 投影位于 t = [(p-v) . (w-v)] / |w-v|^2
+        # 将 t 限制在 [0, 1]，以处理落在线段 vw 之外的点。
         t = max(0, min(1, (p - v).dot(w - v) / l2))
-        projection = v + t * (w - v)  # Projection falls on the segment
+        projection = v + t * (w - v)  # 投影落在线段上
         return (p - projection).dot(p - projection)
 
     def check_segment_collision(self, x1, y1, x2, y2):
@@ -251,7 +251,7 @@ class InformedRRTStar:
             dd = self.distance_squared_point_to_segment(
                 np.array([x1, y1]), np.array([x2, y2]), np.array([ox, oy]))
             if dd <= size ** 2:
-                return False  # collision
+                return False  # 碰撞
         return True
 
     def check_collision(self, near_node, theta, d):
@@ -273,7 +273,7 @@ class InformedRRTStar:
     def draw_graph(self, x_center=None, c_best=None, c_min=None, e_theta=None,
                    rnd=None):
         plt.clf()
-        # for stopping simulation with the esc key.
+        # 按 Esc 键停止仿真。
         plt.gcf().canvas.mpl_connect(
             'key_release_event', lambda event:
             [exit(0) if event.key == 'escape' else None])
@@ -327,17 +327,17 @@ class Node:
 def main():
     print("Start informed rrt star planning")
 
-    # create obstacles
+    # 创建障碍物
     obstacle_list = [(5, 5, 0.5), (9, 6, 1), (7, 5, 1), (1, 5, 1), (3, 6, 1),
                      (7, 9, 1)]
 
-    # Set params
+    # 设置参数
     rrt = InformedRRTStar(start=[0, 0], goal=[5, 10], rand_area=[-2, 15],
                           obstacle_list=obstacle_list)
     path = rrt.informed_rrt_star_search(animation=show_animation)
     print("Done!!")
 
-    # Plot path
+    # 绘制路径
     if show_animation:
         rrt.draw_graph()
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')

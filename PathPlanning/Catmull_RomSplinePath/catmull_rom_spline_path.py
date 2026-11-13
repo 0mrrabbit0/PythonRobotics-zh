@@ -1,7 +1,7 @@
 """
-Path Planner with Catmull-Rom Spline
-Author: Surabhi Gupta (@this_is_surabhi)
-Source: http://graphics.cs.cmu.edu/nsp/course/15-462/Fall04/assts/catmullRom.pdf
+Catmull-Rom 样条路径规划器
+作者: Surabhi Gupta (@this_is_surabhi)
+来源: http://graphics.cs.cmu.edu/nsp/course/15-462/Fall04/assts/catmullRom.pdf
 """
 
 import sys
@@ -16,14 +16,14 @@ def catmull_rom_point(t, p0, p1, p2, p3):
     Parameters
     ----------
     t : float
-        Parameter value (0 <= t <= 1) (0 <= t <= 1)
+        参数值 (0 <= t <= 1) (0 <= t <= 1)
     p0, p1, p2, p3 : np.ndarray
-        Control points for the spline segment
+        样条段的控制点
 
     Returns
     -------
     np.ndarray
-        Calculated point on the spline
+        样条上计算出的点
     """
     return 0.5 * ((2 * p1) +
                   (-p0 + p2) * t +
@@ -36,14 +36,14 @@ def catmull_rom_spline(control_points, num_points):
     Parameters
     ----------
     control_points : list
-        List of control points
+        控制点列表
     num_points : int
-        Number of points to generate on the spline
+        样条上要生成的点数
 
     Returns
     -------
     tuple
-        x and y coordinates of the spline points
+        样条点的 x 与 y 坐标
     """
     t_vals = np.linspace(0, 1, num_points)
     spline_points = []

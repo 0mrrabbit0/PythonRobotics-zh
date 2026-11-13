@@ -1,8 +1,8 @@
 """
 
-Model trajectory generator
+模型轨迹生成器
 
-author: Atsushi Sakai(@Atsushi_twi)
+作者：Atsushi Sakai(@Atsushi_twi)
 
 """
 
@@ -16,9 +16,9 @@ sys.path.append(str(path_planning_dir))
 
 import ModelPredictiveTrajectoryGenerator.motion_model as motion_model
 
-# optimization parameter
+# 优化参数
 max_iter = 100
-h: np.ndarray = np.array([0.5, 0.02, 0.02]).T  # parameter sampling distance
+h: np.ndarray = np.array([0.5, 0.02, 0.02]).T  # 参数采样间距
 cost_th = 0.1
 
 show_animation = True
@@ -26,7 +26,7 @@ show_animation = True
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
     """
-    Plot arrow
+    绘制箭头
     """
     plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
               fc=fc, ec=ec, head_width=width, head_length=width)

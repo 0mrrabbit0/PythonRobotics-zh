@@ -3,10 +3,10 @@ import numpy as np
 from scipy.interpolate import interp1d
 from utils.angle import angle_mod
 
-# motion parameter
-L = 1.0  # wheel base
-ds = 0.1  # course distance
-v = 10.0 / 3.6  # velocity [m/s]
+# 运动参数
+L = 1.0  # 轴距
+ds = 0.1  # 路程间距
+v = 10.0 / 3.6  # 速度 [m/s]
 
 
 class State:

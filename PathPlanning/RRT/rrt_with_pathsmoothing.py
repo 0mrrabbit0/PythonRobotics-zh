@@ -1,8 +1,8 @@
 """
 
-Path planning Sample Code with RRT with path smoothing
+带路径平滑的 RRT 路径规划示例代码
 
-@author: AtsushiSakai(@Atsushi_twi)
+作者: AtsushiSakai(@Atsushi_twi)
 
 """
 
@@ -53,42 +53,41 @@ def get_target_point(path, targetL):
 
 def is_point_collision(x, y, obstacle_list, robot_radius):
     """
-    Check whether a single point collides with any obstacle.
+    检查单个点是否与任一障碍物发生碰撞。
 
-    This function calculates the Euclidean distance between the given point (x, y)
-    and each obstacle center. If the distance is less than or equal to the sum of
-    the obstacle's radius and the robot's radius, a collision is detected.
+    本函数计算给定点 (x, y) 与每个障碍物中心之间的欧氏距离。若该距离小于或等于
+    障碍物半径与机器人半径之和，则判定发生碰撞。
 
     Args:
-        x (float): X-coordinate of the point to check.
-        y (float): Y-coordinate of the point to check.
-        obstacle_list (List[Tuple[float, float, float]]): List of obstacles defined as (ox, oy, radius).
-        robot_radius (float): Radius of the robot, used to inflate the obstacles.
+        x (float): 待检查点的 X 坐标。
+        y (float): 待检查点的 Y 坐标。
+        obstacle_list (List[Tuple[float, float, float]]): 障碍物列表，每个元素为 (ox, oy, radius)。
+        robot_radius (float): 机器人半径，用于膨胀障碍物。
 
     Returns:
-        bool: True if the point is in collision with any obstacle, False otherwise.
+        bool: 点与任一障碍物发生碰撞时为 True，否则为 False。
     """
     for (ox, oy, obstacle_radius) in obstacle_list:
         d = math.hypot(ox - x, oy - y)
         if d <= obstacle_radius + robot_radius:
-            return True  # Collided
+            return True  # 发生碰撞
     return False
 
 
 def line_collision_check(first, second, obstacle_list, robot_radius=0.0, sample_step=0.2):
     """
-    Check if the line segment between `first` and `second` collides with any obstacle.
-    Considers the robot_radius by inflating the obstacle size.
+    检查 `first` 与 `second` 之间的线段是否与任一障碍物发生碰撞。
+    通过膨胀障碍物尺寸来计入 robot_radius。
 
     Args:
-        first (List[float]): Start point of the line [x, y]
-        second (List[float]): End point of the line [x, y]
-        obstacle_list (List[Tuple[float, float, float]]): Obstacles as (x, y, radius)
-        robot_radius (float): Radius of robot
-        sample_step (float): Distance between sampling points along the segment
+        first (List[float]): 线段起点 [x, y]
+        second (List[float]): 线段终点 [x, y]
+        obstacle_list (List[Tuple[float, float, float]]): 障碍物，格式为 (x, y, radius)
+        robot_radius (float): 机器人半径
+        sample_step (float): 沿线段相邻采样点之间的距离
 
     Returns:
-        bool: True if collision-free, False otherwise
+        bool: 无碰撞时为 True，否则为 False
     """
     x1, y1 = first[0], first[1]
     x2, y2 = second[0], second[1]
@@ -98,10 +97,10 @@ def line_collision_check(first, second, obstacle_list, robot_radius=0.0, sample_
     length = math.hypot(dx, dy)
 
     if length == 0:
-        # Degenerate case: point collision check
+        # 退化情形：点碰撞检测
         return not is_point_collision(x1, y1, obstacle_list, robot_radius)
 
-    steps = int(length / sample_step) + 1  # Sampling every sample_step along the segment
+    steps = int(length / sample_step) + 1  # 沿线段每隔 sample_step 采样一次
 
     for i in range(steps + 1):
         t = i / steps
@@ -109,31 +108,31 @@ def line_collision_check(first, second, obstacle_list, robot_radius=0.0, sample_
         y = y1 + t * dy
 
         if is_point_collision(x, y, obstacle_list, robot_radius):
-            return False  # Collision found
+            return False  # 检测到碰撞
 
-    return True  # Safe
+    return True  # 安全
 
 
 def path_smoothing(path, max_iter, obstacle_list, robot_radius=0.0):
     """
-    Smooths a given path by iteratively replacing segments with shortcut connections,
-    while ensuring the new segments are collision-free.
+    通过迭代地用捷径连接替换路径段来平滑给定路径，
+    同时保证新路径段无碰撞。
 
-    The algorithm randomly picks two points along the original path and attempts to
-    connect them with a straight line. If the line does not collide with any obstacles
-    (considering the robot's radius), the intermediate path points between them are
-    replaced with the direct connection.
+    算法沿原始路径随机选取两个点，并尝试用直线
+    连接它们。若该直线不与任何障碍物碰撞
+    （计入机器人半径），则两点之间的中间路径点
+    被替换为这条直接连接。
 
     Args:
-        path (List[List[float]]): The original path as a list of [x, y] coordinates.
-        max_iter (int): Number of iterations for smoothing attempts.
-        obstacle_list (List[Tuple[float, float, float]]): List of obstacles represented as
-            (x, y, radius).
-        robot_radius (float, optional): Radius of the robot, used to inflate obstacle size
-            during collision checking. Defaults to 0.0.
+        path (List[List[float]]): 原始路径，为 [x, y] 坐标列表。
+        max_iter (int): 平滑尝试的迭代次数。
+        obstacle_list (List[Tuple[float, float, float]]): 障碍物列表，每个元素表示为
+            (x, y, radius)。
+        robot_radius (float, optional): 机器人半径，碰撞检测时用于膨胀障碍物尺寸。
+            默认值为 0.0。
 
     Returns:
-        List[List[float]]: The smoothed path as a list of [x, y] coordinates.
+        List[List[float]]: 平滑后的路径，为 [x, y] 坐标列表。
 
     Example:
         >>> smoothed = path_smoothing(path, 1000, obstacle_list, robot_radius=0.5)
@@ -141,7 +140,7 @@ def path_smoothing(path, max_iter, obstacle_list, robot_radius=0.0):
     le = get_path_length(path)
 
     for i in range(max_iter):
-        # Sample two points
+        # 采样两个点
         pickPoints = [random.uniform(0, le), random.uniform(0, le)]
         pickPoints.sort()
         first = get_target_point(path, pickPoints[0])
@@ -156,11 +155,11 @@ def path_smoothing(path, max_iter, obstacle_list, robot_radius=0.0):
         if second[2] == first[2]:
             continue
 
-        # collision check
+        # 碰撞检测
         if not line_collision_check(first, second, obstacle_list, robot_radius):
             continue
 
-        # Create New path
+        # 创建新路径
         newPath = []
         newPath.extend(path[:first[2] + 1])
         newPath.append([first[0], first[1]])
@@ -173,8 +172,8 @@ def path_smoothing(path, max_iter, obstacle_list, robot_radius=0.0):
 
 
 def main():
-    # ====Search Path with RRT====
-    # Parameter
+    # ====使用 RRT 搜索路径====
+    # 参数
     obstacleList = [
         (5, 5, 1),
         (3, 6, 2),
@@ -182,18 +181,18 @@ def main():
         (3, 10, 2),
         (7, 5, 2),
         (9, 5, 2)
-    ]  # [x,y,radius]
+    ]  # [x,y,半径]
     rrt = RRT(start=[0, 0], goal=[6, 10],
               rand_area=[-2, 15], obstacle_list=obstacleList,
               robot_radius=0.3)
     path = rrt.planning(animation=show_animation)
 
-    # Path smoothing
+    # 路径平滑
     maxIter = 1000
     smoothedPath = path_smoothing(path, maxIter, obstacleList,
                                   robot_radius=rrt.robot_radius)
 
-    # Draw final path
+    # 绘制最终路径
     if show_animation:
         rrt.draw_graph()
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
@@ -202,7 +201,7 @@ def main():
             y for (x, y) in smoothedPath], '-c')
 
         plt.grid(True)
-        plt.pause(0.01)  # Need for Mac
+        plt.pause(0.01)  # Mac 上需要
         plt.show()
 
 

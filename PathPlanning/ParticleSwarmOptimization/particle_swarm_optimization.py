@@ -1,18 +1,18 @@
 """
-Particle Swarm Optimization (PSO) Path Planning
+粒子群优化（PSO）路径规划
 
-author: Anish (@anishk85)
+作者：Anish (@anishk85)
 
-See Wikipedia article (https://en.wikipedia.org/wiki/Particle_swarm_optimization)
+参见维基百科条目 (https://en.wikipedia.org/wiki/Particle_swarm_optimization)
 
 References:
-    - Kennedy, J.; Eberhart, R. (1995). "Particle Swarm Optimization"
-    - Shi, Y.; Eberhart, R. (1998). "A Modified Particle Swarm Optimizer"
+    - Kennedy, J.; Eberhart, R. (1995). "粒子群优化"
+    - Shi, Y.; Eberhart, R. (1998). "一种改进的粒子群优化器"
     - https://machinelearningmastery.com/a-gentle-introduction-to-particle-swarm-optimization/
 
-This implementation uses PSO to find collision-free paths by treating
-path planning as an optimization problem where particles explore the
-search space to minimize distance to target while avoiding obstacles.
+本实现用 PSO 寻找无碰撞路径，将
+路径规划视为优化问题：粒子探索
+搜索空间，在避开障碍物的同时最小化到目标的距离。
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,7 +20,7 @@ import matplotlib.animation as animation
 import matplotlib.patches as patches
 import signal
 import sys
-# Add show_animation flag for consistency with other planners
+# 添加 show_animation 标志，以便与其他规划器保持一致
 show_animation = True
 
 def signal_handler(sig, frame):
@@ -31,19 +31,18 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 class Particle:
-    """Represents a single particle in the PSO swarm.
-    Each particle maintains its current position, velocity, and personal best
-    position discovered during the search. Particles explore the search space
-    by updating their velocity based on personal experience (cognitive component)
-    and swarm knowledge (social component).
+    """表示 PSO 粒子群中的单个粒子。
+    每个粒子维护当前位置、速度，以及搜索过程中发现的个体最优
+    位置。粒子根据个体经验（认知分量）
+    和群体知识（社会分量）更新速度，从而探索搜索空间。
     Attributes:
-        search_bounds: List of tuples [(x_min, x_max), (y_min, y_max)] defining search space
-        max_velocity: Maximum velocity allowed in each dimension (5% of search space range)
-        position: Current 2D position [x, y] in search space
-        velocity: Current velocity vector [vx, vy]
-        personal_best_position: Personal best position found so far
-        personal_best_value: Fitness value at personal best position
-        path: List of all positions visited by this particle
+        search_bounds: 定义搜索空间的元组列表 [(x_min, x_max), (y_min, y_max)]
+        max_velocity: 每个维度允许的最大速度（搜索空间范围的 5%）
+        position: 搜索空间中的当前二维位置 [x, y]
+        velocity: 当前速度向量 [vx, vy]
+        personal_best_position: 迄今找到的个体最优位置
+        personal_best_value: 个体最优位置处的适应度
+        path: 该粒子访问过的全部位置列表
     """
 
     def __init__(self, search_bounds, spawn_bounds):
@@ -56,7 +55,7 @@ class Particle:
         self.path = [self.position.copy()]
 
     def update_velocity(self, gbest_pos, w, c1, c2):
-        """Update particle velocity using PSO equation:
+        """使用 PSO 方程更新粒子速度：
         v = w*v + c1*r1*(personal_best - x) + c2*r2*(gbest - x)
         """
         r1 = np.random.rand(2)
@@ -68,7 +67,7 @@ class Particle:
 
     def update_position(self):
         self.position = self.position + self.velocity
-        # Keep in bounds
+        # 保持在边界内
         for i in range(2):
             self.position[i] = np.clip(
                 self.position[i], self.search_bounds[i][0], self.search_bounds[i][1]
@@ -85,12 +84,12 @@ class PSOSwarm:
         self.target = np.array(target)
         self.obstacles = obstacles
         self.search_bounds = search_bounds
-        # PSO parameters
-        self.w_start = 0.9  # Initial inertia weight
-        self.w_end = 0.4  # Final inertia weight
-        self.c1 = 1.5  # Cognitive coefficient
-        self.c2 = 1.5  # Social coefficient
-        # Initialize particles
+        # PSO 参数
+        self.w_start = 0.9  # 初始惯性权重
+        self.w_end = 0.4  # 最终惯性权重
+        self.c1 = 1.5  # 认知系数
+        self.c2 = 1.5  # 社会系数
+        # 初始化粒子
         self.particles = [
             Particle(search_bounds, spawn_bounds) for _ in range(n_particles)
         ]
@@ -100,85 +99,85 @@ class PSOSwarm:
         self.iteration = 0
 
     def fitness(self, pos):
-        """Calculate fitness - distance to target + obstacle penalty"""
+        """计算适应度：到目标的距离 + 障碍物惩罚"""
         dist = np.linalg.norm(pos - self.target)
-        # Obstacle penalty
+        # 障碍物惩罚
         penalty = 0
         for ox, oy, r in self.obstacles:
             obs_dist = np.linalg.norm(pos - np.array([ox, oy]))
             if obs_dist < r:
-                penalty += 1000  # Inside obstacle
+                penalty += 1000  # 在障碍物内部
             elif obs_dist < r + 5:
-                penalty += 50 / (obs_dist - r + 0.1)  # Too close
+                penalty += 50 / (obs_dist - r + 0.1)  # 过于接近
         return dist + penalty
 
     def check_collision(self, start, end, obstacle):
-        """Check if path from start to end hits obstacle using line-circle intersection
+        """使用直线与圆的相交检测，判断从 start 到 end 的路径是否碰到障碍物
             Args:
-            start: Starting position (numpy array)
-            end: Ending position (numpy array)
-            obstacle: Tuple (ox, oy, r) representing obstacle center and radius
+            start: 起始位置（numpy 数组）
+            end: 终止位置（numpy 数组）
+            obstacle: 元组 (ox, oy, r)，表示障碍物圆心与半径
         Returns:
-            bool: True if collision detected, False otherwise
+            bool：检测到碰撞时为 True，否则为 False
         """
         ox, oy, r = obstacle
         center = np.array([ox, oy])
-        # Vector math for line-circle intersection
+        # 直线与圆相交的向量计算
         d = end - start
         f = start - center
         a = np.dot(d, d)
-        # Guard against zero-length steps to prevent ZeroDivisionError
-        if a < 1e-10:  # Near-zero length step
-            # Check if start point is inside obstacle
+        # 防止零长度步长导致 ZeroDivisionError
+        if a < 1e-10:  # 近乎零长度的步长
+            # 检查起点是否在障碍物内
             return np.linalg.norm(f) <= r
         b = 2 * np.dot(f, d)
         c = np.dot(f, f) - r * r
         discriminant = b * b - 4 * a * c
         if discriminant < 0:
             return False
-        # Check if intersection on segment
+        # 检查交点是否在线段上
         sqrt_discriminant = np.sqrt(discriminant)
         t1 = (-b - sqrt_discriminant) / (2 * a)
         t2 = (-b + sqrt_discriminant) / (2 * a)
         return (0 <= t1 <= 1) or (0 <= t2 <= 1)
 
     def step(self):
-        """Run one PSO iteration
+        """执行一次 PSO 迭代
         Returns:
-            bool: True if algorithm should continue, False if completed
+            bool：算法应继续时为 True，已完成时为 False
         """
         if self.iteration >= self.max_iter:
             return False
-        # Update inertia weight (linear decay)
+        # 更新惯性权重（线性衰减）
         w = self.w_start - (self.w_start - self.w_end) * (
             self.iteration / self.max_iter
         )
-        # Evaluate all particles
+        # 评估所有粒子
         for particle in self.particles:
             value = self.fitness(particle.position)
-            # Update personal best
+            # 更新个体最优
             if value < particle.personal_best_value:
                 particle.personal_best_value = value
                 particle.personal_best_position = particle.position.copy()
-            # Update global best
+            # 更新全局最优
             if value < self.gbest_value:
                 self.gbest_value = value
                 self.gbest_position = particle.position.copy()
         if self.gbest_position is not None:
             self.gbest_path.append(self.gbest_position.copy())
-        # Update particles
+        # 更新粒子
         for particle in self.particles:
             particle.update_velocity(self.gbest_position, w, self.c1, self.c2)
-            # Predict next position
+            # 预测下一位置
             next_pos = particle.position + particle.velocity
-            # Check collision
+            # 检查碰撞
             collision = False
             for obs in self.obstacles:
                 if self.check_collision(particle.position, next_pos, obs):
                     collision = True
                     break
             if collision:
-                # Reduce velocity if collision detected
+                # 若检测到碰撞则减小速度
                 particle.velocity *= 0.2
             particle.update_position()
         self.iteration += 1
@@ -189,22 +188,22 @@ class PSOSwarm:
         return True
 
 def main():
-    """Run PSO path planning algorithm demonstration.
-    This function demonstrates PSO-based path planning with the following setup:
-    - 15 particles exploring a (-50,50) x (-50,50) search space
-    - Start zone: (-45,-45) to (-35,-35)
-    - Target: (40, 35)
-    - 4 circular obstacles with collision avoidance
-    - Real-time visualization showing particle convergence (if show_animation=True)
-    - Headless mode support for testing (if show_animation=False)
-    The algorithm runs for up to 150 iterations, displaying particle movement,
-    personal/global best positions, and the evolving optimal path.
+    """运行 PSO 路径规划算法演示。
+    本函数以下列设置演示基于 PSO 的路径规划：
+    - 15 个粒子在 (-50,50) x (-50,50) 的搜索空间中探索
+    - 起始区域：(-45,-45) 到 (-35,-35)
+    - 目标：(40, 35)
+    - 4 个圆形障碍物，并带碰撞避免
+    - 实时可视化粒子收敛过程（当 show_animation=True）
+    - 支持无界面模式以便测试（当 show_animation=False）
+    算法最多运行 150 次迭代，显示粒子运动、
+    个体/全局最优位置，以及不断演化的最优路径。
     """
     print(__file__ + " start!!")
-    # Set matplotlib backend for headless environments
+    # 为无界面环境设置 matplotlib 后端
     if not show_animation:
-        plt.switch_backend("Agg")  # Use non-GUI backend for testing
-    # Setup parameters
+        plt.switch_backend("Agg")  # 测试时使用非图形界面后端
+    # 设置参数
     N_PARTICLES = 15
     MAX_ITER = 150
     SEARCH_BOUNDS = [(-50, 50), (-50, 50)]
@@ -221,18 +220,18 @@ def main():
     )
     # pragma: no cover
     if show_animation:
-        # Visualization setup
+        # 可视化设置
         signal.signal(signal.SIGINT, signal_handler)
         fig, ax = plt.subplots(figsize=(10, 10))
         ax.set_xlim(SEARCH_BOUNDS[0])
         ax.set_ylim(SEARCH_BOUNDS[1])
         ax.set_title("PSO Path Planning with Collision Avoidance", fontsize=14)
         ax.grid(True, alpha=0.3)
-        # Draw obstacles
+        # 绘制障碍物
         for ox, oy, r in OBSTACLES:
             circle = patches.Circle((ox, oy), r, color="gray", alpha=0.7)
             ax.add_patch(circle)
-        # Draw spawn area
+        # 绘制起始区域
         spawn_rect = patches.Rectangle(
             (SPAWN_AREA[0][0], SPAWN_AREA[1][0]),
             SPAWN_AREA[0][1] - SPAWN_AREA[0][0],
@@ -244,9 +243,9 @@ def main():
             label="Start Zone",
         )
         ax.add_patch(spawn_rect)
-        # Draw target
+        # 绘制目标
         ax.plot(TARGET[0], TARGET[1], "r*", markersize=20, label="Target")
-        # Initialize plot elements
+        # 初始化绘图元素
         particles_scatter = ax.scatter(
             [], [], c="blue", s=50, alpha=0.6, label="Particles"
         )
@@ -266,7 +265,7 @@ def main():
         )
         ax.legend(loc="upper right")
         def animate(frame):
-            """Animation function for matplotlib FuncAnimation"""
+            """matplotlib FuncAnimation 的动画函数"""
             if not swarm.step():
                 return (
                     particles_scatter,
@@ -275,15 +274,15 @@ def main():
                     iteration_text,
                     *particle_paths,
                 )
-            # Update particle positions
+            # 更新粒子位置
             positions = np.array([p.position for p in swarm.particles])
             particles_scatter.set_offsets(positions)
-            # Update particle paths
+            # 更新粒子路径
             for i, particle in enumerate(swarm.particles):
                 if len(particle.path) > 1:
                     path = np.array(particle.path)
                     particle_paths[i].set_data(path[:, 0], path[:, 1])
-            # Update global best
+            # 更新全局最优
             if swarm.gbest_position is not None:
                 gbest_scatter.set_data(
                     [swarm.gbest_position[0]], [swarm.gbest_position[1]]
@@ -291,7 +290,7 @@ def main():
                 if len(swarm.gbest_path) > 1:
                     gbest = np.array(swarm.gbest_path)
                     gbest_path_line.set_data(gbest[:, 0], gbest[:, 1])
-            # Update text
+            # 更新文本
             iteration_text.set_text(
                 f"Iteration: {swarm.iteration}/{MAX_ITER}\n"
                 f"Best Fitness: {swarm.gbest_value:.2f}"
@@ -303,16 +302,16 @@ def main():
                 iteration_text,
                 *particle_paths,
             )
-        # Create animation and store reference to prevent garbage collection
+        # 创建动画并保存引用，防止被垃圾回收
         animation_ref = animation.FuncAnimation(
             fig, animate, frames=MAX_ITER, interval=100, blit=True, repeat=False
         )
         plt.tight_layout()
         plt.show()
-        # Keep reference to prevent garbage collection
+        # 保留引用，防止被垃圾回收
         return animation_ref
     else:
-        # Run without animation for testing
+        # 测试时不播放动画
         print("Running PSO algorithm without animation...")
         iteration_count = 0
         while swarm.step():

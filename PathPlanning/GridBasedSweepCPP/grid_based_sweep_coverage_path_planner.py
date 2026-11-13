@@ -1,7 +1,7 @@
 """
-Grid based sweep planner
+基于栅格的扫描路径规划器
 
-author: Atsushi Sakai
+作者: Atsushi Sakai
 """
 
 import math
@@ -40,21 +40,21 @@ class SweepSearcher:
         n_x_index = self.moving_direction + c_x_index
         n_y_index = c_y_index
 
-        # found safe grid
+        # 找到安全栅格
         if not self.check_occupied(n_x_index, n_y_index, grid_map):
             return n_x_index, n_y_index
-        else:  # occupied
+        else:  # 已被占用
             next_c_x_index, next_c_y_index = self.find_safe_turning_grid(
                 c_x_index, c_y_index, grid_map)
             if (next_c_x_index is None) and (next_c_y_index is None):
-                # moving backward
+                # 向后移动
                 next_c_x_index = -self.moving_direction + c_x_index
                 next_c_y_index = c_y_index
                 if self.check_occupied(next_c_x_index, next_c_y_index, grid_map, FloatGrid(1.0)):
-                    # moved backward, but the grid is occupied by obstacle
+                    # 已向后移动，但该栅格被障碍物占用
                     return None, None
             else:
-                # keep moving until end
+                # 持续移动直到尽头
                 while not self.check_occupied(next_c_x_index + self.moving_direction, next_c_y_index, grid_map):
                     next_c_x_index += self.moving_direction
                 self.swap_moving_direction()
@@ -71,7 +71,7 @@ class SweepSearcher:
             next_x_ind = d_x_ind + c_x_index
             next_y_ind = d_y_ind + c_y_index
 
-            # found safe grid
+            # 找到安全栅格
             if not self.check_occupied(next_x_ind, next_y_ind, grid_map):
                 return next_x_ind, next_y_ind
 
@@ -82,12 +82,12 @@ class SweepSearcher:
             if not self.check_occupied(ix, self.goal_y, grid_map):
                 return False
 
-        # all lower grid is occupied
+        # 下方所有栅格均已被占用
         return True
 
     def update_turning_window(self):
-        # turning window definition
-        # robot can move grid based on it.
+        # 转向窗口定义
+        # 机器人据此在栅格上移动。
         self.turing_window = [
             (self.moving_direction, 0.0),
             (self.moving_direction, self.sweep_direction),
@@ -118,7 +118,7 @@ class SweepSearcher:
 
 
 def find_sweep_direction_and_start_position(ox, oy):
-    # find sweep_direction
+    # 寻找扫描方向
     max_dist = 0.0
     vec = [0.0, 0.0]
     sweep_start_pos = [0.0, 0.0]
@@ -198,7 +198,7 @@ def setup_grid_map(ox, oy, resolution, sweep_direction, offset_grid=10):
 
 
 def sweep_path_search(sweep_searcher, grid_map, grid_search_animation=False):
-    # search start grid
+    # 搜索起始栅格
     c_x_index, c_y_index = sweep_searcher.search_start_grid(grid_map)
     if not grid_map.set_value_from_xy_index(c_x_index, c_y_index, FloatGrid(0.5)):
         print("Cannot find start grid")
@@ -211,7 +211,7 @@ def sweep_path_search(sweep_searcher, grid_map, grid_search_animation=False):
     fig, ax = None, None
     if grid_search_animation:
         fig, ax = plt.subplots()
-        # for stopping simulation with the esc key.
+        # 按 Esc 键停止仿真。
         fig.canvas.mpl_connect(
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
@@ -270,11 +270,11 @@ def planning(ox, oy, resolution,
 def planning_animation(ox, oy, resolution):  # pragma: no cover
     px, py = planning(ox, oy, resolution)
 
-    # animation
+    # 动画
     if do_animation:
         for ipx, ipy in zip(px, py):
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 Esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])

@@ -1,7 +1,7 @@
 """
-Path planning Sample Code with RRT and Dubins path
+使用 RRT 与 Dubins 路径的路径规划示例代码
 
-author: AtsushiSakai(@Atsushi_twi)
+作者: AtsushiSakai(@Atsushi_twi)
 
 """
 import copy
@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 import pathlib
-sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))  # root dir
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))  # 根目录
 sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
 from DubinsPath import dubins_path_planner
@@ -23,12 +23,12 @@ show_animation = True
 
 class RRTStarDubins(RRTStar):
     """
-    Class for RRT star planning with Dubins path
+    使用 Dubins 路径进行 RRT* 规划的类
     """
 
     class Node(RRTStar.Node):
         """
-        RRT Node
+        RRT 节点
         """
 
         def __init__(self, x, y, yaw):
@@ -43,13 +43,13 @@ class RRTStarDubins(RRTStar):
                  robot_radius=0.0,
                  ):
         """
-        Setting Parameter
+        参数设置
 
-        start:Start Position [x,y]
-        goal:Goal Position [x,y]
-        obstacleList:obstacle Positions [[x,y,size],...]
-        randArea:Random Sampling Area [min,max]
-        robot_radius: robot body modeled as circle with given radius
+        start:起点位置 [x,y]
+        goal:目标点位置 [x,y]
+        obstacleList:障碍物位置 [[x,y,尺寸],...]
+        randArea:随机采样区域 [min,max]
+        robot_radius: 将机器人本体建模为给定半径的圆
 
         """
         self.start = self.Node(start[0], start[1], start[2])
@@ -61,16 +61,16 @@ class RRTStarDubins(RRTStar):
         self.obstacle_list = obstacle_list
         self.connect_circle_dist = connect_circle_dist
 
-        self.curvature = 1.0  # for dubins path
+        self.curvature = 1.0  # 用于 Dubins 路径
         self.goal_yaw_th = np.deg2rad(1.0)
         self.goal_xy_th = 0.5
         self.robot_radius = robot_radius
 
     def planning(self, animation=True, search_until_max_iter=True):
         """
-        RRT Star planning
+        RRT* 规划
 
-        animation: flag for animation on or off
+        animation: 是否开启动画的标志
         """
 
         self.node_list = [self.start]
@@ -92,7 +92,7 @@ class RRTStarDubins(RRTStar):
                 self.plot_start_goal_arrow()
                 self.draw_graph(rnd)
 
-            if (not search_until_max_iter) and new_node:  # check reaching the goal
+            if (not search_until_max_iter) and new_node:  # 检查是否到达目标点
                 last_index = self.search_best_goal_node()
                 if last_index:
                     return self.generate_final_course(last_index)
@@ -109,7 +109,7 @@ class RRTStarDubins(RRTStar):
 
     def draw_graph(self, rnd=None):
         plt.clf()
-        # for stopping simulation with the esc key.
+        # 按 Esc 键停止仿真。
         plt.gcf().canvas.mpl_connect('key_release_event',
                                      lambda event: [exit(0) if event.key == 'escape' else None])
         if rnd is not None:
@@ -139,7 +139,7 @@ class RRTStarDubins(RRTStar):
                 from_node.x, from_node.y, from_node.yaw,
                 to_node.x, to_node.y, to_node.yaw, self.curvature)
 
-        if len(px) <= 1:  # cannot find a dubins path
+        if len(px) <= 1:  # 无法找到 Dubins 路径
             return None
 
         new_node = copy.deepcopy(from_node)
@@ -172,7 +172,7 @@ class RRTStarDubins(RRTStar):
                             random.uniform(self.min_rand, self.max_rand),
                             random.uniform(-math.pi, math.pi)
                             )
-        else:  # goal point sampling
+        else:  # 目标点采样
             rnd = self.Node(self.end.x, self.end.y, self.end.yaw)
 
         return rnd
@@ -184,7 +184,7 @@ class RRTStarDubins(RRTStar):
             if self.calc_dist_to_goal(node.x, node.y) <= self.goal_xy_th:
                 goal_indexes.append(i)
 
-        # angle check
+        # 航向角检查
         final_goal_indexes = []
         for i in goal_indexes:
             if abs(self.node_list[i].yaw - self.end.yaw) <= self.goal_yaw_th:
@@ -215,7 +215,7 @@ class RRTStarDubins(RRTStar):
 def main():
     print("Start rrt star with dubins planning")
 
-    # ====Search Path with RRT====
+    # ====使用 RRT 搜索路径====
     obstacleList = [
         (5, 5, 1),
         (3, 6, 2),
@@ -223,16 +223,16 @@ def main():
         (3, 10, 2),
         (7, 5, 2),
         (9, 5, 2)
-    ]  # [x,y,size(radius)]
+    ]  # [x,y,尺寸(半径)]
 
-    # Set Initial parameters
+    # 设置初始参数
     start = [0.0, 0.0, np.deg2rad(0.0)]
     goal = [10.0, 10.0, np.deg2rad(0.0)]
 
     rrtstar_dubins = RRTStarDubins(start, goal, rand_area=[-2.0, 15.0], obstacle_list=obstacleList)
     path = rrtstar_dubins.planning(animation=show_animation)
 
-    # Draw final path
+    # 绘制最终路径
     if show_animation:  # pragma: no cover
         rrtstar_dubins.draw_graph()
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')

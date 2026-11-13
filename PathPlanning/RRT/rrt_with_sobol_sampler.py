@@ -1,26 +1,25 @@
 """
 
-Path planning Sample Code with Randomized Rapidly-Exploring Random
-Trees with sobol low discrepancy sampler(RRTSobol).
-Sobol wiki https://en.wikipedia.org/wiki/Sobol_sequence
+使用 Sobol 低差异采样器的随机快速扩展随机树
+（RRTSobol）路径规划示例代码。
+Sobol 维基百科 https://en.wikipedia.org/wiki/Sobol_sequence
 
-The goal of low discrepancy samplers is to generate a sequence of points that
-optimizes a criterion called dispersion.  Intuitively, the idea is to place
-samples to cover the exploration space in a way that makes the largest
-uncovered area be as small as possible.  This generalizes of the idea of grid
-resolution.  For a grid, the resolution may be selected by defining the step
-size for each axis.  As the step size is decreased, the resolution increases.
-If a grid-based motion planning algorithm can increase the resolution
-arbitrarily, it becomes resolution complete.  Dispersion can be considered as a
-powerful generalization of the notion of resolution.
+低差异采样器的目标是生成一个点序列，使其在称为离散度的
+准则上达到最优。直观地说，就是放置采样点以覆盖探索空间，
+并使最大的未覆盖区域尽可能小。这是对栅格
+分辨率思想的推广。对于栅格，分辨率可通过为每个坐标轴定义步长
+来选取。步长减小，分辨率提高。
+若基于栅格的运动规划算法能够任意提高分辨率，
+则它是分辨率完备的。离散度可视为
+分辨率概念的一种强有力推广。
 
-Taken from
+摘自
 LaValle, Steven M. Planning algorithms. Cambridge university press, 2006.
 
 
-authors:
-    First implementation AtsushiSakai(@Atsushi_twi)
-    Sobol sampler Rafael A.
+作者:
+    首次实现 AtsushiSakai(@Atsushi_twi)
+    Sobol 采样器 Rafael A.
 Rojas (rafaelrojasmiliani@gmail.com)
 
 
@@ -39,12 +38,12 @@ show_animation = True
 
 class RRTSobol:
     """
-    Class for RRTSobol planning
+    RRTSobol 路径规划类
     """
 
     class Node:
         """
-        RRTSobol Node
+        RRTSobol 节点
         """
 
         def __init__(self, x, y):
@@ -65,13 +64,13 @@ class RRTSobol:
                  max_iter=500,
                  robot_radius=0.0):
         """
-        Setting Parameter
+        参数设置
 
-        start:Start Position [x,y]
-        goal:Goal Position [x,y]
-        obstacle_list:obstacle Positions [[x,y,size],...]
-        randArea:Random Sampling Area [min,max]
-        robot_radius: robot body modeled as circle with given radius
+        start:起点位置 [x,y]
+        goal:目标点位置 [x,y]
+        obstacle_list:障碍物位置 [[x,y,size],...]
+        randArea:随机采样区域 [min,max]
+        robot_radius: 机器人本体建模为给定半径的圆
 
         """
         self.start = self.Node(start[0], start[1])
@@ -89,9 +88,9 @@ class RRTSobol:
 
     def planning(self, animation=True):
         """
-        rrt path planning
+        RRT 路径规划
 
-        animation: flag for animation on or off
+        animation: 动画开关标志
         """
 
         self.node_list = [self.start]
@@ -120,7 +119,7 @@ class RRTSobol:
             if animation and i % 5:
                 self.draw_graph(rnd_node)
 
-        return None  # cannot find path
+        return None  # 找不到路径
 
     def steer(self, from_node, to_node, extend_length=float("inf")):
 
@@ -176,13 +175,13 @@ class RRTSobol:
             self.sobol_inter_ = n
             rnd = self.Node(*rand_coordinates)
 
-        else:  # goal point sampling
+        else:  # 目标点采样
             rnd = self.Node(self.end.x, self.end.y)
         return rnd
 
     def draw_graph(self, rnd=None):
         plt.clf()
-        # for stopping simulation with the esc key.
+        # 按 esc 键停止仿真。
         plt.gcf().canvas.mpl_connect(
             'key_release_event',
             lambda event: [sys.exit(0) if event.key == 'escape' else None])
@@ -232,9 +231,9 @@ class RRTSobol:
             d_list = [dx * dx + dy * dy for (dx, dy) in zip(dx_list, dy_list)]
 
             if min(d_list) <= (size+robot_radius)**2:
-                return False  # collision
+                return False  # 碰撞
 
-        return True  # safe
+        return True  # 安全
 
     @staticmethod
     def calc_distance_and_angle(from_node, to_node):
@@ -248,10 +247,10 @@ class RRTSobol:
 def main(gx=6.0, gy=10.0):
     print("start " + __file__)
 
-    # ====Search Path with RRTSobol====
+    # ====使用 RRTSobol 搜索路径====
     obstacle_list = [(5, 5, 1), (3, 6, 2), (3, 8, 2), (3, 10, 2), (7, 5, 2),
-                     (9, 5, 2), (8, 10, 1)]  # [x, y, radius]
-    # Set Initial parameters
+                     (9, 5, 2), (8, 10, 1)]  # [x, y, 半径]
+    # 设置初始参数
     rrt = RRTSobol(
         start=[0, 0],
         goal=[gx, gy],
@@ -265,12 +264,12 @@ def main(gx=6.0, gy=10.0):
     else:
         print("found path!!")
 
-        # Draw final path
+        # 绘制最终路径
         if show_animation:
             rrt.draw_graph()
             plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
             plt.grid(True)
-            plt.pause(0.01)  # Need for Mac
+            plt.pause(0.01)  # Mac 上需要
             plt.show()
 
 

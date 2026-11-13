@@ -1,10 +1,10 @@
 """
 
-Depth-First grid planning
+深度优先栅格规划
 
-author: Erwin Lejeune (@spida_rwin)
+作者: Erwin Lejeune (@spida_rwin)
 
-See Wikipedia article (https://en.wikipedia.org/wiki/Depth-first_search)
+参见维基百科条目 (https://en.wikipedia.org/wiki/Depth-first_search)
 
 """
 
@@ -19,12 +19,12 @@ class DepthFirstSearchPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
-        Initialize grid map for Depth-First planning
+        为深度优先搜索规划初始化栅格地图
 
-        ox: x position list of Obstacles [m]
-        oy: y position list of Obstacles [m]
-        resolution: grid resolution [m]
-        rr: robot radius[m]
+        ox: 障碍物的 x 位置列表 [m]
+        oy: 障碍物的 y 位置列表 [m]
+        resolution: 栅格分辨率 [m]
+        rr: 机器人半径[m]
         """
 
         self.reso = reso
@@ -34,8 +34,8 @@ class DepthFirstSearchPlanner:
 
     class Node:
         def __init__(self, x, y, cost, parent_index, parent):
-            self.x = x  # index of grid
-            self.y = y  # index of grid
+            self.x = x  # 栅格索引
+            self.y = y  # 栅格索引
             self.cost = cost
             self.parent_index = parent_index
             self.parent = parent
@@ -46,17 +46,17 @@ class DepthFirstSearchPlanner:
 
     def planning(self, sx, sy, gx, gy):
         """
-        Depth First search
+        深度优先搜索
 
-        input:
-            s_x: start x position [m]
-            s_y: start y position [m]
-            gx: goal x position [m]
-            gy: goal y position [m]
+        输入:
+            s_x: 起点 x 位置 [m]
+            s_y: 起点 y 位置 [m]
+            gx: 目标点 x 位置 [m]
+            gy: 目标点 y 位置 [m]
 
-        output:
-            rx: x position list of the final path
-            ry: y position list of the final path
+        输出:
+            rx: 最终路径的 x 位置列表
+            ry: 最终路径的 y 位置列表
         """
 
         nstart = self.Node(self.calc_xyindex(sx, self.minx),
@@ -75,11 +75,11 @@ class DepthFirstSearchPlanner:
             current = open_set.pop(list(open_set.keys())[-1])
             c_id = self.calc_grid_index(current)
 
-            # show graph
+            # 显示搜索图
             if show_animation:  # pragma: no cover
                 plt.plot(self.calc_grid_position(current.x, self.minx),
                          self.calc_grid_position(current.y, self.miny), "xc")
-                # for stopping simulation with the esc key.
+                # 按 Esc 键停止仿真。
                 plt.gcf().canvas.mpl_connect('key_release_event',
                                              lambda event:
                                              [exit(0) if event.key == 'escape'
@@ -92,14 +92,14 @@ class DepthFirstSearchPlanner:
                 ngoal.cost = current.cost
                 break
 
-            # expand_grid search grid based on motion model
+            # 基于运动模型扩展搜索栅格
             for i, _ in enumerate(self.motion):
                 node = self.Node(current.x + self.motion[i][0],
                                  current.y + self.motion[i][1],
                                  current.cost + self.motion[i][2], c_id, None)
                 n_id = self.calc_grid_index(node)
 
-                # If the node is not safe, do nothing
+                # 若节点不安全，则不做处理
                 if not self.verify_node(node):
                     continue
 
@@ -112,7 +112,7 @@ class DepthFirstSearchPlanner:
         return rx, ry
 
     def calc_final_path(self, ngoal, closedset):
-        # generate final course
+        # 生成最终路径
         rx, ry = [self.calc_grid_position(ngoal.x, self.minx)], [
             self.calc_grid_position(ngoal.y, self.miny)]
         n = closedset[ngoal.parent_index]
@@ -125,7 +125,7 @@ class DepthFirstSearchPlanner:
 
     def calc_grid_position(self, index, minp):
         """
-        calc grid position
+        计算栅格位置
 
         :param index:
         :param minp:
@@ -153,7 +153,7 @@ class DepthFirstSearchPlanner:
         elif py >= self.maxy:
             return False
 
-        # collision check
+        # 碰撞检测
         if self.obmap[node.x][node.y]:
             return False
 
@@ -175,7 +175,7 @@ class DepthFirstSearchPlanner:
         print("x_width:", self.xwidth)
         print("y_width:", self.ywidth)
 
-        # obstacle map generation
+        # 生成障碍物地图
         self.obmap = [[False for _ in range(self.ywidth)]
                       for _ in range(self.xwidth)]
         for ix in range(self.xwidth):
@@ -190,7 +190,7 @@ class DepthFirstSearchPlanner:
 
     @staticmethod
     def get_motion_model():
-        # dx, dy, cost
+        # dx, dy, 代价
         motion = [[1, 0, 1],
                   [0, 1, 1],
                   [-1, 0, 1],
@@ -206,7 +206,7 @@ class DepthFirstSearchPlanner:
 def main():
     print(__file__ + " start!!")
 
-    # start and goal position
+    # 起点与目标点位置
     sx = 10.0  # [m]
     sy = 10.0  # [m]
     gx = 50.0  # [m]
@@ -214,7 +214,7 @@ def main():
     grid_size = 2.0  # [m]
     robot_radius = 1.0  # [m]
 
-    # set obstacle positions
+    # 设置障碍物位置
     ox, oy = [], []
     for i in range(-10, 60):
         ox.append(i)

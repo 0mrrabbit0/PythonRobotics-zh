@@ -1,14 +1,13 @@
 """
-Batch Informed Trees based path planning:
-Uses a heuristic to efficiently search increasingly dense
-RGGs while reusing previous information. Provides faster
-convergence that RRT*, Informed RRT* and other sampling based
-methods.
+基于 Batch Informed Trees 的路径规划：
+利用启发式高效搜索逐渐加密的
+随机几何图（RGG），并复用先前信息。相比 RRT*、Informed RRT* 及其他基于采样的
+方法，收敛更快。
 
-Uses lazy connecting by combining sampling based methods and A*
-like incremental graph search algorithms.
+通过结合基于采样的方法与类 A*
+增量图搜索算法，采用惰性连接。
 
-author: Karan Chawla(@karanchawla)
+作者: Karan Chawla(@karanchawla)
         Atsushi Sakai(@Atsushi_twi)
 
 Reference: https://arxiv.org/abs/1405.5848
@@ -24,8 +23,8 @@ show_animation = True
 
 
 class RTree:
-    # Class to represent the explicit tree created
-    # while sampling through the state space
+    # 表示在状态空间采样过程中
+    # 所构建显式树的类
 
     def __init__(self, start=None, lowerLimit=None, upperLimit=None,
                  resolution=1.0):
@@ -44,8 +43,8 @@ class RTree:
         self.dimension = len(lowerLimit)
         self.num_cells = [0] * self.dimension
         self.resolution = resolution
-        # compute the number of grid cells based on the limits and
-        # resolution given
+        # 根据给定的边界与分辨率
+        # 计算栅格单元数量
         for idx in range(self.dimension):
             self.num_cells[idx] = np.ceil(
                 (upperLimit[idx] - lowerLimit[idx]) / resolution)
@@ -55,37 +54,36 @@ class RTree:
 
     @staticmethod
     def get_root_id():
-        # return the id of the root of the tree
+        # 返回树根的 id
         return 0
 
     def add_vertex(self, vertex):
-        # add a vertex to the tree
+        # 向树中添加一个顶点
         vertex_id = self.real_world_to_node_id(vertex)
         self.vertices[vertex_id] = []
         return vertex_id
 
     def add_edge(self, v, x):
-        # create an edge between v and x vertices
+        # 在顶点 v 与 x 之间创建一条边
         if (v, x) not in self.edges:
             self.edges.append((v, x))
-        # since the tree is undirected
+        # 因为该树是无向的
         self.vertices[v].append(x)
         self.vertices[x].append(v)
 
     def real_coords_to_grid_coord(self, real_coord):
-        # convert real world coordinates to grid space
-        # depends on the resolution of the grid
-        # the output is the same as real world coords if the resolution
-        # is set to 1
+        # 将真实世界坐标转换到栅格空间
+        # 取决于栅格分辨率
+        # 若分辨率设为 1，输出与真实世界坐标相同
         coord = [0] * self.dimension
         for i in range(len(coord)):
-            start = self.lowerLimit[i]  # start of the grid space
+            start = self.lowerLimit[i]  # 栅格空间的起点
             coord[i] = int(np.around((real_coord[i] - start) / self.resolution))
         return coord
 
     def grid_coordinate_to_node_id(self, coord):
-        # This function maps a grid coordinate to a unique
-        # node id
+        # 本函数将栅格坐标映射为唯一的
+        # 节点 id
         nodeId = 0
         for i in range(len(coord) - 1, -1, -1):
             product = 1
@@ -95,29 +93,29 @@ class RTree:
         return nodeId
 
     def real_world_to_node_id(self, real_coord):
-        # first convert the given coordinates to grid space and then
-        # convert the grid space coordinates to a unique node id
+        # 先将给定坐标转换到栅格空间，再
+        # 将栅格空间坐标转换为唯一节点 id
         return self.grid_coordinate_to_node_id(
             self.real_coords_to_grid_coord(real_coord))
 
     def grid_coord_to_real_world_coord(self, coord):
-        # This function maps a grid coordinate in discrete space
-        # to a configuration in the full configuration space
+        # 本函数将离散空间中的栅格坐标
+        # 映射为完整构型空间中的一个构型
         config = [0] * self.dimension
         for i in range(0, len(coord)):
-            # start of the real world / configuration space
+            # 真实世界 / 构型空间的起点
             start = self.lowerLimit[i]
-            # step from the coordinate in the grid
+            # 由栅格坐标得到的步长
             grid_step = self.resolution * coord[i]
             config[i] = start + grid_step
         return config
 
     def node_id_to_grid_coord(self, node_id):
-        # This function maps a node id to the associated
-        # grid coordinate
+        # 本函数将节点 id 映射到对应的
+        # 栅格坐标
         coord = [0] * len(self.lowerLimit)
         for i in range(len(coord) - 1, -1, -1):
-            # Get the product of the grid space maximums
+            # 计算栅格空间各维上限的乘积
             prod = 1
             for j in range(0, i):
                 prod = prod * self.num_cells[j]
@@ -126,8 +124,8 @@ class RTree:
         return coord
 
     def node_id_to_real_world_coord(self, nid):
-        # This function maps a node in discrete space to a configuration
-        # in the full configuration space
+        # 本函数将离散空间中的节点映射为
+        # 完整构型空间中的一个构型
         return self.grid_coord_to_real_world_coord(
             self.node_id_to_grid_coord(nid))
 
@@ -154,11 +152,11 @@ class BITStar:
         self.f_scores = dict()
         self.nodes = dict()
         self.r = float('inf')
-        self.eta = eta  # tunable parameter
+        self.eta = eta  # 可调参数
         self.unit_ball_measure = 1
         self.old_vertices = []
 
-        # initialize tree
+        # 初始化树
         lowerLimit = [randArea[0], randArea[0]]
         upperLimit = [randArea[1], randArea[1]]
         self.tree = RTree(start=start, lowerLimit=lowerLimit,
@@ -168,21 +166,21 @@ class BITStar:
         self.startId = self.tree.real_world_to_node_id(self.start)
         self.goalId = self.tree.real_world_to_node_id(self.goal)
 
-        # add goal to the samples
+        # 将目标点加入采样集
         self.samples[self.goalId] = self.goal
         self.g_scores[self.goalId] = float('inf')
         self.f_scores[self.goalId] = 0
 
-        # add the start id to the tree
+        # 将起点 id 加入树
         self.tree.add_vertex(self.start)
         self.g_scores[self.startId] = 0
         self.f_scores[self.startId] = self.compute_heuristic_cost(
             self.startId, self.goalId)
 
-        # max length we expect to find in our 'informed' sample space, starts as infinite
+        # 启发式信息采样空间中预期找到的最大长度，初始为无穷大
         cBest = self.g_scores[self.goalId]
 
-        # Computing the sampling space
+        # 计算采样空间
         cMin = math.hypot(self.start[0] - self.goal[0],
                           self.start[1] - self.goal[1]) / 1.5
         xCenter = np.array([[(self.start[0] + self.goal[0]) / 2.0],
@@ -190,7 +188,7 @@ class BITStar:
         a1 = np.array([[(self.goal[0] - self.start[0]) / cMin],
                        [(self.goal[1] - self.start[1]) / cMin], [0]])
         eTheta = math.atan2(a1[1, 0], a1[0, 0])
-        # first column of identity matrix transposed
+        # 单位矩阵第一列的转置
         id1_t = np.array([1.0, 0.0, 0.0]).reshape(1, 3)
         M = np.dot(a1, id1_t)
         U, S, Vh = np.linalg.svd(M, True, True)
@@ -207,12 +205,12 @@ class BITStar:
 
         if len(self.vertex_queue) == 0 and len(self.edge_queue) == 0:
             print("Batch: ", iterations)
-            # Using informed rrt star way of computing the samples
+            # 采用 Informed RRT* 的方式计算采样点
             self.r = 2.0
             if iterations != 0:
                 if foundGoal:
-                    # a better way to do this would be to make number of samples
-                    # a function of cMin
+                    # 更好的做法是让采样点数量
+                    # 成为 cMin 的函数
                     m = 200
                     self.samples = dict()
                     self.samples[self.goalId] = self.goal
@@ -222,9 +220,9 @@ class BITStar:
                 self.samples.update(self.informed_sample(
                     m, cBest, cMin, xCenter, C))
 
-            # make the old vertices the new vertices
+            # 将旧顶点并入新顶点集合
             self.old_vertices += self.tree.vertices.keys()
-            # add the vertices to the vertex queue
+            # 将顶点加入顶点队列
             for nid in self.tree.vertices.keys():
                 if nid not in self.vertex_queue:
                     self.vertex_queue.append(nid)
@@ -236,22 +234,22 @@ class BITStar:
         iterations = 0
 
         foundGoal = False
-        # run until done
+        # 一直运行直到结束
         while iterations < self.max_iIter:
             cBest = self.setup_sample(iterations,
                                       foundGoal, cMin, xCenter, C, cBest)
-            # expand the best vertices until an edge is better than the vertex
-            # this is done because the vertex cost represents the lower bound
-            # on the edge cost
+            # 扩展最优顶点，直到某条边优于该顶点
+            # 这样做是因为顶点代价表示边代价的
+            # 下界
             while self.best_vertex_queue_value() <= \
                     self.best_edge_queue_value():
                 self.expand_vertex(self.best_in_vertex_queue())
 
-            # add the best edge to the tree
+            # 将最优边加入树
             bestEdge = self.best_in_edge_queue()
             self.edge_queue.remove(bestEdge)
 
-            # Check if this can improve the current solution
+            # 检查这是否能改进当前解
             estimatedCostOfVertex = self.g_scores[bestEdge[
                 0]] + self.compute_distance_cost(
                 bestEdge[0], bestEdge[1]) + self.compute_heuristic_cost(
@@ -269,7 +267,7 @@ class BITStar:
             f3 = actualCostOfEdge < self.g_scores[self.goalId]
 
             if f1 and f2 and f3:
-                # connect this edge
+                # 连接这条边
                 firstCoord = self.tree.node_id_to_real_world_coord(
                     bestEdge[0])
                 secondCoord = self.tree.node_id_to_real_world_coord(
@@ -288,7 +286,7 @@ class BITStar:
                     try:
                         del self.samples[bestEdge[1]]
                     except KeyError:
-                        # invalid sample key
+                        # 无效的采样键
                         pass
                     eid = self.tree.add_vertex(nextCoord)
                     self.vertex_queue.append(eid)
@@ -308,7 +306,7 @@ class BITStar:
                     bestEdge[1], self.goalId)
                 self.update_graph()
 
-                # visualize new edge
+                # 可视化新边
                 if animation:
                     self.draw_graph(xCenter=xCenter, cBest=cBest,
                                     cMin=cMin, eTheta=eTheta,
@@ -339,7 +337,7 @@ class BITStar:
                 return []
 
         plan.append(self.start)
-        plan = plan[::-1]  # reverse the plan
+        plan = plan[::-1]  # 反转规划路径
 
         return plan
 
@@ -354,8 +352,8 @@ class BITStar:
                             (lastEdge, bestEdge[1]))
 
     def connect(self, start, end):
-        # A function which attempts to extend from a start coordinates
-        # to goal coordinates
+        # 尝试从起点坐标扩展到
+        # 目标点坐标的函数
         steps = int(self.compute_distance_cost(
             self.tree.real_world_to_node_id(start),
             self.tree.real_world_to_node_id(end)) * 10)
@@ -365,7 +363,7 @@ class BITStar:
             if self._collision_check(x[i], y[i]):
                 if i == 0:
                     return None
-                # if collision, send path until collision
+                # 若发生碰撞，则返回碰撞前的路径
                 return np.vstack((x[0:i], y[0:i])).transpose()
 
         return np.vstack((x, y)).transpose()
@@ -376,24 +374,24 @@ class BITStar:
             dy = oy - y
             d = dx * dx + dy * dy
             if d <= size ** 2:
-                return True  # collision
+                return True  # 碰撞
         return False
 
     def compute_heuristic_cost(self, start_id, goal_id):
-        # Using Manhattan distance as heuristic
+        # 使用曼哈顿距离作为启发式
         start = np.array(self.tree.node_id_to_real_world_coord(start_id))
         goal = np.array(self.tree.node_id_to_real_world_coord(goal_id))
 
         return np.linalg.norm(start - goal, 2)
 
     def compute_distance_cost(self, vid, xid):
-        # L2 norm distance
+        # L2 范数距离
         start = np.array(self.tree.node_id_to_real_world_coord(vid))
         stop = np.array(self.tree.node_id_to_real_world_coord(xid))
 
         return np.linalg.norm(stop - start, 2)
 
-    # Sample free space confined in the radius of ball R
+    # 在半径为 R 的球内采样自由空间
     def informed_sample(self, m, cMax, cMin, xCenter, C):
         samples = dict()
         print("g_Score goal id: ", self.g_scores[self.goalId])
@@ -414,7 +412,7 @@ class BITStar:
                 samples[random_id] = rnd
         return samples
 
-    # Sample point in a unit ball
+    # 在单位球内采样点
     @staticmethod
     def sample_unit_ball():
         a = random.random()
@@ -445,7 +443,7 @@ class BITStar:
     def best_edge_queue_value(self):
         if len(self.edge_queue) == 0:
             return float('inf')
-        # return the best value in the queue by score g_tau[v] + c(v,x) + h(x)
+        # 按得分 g_tau[v] + c(v,x) + h(x) 返回队列中的最优值
         values = [self.g_scores[e[0]] + self.compute_distance_cost(e[0], e[1])
                   + self.compute_heuristic_cost(e[1], self.goalId) for e in
                   self.edge_queue]
@@ -453,7 +451,7 @@ class BITStar:
         return values[0]
 
     def best_in_vertex_queue(self):
-        # return the best value in the vertex queue
+        # 返回顶点队列中的最优值
         v_plus_values = [(v, self.g_scores[v] +
                           self.compute_heuristic_cost(v, self.goalId))
                          for v in self.vertex_queue]
@@ -473,18 +471,18 @@ class BITStar:
     def expand_vertex(self, vid):
         self.vertex_queue.remove(vid)
 
-        # get the coordinates for given vid
+        # 获取给定 vid 的坐标
         currCoord = np.array(self.tree.node_id_to_real_world_coord(vid))
 
-        # get the nearest value in vertex for every one in samples where difference is
-        # less than the radius
+        # 在采样点中找出与该顶点之差
+        # 小于半径的最近顶点
         neighbors = []
         for sid, s_coord in self.samples.items():
             s_coord = np.array(s_coord)
             if np.linalg.norm(s_coord - currCoord, 2) <= self.r and sid != vid:
                 neighbors.append((sid, s_coord))
 
-        # add an edge to the edge queue is the path might improve the solution
+        # 若该路径可能改进当前解，则向边队列添加一条边
         for neighbor in neighbors:
             sid = neighbor[0]
             h_cost = self.compute_heuristic_cost(sid, self.goalId)
@@ -494,7 +492,7 @@ class BITStar:
             if estimated_f_score < self.g_scores[self.goalId]:
                 self.edge_queue.append((vid, sid))
 
-        # add the vertex to the edge queue
+        # 将该顶点加入边队列
         self.add_vertex_to_edge_queue(vid, currCoord)
 
     def add_vertex_to_edge_queue(self, vid, currCoord):
@@ -525,47 +523,47 @@ class BITStar:
         openSet.append(currId)
 
         while len(openSet) != 0:
-            # get the element with lowest f_score
+            # 取 f_score 最小的元素
             currId = min(openSet, key=lambda x: self.f_scores[x])
 
-            # remove element from open set
+            # 从开集中移除该元素
             openSet.remove(currId)
 
-            # Check if we're at the goal
+            # 检查是否已到达目标点
             if currId == self.goalId:
                 break
 
             if currId not in closedSet:
                 closedSet.append(currId)
 
-            # find a non visited successor to the current node
+            # 寻找当前节点尚未访问的后继
             successors = self.tree.vertices[currId]
             for successor in successors:
                 if successor in closedSet:
                     continue
                 else:
-                    # calculate tentative g score
+                    # 计算暂定 g 得分
                     g_score = self.g_scores[currId] + \
                               self.compute_distance_cost(currId, successor)
                     if successor not in openSet:
-                        # add the successor to open set
+                        # 将后继加入开集
                         openSet.append(successor)
                     elif g_score >= self.g_scores[successor]:
                         continue
 
-                    # update g and f scores
+                    # 更新 g 得分与 f 得分
                     self.g_scores[successor] = g_score
                     self.f_scores[
                         successor] = g_score + self.compute_heuristic_cost(
                         successor, self.goalId)
 
-                    # store the parent and child
+                    # 记录父节点与子节点
                     self.nodes[successor] = currId
 
     def draw_graph(self, xCenter=None, cBest=None, cMin=None, eTheta=None,
                    samples=None, start=None, end=None):
         plt.clf()
-        # for stopping simulation with the esc key.
+        # 按 esc 键停止仿真。
         plt.gcf().canvas.mpl_connect(
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])

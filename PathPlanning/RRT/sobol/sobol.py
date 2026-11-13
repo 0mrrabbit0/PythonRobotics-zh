@@ -1,26 +1,26 @@
 """
-  Licensing:
-    This code is distributed under the MIT license.
+  许可:
+    本代码在 MIT 许可下分发。
 
-  Authors:
-    Original FORTRAN77 version of i4_sobol by Bennett Fox.
-    MATLAB version by John Burkardt.
-    PYTHON version by Corrado Chisari
+  作者:
+    i4_sobol 的原始 FORTRAN77 版本由 Bennett Fox 编写。
+    MATLAB 版本由 John Burkardt 编写。
+    PYTHON 版本由 Corrado Chisari 编写。
 
-    Original Python version of is_prime by Corrado Chisari
+    is_prime 的原始 Python 版本由 Corrado Chisari 编写。
 
-    Original MATLAB versions of other functions by John Burkardt.
-    PYTHON versions by Corrado Chisari
+    其他函数的原始 MATLAB 版本由 John Burkardt 编写。
+    PYTHON 版本由 Corrado Chisari 编写。
 
-    Original code is available at
+    原始代码见
     https://people.sc.fsu.edu/~jburkardt/py_src/sobol/sobol.html
 
-    Note: the i4 prefix means that the function takes a numeric argument or
-          returns a number which is interpreted inside the function as a 4
-          byte integer
-    Note: the r4 prefix means that the function takes a numeric argument or
-          returns a number which is interpreted inside the function as a 4
-          byte float
+    注: 前缀 i4 表示该函数接受一个数值参数，或
+          返回一个在函数内部被解释为 4
+          字节整数的数
+    注: 前缀 r4 表示该函数接受一个数值参数，或
+          返回一个在函数内部被解释为 4
+          字节浮点数的数
 """
 import math
 import sys
@@ -41,11 +41,11 @@ v = None
 
 def i4_bit_hi1(n):
     """
-     I4_BIT_HI1 returns the position of the high 1 bit base 2 in an I4.
+     I4_BIT_HI1 返回 I4 中以 2 为底的最高位 1 的位置。
 
-      Discussion:
+      讨论:
 
-        An I4 is an integer ( kind = 4 ) value.
+        I4 是一种整数（kind = 4）值。
 
       Example:
 
@@ -73,25 +73,25 @@ def i4_bit_hi1(n):
         1024 10000000000    11
         1025 10000000001    11
 
-      Licensing:
+      许可:
 
-        This code is distributed under the GNU LGPL license.
+        本代码在 GNU LGPL 许可下分发。
 
-      Modified:
+      修改:
 
         26 October 2014
 
-      Author:
+      作者:
 
         John Burkardt
 
       Parameters:
 
-        Input, integer N, the integer to be measured.
-        N should be nonnegative.  If N is nonpositive, the function
-        will always be 0.
+        输入，整数 N，待测量的整数。
+        N 应为非负。若 N 为非正，该函数
+        将始终为 0。
 
-        Output, integer BIT, the position of the highest bit.
+        输出，整数 BIT，最高位的位置。
 
     """
     i = n
@@ -110,11 +110,11 @@ def i4_bit_hi1(n):
 
 def i4_bit_lo0(n):
     """
-     I4_BIT_LO0 returns the position of the low 0 bit base 2 in an I4.
+     I4_BIT_LO0 返回 I4 中以 2 为底的最低位 0 的位置。
 
-      Discussion:
+      讨论:
 
-        An I4 is an integer ( kind = 4 ) value.
+        I4 是一种整数（kind = 4）值。
 
       Example:
 
@@ -142,24 +142,24 @@ def i4_bit_lo0(n):
         1024 10000000000     1
         1025 10000000001     2
 
-      Licensing:
+      许可:
 
-        This code is distributed under the GNU LGPL license.
+        本代码在 GNU LGPL 许可下分发。
 
-      Modified:
+      修改:
 
         08 February 2018
 
-      Author:
+      作者:
 
         John Burkardt
 
       Parameters:
 
-        Input, integer N, the integer to be measured.
-        N should be nonnegative.
+        输入，整数 N，待测量的整数。
+        N 应为非负。
 
-        Output, integer BIT, the position of the low 1 bit.
+        输出，整数 BIT，最低位 1 的位置。
 
     """
     bit = 0
@@ -182,30 +182,30 @@ def i4_sobol_generate(m, n, skip):
     """
 
 
-     I4_SOBOL_GENERATE generates a Sobol dataset.
+     I4_SOBOL_GENERATE 生成一个 Sobol 数据集。
 
-      Licensing:
+      许可:
 
-        This code is distributed under the MIT license.
+        本代码在 MIT 许可下分发。
 
-      Modified:
+      修改:
 
         22 February 2011
 
-      Author:
+      作者:
 
-        Original MATLAB version by John Burkardt.
-        PYTHON version by Corrado Chisari
+        原始 MATLAB 版本由 John Burkardt 编写。
+        PYTHON 版本由 Corrado Chisari 编写。
 
       Parameters:
 
-        Input, integer M, the spatial dimension.
+        输入，整数 M，空间维数。
 
-        Input, integer N, the number of points to generate.
+        输入，整数 N，要生成的点数。
 
-        Input, integer SKIP, the number of initial points to skip.
+        输入，整数 SKIP，要跳过的初始点数。
 
-        Output, real R(M,N), the points.
+        输出，实数 R(M,N)，这些点。
 
     """
     r = np.zeros((m, n))
@@ -219,68 +219,68 @@ def i4_sobol(dim_num, seed):
     """
 
 
-     I4_SOBOL generates a new quasirandom Sobol vector with each call.
+     I4_SOBOL 每次调用生成一个新的 Sobol 拟随机向量。
 
-      Discussion:
+      讨论:
 
-        The routine adapts the ideas of Antonov and Saleev.
+        本程序采用了 Antonov 与 Saleev 的思想。
 
-      Licensing:
+      许可:
 
-        This code is distributed under the MIT license.
+        本代码在 MIT 许可下分发。
 
-      Modified:
+      修改:
 
         22 February 2011
 
-      Author:
+      作者:
 
-        Original FORTRAN77 version by Bennett Fox.
-        MATLAB version by John Burkardt.
-        PYTHON version by Corrado Chisari
+        原始 FORTRAN77 版本由 Bennett Fox 编写。
+        MATLAB 版本由 John Burkardt 编写。
+        PYTHON 版本由 Corrado Chisari 编写。
 
       Reference:
 
         Antonov, Saleev,
         USSR Computational Mathematics and Mathematical Physics,
-        olume 19, 19, pages 252 - 256.
+        第 19 卷，19，第 252 - 256 页。
 
         Paul Bratley, Bennett Fox,
-        Algorithm 659:
-        Implementing Sobol's Quasirandom Sequence Generator,
+        算法 659:
+        Sobol 拟随机序列生成器的实现，
         ACM Transactions on Mathematical Software,
-        Volume 14, Number 1, pages 88-100, 1988.
+        第 14 卷，第 1 期，第 88-100 页，1988 年。
 
         Bennett Fox,
-        Algorithm 647:
-        Implementation and Relative Efficiency of Quasirandom
-        Sequence Generators,
+        算法 647:
+        拟随机序列生成器的实现
+        及其相对效率，
         ACM Transactions on Mathematical Software,
-        Volume 12, Number 4, pages 362-376, 1986.
+        第 12 卷，第 4 期，第 362-376 页，1986 年。
 
         Ilya Sobol,
         USSR Computational Mathematics and Mathematical Physics,
-        Volume 16, pages 236-242, 1977.
+        第 16 卷，第 236-242 页，1977 年。
 
         Ilya Sobol, Levitan,
-        The Production of Points Uniformly Distributed in a Multidimensional
-        Cube (in Russian),
+        多维立方体内均匀分布点的生成
+        （俄文），
         Preprint IPM Akad. Nauk SSSR,
-        Number 40, Moscow 1976.
+        第 40 号，Moscow 1976。
 
       Parameters:
 
-        Input, integer DIM_NUM, the number of spatial dimensions.
-        DIM_NUM must satisfy 1 <= DIM_NUM <= 40.
+        输入，整数 DIM_NUM，空间维数。
+        DIM_NUM 必须满足 1 <= DIM_NUM <= 40。
 
-        Input/output, integer SEED, the "seed" for the sequence.
-        This is essentially the index in the sequence of the quasirandom
-        value to be generated.    On output, SEED has been set to the
-        appropriate next value, usually simply SEED+1.
-        If SEED is less than 0 on input, it is treated as though it were 0.
-        An input value of 0 requests the first (0-th) element of the sequence.
+        输入/输出，整数 SEED，序列的“种子”。
+        它实质上是待生成拟随机
+        值在序列中的索引。    输出时，SEED 已被设为
+        合适的下一个值，通常就是 SEED+1。
+        若输入的 SEED 小于 0，则按 0 处理。
+        输入值 0 请求序列的第一个（第 0 个）元素。
 
-        Output, real QUASI(DIM_NUM), the next quasirandom vector.
+        输出，实数 QUASI(DIM_NUM)，下一个拟随机向量。
 
     """
 
@@ -303,7 +303,7 @@ def i4_sobol(dim_num, seed):
         log_max = 30
         seed_save = -1
         #
-        #    Initialize (part of) V.
+        #    初始化 V（的一部分）。
         #
         v = np.zeros((dim_max, log_max))
         v[0:40, 0] = np.transpose([
@@ -343,7 +343,7 @@ def i4_sobol(dim_num, seed):
 
         v[37:40, 7] = np.transpose([7, 23, 39])
         #
-        #    Set POLY.
+        #    设置 POLY。
         #
         poly = [
             1, 3, 7, 11, 13, 19, 25, 37, 59, 47, 61, 55, 41, 67, 97, 91, 109,
@@ -353,19 +353,19 @@ def i4_sobol(dim_num, seed):
 
         atmost = 2**log_max - 1
         #
-        #    Find the number of bits in ATMOST.
+        #    求 ATMOST 中的位数。
         #
         maxcol = i4_bit_hi1(atmost)
         #
-        #    Initialize row 1 of V.
+        #    初始化 V 的第 1 行。
         #
         v[0, 0:maxcol] = 1
 
-        # Things to do only if the dimension changed.
+        # 仅当维度发生变化时才需要做的事。
 
     if dim_num != dim_num_save:
         #
-        #    Check parameters.
+        #    检查参数。
         #
         if (dim_num < 1 or dim_max < dim_num):
             print('I4_SOBOL - Fatal error!')
@@ -376,14 +376,14 @@ def i4_sobol(dim_num, seed):
 
         dim_num_save = dim_num
         #
-        #    Initialize the remaining rows of V.
+        #    初始化 V 的其余各行。
         #
         for i in range(2, dim_num + 1):
             #
-            #    The bits of the integer POLY(I) gives the form of polynomial
-            #    I.
+            #    整数 POLY(I) 的各个位给出多项式
+            #    I 的形式。
             #
-            #    Find the degree of polynomial I from binary encoding.
+            #    由二进制编码求多项式 I 的次数。
             #
             j = poly[i - 1]
             m = 0
@@ -393,8 +393,8 @@ def i4_sobol(dim_num, seed):
                     break
                 m = m + 1
             #
-            #    Expand this bit pattern to separate components of the logical
-            #    array INCLUD.
+            #    展开该位模式，以分离逻辑
+            #    数组 INCLUD 的各个分量。
             #
             j = poly[i - 1]
             includ = np.zeros(m)
@@ -403,8 +403,8 @@ def i4_sobol(dim_num, seed):
                 includ[k - 1] = (j != 2 * j2)
                 j = j2
             #
-            #    Calculate the remaining elements of row I as explained
-            #    in Bratley and Fox, section 2.
+            #    按 Bratley 与 Fox 第 2 节所述，计算
+            #    第 I 行的其余元素。
             #
             for j in range(m + 1, maxcol + 1):
                 newv = v[i - 1, j - m - 1]
@@ -416,14 +416,14 @@ def i4_sobol(dim_num, seed):
                             int(newv), int(l_var * v[i - 1, j - k - 1]))
                 v[i - 1, j - 1] = newv
 #
-#    Multiply columns of V by appropriate power of 2.
+#    将 V 的各列乘以相应的 2 的幂。
 #
         l_var = 1
         for j in range(maxcol - 1, 0, -1):
             l_var = 2 * l_var
             v[0:dim_num, j - 1] = v[0:dim_num, j - 1] * l_var
 #
-#    RECIPD is 1/(common denominator of the elements in V).
+#    RECIPD 等于 1/（V 中元素的公分母）。
 #
         recipd = 1.0 / (2 * l_var)
         lastq = np.zeros(dim_num)
@@ -439,7 +439,7 @@ def i4_sobol(dim_num, seed):
 
     elif (seed == seed_save + 1):
         #
-        #    Find the position of the right-hand zero in SEED.
+        #    找出 SEED 中最右侧 0 的位置。
         #
         l_var = i4_bit_lo0(seed)
 
@@ -466,7 +466,7 @@ def i4_sobol(dim_num, seed):
 
         l_var = i4_bit_lo0(seed)
 #
-#    Check that the user is not calling too many times!
+#    检查用户的调用次数是否过多！
 #
     if maxcol < l_var:
         print('I4_SOBOL - Fatal error!')
@@ -477,7 +477,7 @@ def i4_sobol(dim_num, seed):
 
 
 #
-#    Calculate the new components of QUASI.
+#    计算 QUASI 的新分量。
 #
     quasi = np.zeros(dim_num)
     for i in range(1, dim_num + 1):
@@ -495,63 +495,63 @@ def i4_uniform_ab(a, b, seed):
     """
 
 
-     I4_UNIFORM_AB returns a scaled pseudorandom I4.
+     I4_UNIFORM_AB 返回一个缩放后的伪随机 I4。
 
-      Discussion:
+      讨论:
 
-        The pseudorandom number will be scaled to be uniformly distributed
-        between A and B.
+        该伪随机数将被缩放，使其均匀分布
+        在 A 与 B 之间。
 
-      Licensing:
+      许可:
 
-        This code is distributed under the GNU LGPL license.
+        本代码在 GNU LGPL 许可下分发。
 
-      Modified:
+      修改:
 
         05 April 2013
 
-      Author:
+      作者:
 
         John Burkardt
 
       Reference:
 
         Paul Bratley, Bennett Fox, Linus Schrage,
-        A Guide to Simulation,
-        Second Edition,
+        《仿真指南》，
+        第二版，
         Springer, 1987,
         ISBN: 0387964673,
         LC: QA76.9.C65.B73.
 
         Bennett Fox,
-        Algorithm 647:
-        Implementation and Relative Efficiency of Quasirandom
-        Sequence Generators,
+        算法 647:
+        拟随机序列生成器的实现
+        及其相对效率，
         ACM Transactions on Mathematical Software,
-        Volume 12, Number 4, December 1986, pages 362-376.
+        第 12 卷，第 4 期，1986 年 12 月，第 362-376 页。
 
         Pierre L'Ecuyer,
-        Random Number Generation,
-        in Handbook of Simulation,
-        edited by Jerry Banks,
+        《随机数生成》，
+        载于《仿真手册》，
+        Jerry Banks 编，
         Wiley, 1998,
         ISBN: 0471134031,
         LC: T57.62.H37.
 
         Peter Lewis, Allen Goodman, James Miller,
-        A Pseudo-Random Number Generator for the System/360,
+        System/360 的伪随机数生成器，
         IBM Systems Journal,
-        Volume 8, Number 2, 1969, pages 136-143.
+        第 8 卷，第 2 期，1969 年，第 136-143 页。
 
       Parameters:
 
-        Input, integer A, B, the minimum and maximum acceptable values.
+        输入，整数 A、B，可接受的最小值与最大值。
 
-        Input, integer SEED, a seed for the random number generator.
+        输入，整数 SEED，随机数生成器的种子。
 
-        Output, integer C, the randomly chosen integer.
+        输出，整数 C，随机选取的整数。
 
-        Output, integer SEED, the updated seed.
+        输出，整数 SEED，更新后的种子。
 
     """
 
@@ -579,7 +579,7 @@ def i4_uniform_ab(a, b, seed):
 
     r = seed * 4.656612875E-10
     #
-    #  Scale R to lie between A-0.5 and B+0.5.
+    #  将 R 缩放到介于 A-0.5 与 B+0.5 之间。
     #
     a = round(a)
     b = round(b)
@@ -587,7 +587,7 @@ def i4_uniform_ab(a, b, seed):
     r = (1.0 - r) * (min(a, b) - 0.5) \
         + r * (max(a, b) + 0.5)
     #
-    #  Use rounding to convert R to an integer between A and B.
+    #  通过舍入将 R 转换为介于 A 与 B 之间的整数。
     #
     value = round(r)
 
@@ -602,7 +602,7 @@ def prime_ge(n):
     """
 
 
-     PRIME_GE returns the smallest prime greater than or equal to N.
+     PRIME_GE 返回大于或等于 N 的最小素数。
 
       Example:
 
@@ -620,25 +620,25 @@ def prime_ge(n):
           9    11
          10    11
 
-      Licensing:
+      许可:
 
-        This code is distributed under the MIT license.
+        本代码在 MIT 许可下分发。
 
-      Modified:
+      修改:
 
         22 February 2011
 
-      Author:
+      作者:
 
-        Original MATLAB version by John Burkardt.
-        PYTHON version by Corrado Chisari
+        原始 MATLAB 版本由 John Burkardt 编写。
+        PYTHON 版本由 Corrado Chisari 编写。
 
       Parameters:
 
-        Input, integer N, the number to be bounded.
+        输入，整数 N，待定界的数。
 
-        Output, integer P, the smallest prime number that is greater
-        than or equal to N.
+        输出，整数 P，大于
+        或等于 N 的最小素数。
 
     """
     p = max(math.ceil(n), 2)
@@ -652,25 +652,25 @@ def isprime(n):
     """
 
 
-     IS_PRIME returns True if N is a prime number, False otherwise
+     IS_PRIME 在 N 为素数时返回 True，否则返回 False
 
-      Licensing:
+      许可:
 
-        This code is distributed under the MIT license.
+        本代码在 MIT 许可下分发。
 
-      Modified:
+      修改:
 
         22 February 2011
 
-      Author:
+      作者:
 
         Corrado Chisari
 
       Parameters:
 
-        Input, integer N, the number to be checked.
+        输入，整数 N，待检查的数。
 
-        Output, boolean value, True or False
+        输出，布尔值，True 或 False
 
     """
     if n != int(n) or n < 1:
@@ -688,19 +688,19 @@ def r4_uniform_01(seed):
     """
 
 
-     R4_UNIFORM_01 returns a unit pseudorandom R4.
+     R4_UNIFORM_01 返回一个单位区间上的伪随机 R4。
 
-      Discussion:
+      讨论:
 
-        This routine implements the recursion
+        本程序实现如下递推
 
           seed = 167 * seed mod ( 2^31 - 1 )
           r = seed / ( 2^31 - 1 )
 
-        The integer arithmetic never requires more than 32 bits,
-        including a sign bit.
+        整数运算所需位数从不超过 32 位，
+        其中包括一个符号位。
 
-        If the initial seed is 12345, then the first three computations are
+        若初始种子为 12345，则前三次计算为
 
           Input     Output      R4_UNIFORM_01
           SEED      SEED
@@ -709,56 +709,56 @@ def r4_uniform_01(seed):
          207482415  1790989824  0.833995
         1790989824  2035175616  0.947702
 
-      Licensing:
+      许可:
 
-        This code is distributed under the GNU LGPL license.
+        本代码在 GNU LGPL 许可下分发。
 
-      Modified:
+      修改:
 
         04 April 2013
 
-      Author:
+      作者:
 
         John Burkardt
 
       Reference:
 
         Paul Bratley, Bennett Fox, Linus Schrage,
-        A Guide to Simulation,
-        Second Edition,
+        《仿真指南》，
+        第二版，
         Springer, 1987,
         ISBN: 0387964673,
         LC: QA76.9.C65.B73.
 
         Bennett Fox,
-        Algorithm 647:
-        Implementation and Relative Efficiency of Quasirandom
-        Sequence Generators,
+        算法 647:
+        拟随机序列生成器的实现
+        及其相对效率，
         ACM Transactions on Mathematical Software,
-        Volume 12, Number 4, December 1986, pages 362-376.
+        第 12 卷，第 4 期，1986 年 12 月，第 362-376 页。
 
         Pierre L'Ecuyer,
-        Random Number Generation,
-        in Handbook of Simulation,
-        edited by Jerry Banks,
+        《随机数生成》，
+        载于《仿真手册》，
+        Jerry Banks 编，
         Wiley, 1998,
         ISBN: 0471134031,
         LC: T57.62.H37.
 
         Peter Lewis, Allen Goodman, James Miller,
-        A Pseudo-Random Number Generator for the System/360,
+        System/360 的伪随机数生成器，
         IBM Systems Journal,
-        Volume 8, Number 2, 1969, pages 136-143.
+        第 8 卷，第 2 期，1969 年，第 136-143 页。
 
       Parameters:
 
-        Input, integer SEED, the integer "seed" used to generate
-        the output random number.  SEED should not be 0.
+        输入，整数 SEED，用于生成
+        输出随机数的整数“种子”。  SEED 不得为 0。
 
-        Output, real R, a random value between 0 and 1.
+        输出，实数 R，介于 0 与 1 之间的随机值。
 
-        Output, integer SEED, the updated seed.  This would
-        normally be used as the input seed on the next call.
+        输出，整数 SEED，更新后的种子。  该值
+        通常会作为下一次调用的输入种子。
 
     """
 
@@ -791,29 +791,29 @@ def r8mat_write(filename, m, n, a):
     """
 
 
-     R8MAT_WRITE writes an R8MAT to a file.
+     R8MAT_WRITE 将一个 R8MAT 写入文件。
 
-      Licensing:
+      许可:
 
-        This code is distributed under the GNU LGPL license.
+        本代码在 GNU LGPL 许可下分发。
 
-      Modified:
+      修改:
 
         12 October 2014
 
-      Author:
+      作者:
 
         John Burkardt
 
       Parameters:
 
-        Input, string FILENAME, the name of the output file.
+        输入，字符串 FILENAME，输出文件名。
 
-        Input, integer M, the number of rows in A.
+        输入，整数 M，A 的行数。
 
-        Input, integer N, the number of columns in A.
+        输入，整数 N，A 的列数。
 
-        Input, real A(M,N), the matrix.
+        输入，实数 A(M,N)，该矩阵。
     """
 
     with open(filename, 'w') as output:
@@ -828,75 +828,75 @@ def tau_sobol(dim_num):
     """
 
 
-     TAU_SOBOL defines favorable starting seeds for Sobol sequences.
+     TAU_SOBOL 定义 Sobol 序列的有利起始种子。
 
-      Discussion:
+      讨论:
 
-        For spatial dimensions 1 through 13, this routine returns
-        a "favorable" value TAU by which an appropriate starting point
-        in the Sobol sequence can be determined.
+        对于空间维数 1 到 13，本程序返回
+        一个“有利”的 TAU 值，据此可以确定
+        Sobol 序列中合适的起始点。
 
-        These starting points have the form N = 2**K, where
-        for integration problems, it is desirable that
+        这些起始点具有 N = 2**K 的形式，其中
+        对于积分问题，希望满足
                 TAU + DIM_NUM - 1 <= K
-        while for optimization problems, it is desirable that
+        而对于优化问题，希望满足
                 TAU < K.
 
-      Licensing:
+      许可:
 
-        This code is distributed under the MIT license.
+        本代码在 MIT 许可下分发。
 
-      Modified:
+      修改:
 
         22 February 2011
 
-      Author:
+      作者:
 
-        Original FORTRAN77 version by Bennett Fox.
-        MATLAB version by John Burkardt.
-        PYTHON version by Corrado Chisari
+        原始 FORTRAN77 版本由 Bennett Fox 编写。
+        MATLAB 版本由 John Burkardt 编写。
+        PYTHON 版本由 Corrado Chisari 编写。
 
       Reference:
 
         IA Antonov, VM Saleev,
         USSR Computational Mathematics and Mathematical Physics,
-        Volume 19, 19, pages 252 - 256.
+        第 19 卷，19，第 252 - 256 页。
 
         Paul Bratley, Bennett Fox,
-        Algorithm 659:
-        Implementing Sobol's Quasirandom Sequence Generator,
+        算法 659:
+        Sobol 拟随机序列生成器的实现，
         ACM Transactions on Mathematical Software,
-        Volume 14, Number 1, pages 88-100, 1988.
+        第 14 卷，第 1 期，第 88-100 页，1988 年。
 
         Bennett Fox,
-        Algorithm 647:
-        Implementation and Relative Efficiency of Quasirandom
-        Sequence Generators,
+        算法 647:
+        拟随机序列生成器的实现
+        及其相对效率，
         ACM Transactions on Mathematical Software,
-        Volume 12, Number 4, pages 362-376, 1986.
+        第 12 卷，第 4 期，第 362-376 页，1986 年。
 
         Stephen Joe, Frances Kuo
-        Remark on Algorithm 659:
-        Implementing Sobol's Quasirandom Sequence Generator,
+        关于算法 659 的注记:
+        Sobol 拟随机序列生成器的实现，
         ACM Transactions on Mathematical Software,
-        Volume 29, Number 1, pages 49-57, March 2003.
+        第 29 卷，第 1 期，第 49-57 页，2003 年 3 月。
 
         Ilya Sobol,
         USSR Computational Mathematics and Mathematical Physics,
-        Volume 16, pages 236-242, 1977.
+        第 16 卷，第 236-242 页，1977 年。
 
         Ilya Sobol, YL Levitan,
-        The Production of Points Uniformly Distributed in a Multidimensional
-        Cube (in Russian),
+        多维立方体内均匀分布点的生成
+        （俄文），
         Preprint IPM Akad. Nauk SSSR,
-        Number 40, Moscow 1976.
+        第 40 号，Moscow 1976。
 
       Parameters:
 
-                Input, integer DIM_NUM, the spatial dimension.    Only values
-                of 1 through 13 will result in useful responses.
+                输入，整数 DIM_NUM，空间维数。    仅当取值
+                为 1 到 13 时才会得到有用的结果。
 
-                Output, integer TAU, the value TAU.
+                输出，整数 TAU，即 TAU 的值。
 
     """
     dim_max = 13

@@ -1,10 +1,10 @@
 """
 
-D* grid planning
+D* 栅格规划
 
-author: Nirnay Roy
+作者: Nirnay Roy
 
-See Wikipedia article (https://en.wikipedia.org/wiki/D*)
+参见维基百科条目 (https://en.wikipedia.org/wiki/D*)
 
 """
 import math
@@ -24,7 +24,7 @@ class State:
         self.y = y
         self.parent = None
         self.state = "."
-        self.t = "new"  # tag for state
+        self.t = "new"  # 状态标签
         self.h = 0
         self.k = 0
 
@@ -37,11 +37,11 @@ class State:
 
     def set_state(self, state):
         """
-        .: new
-        #: obstacle
-        e: oparent of current state
-        *: closed state
-        s: current state
+        .: 新状态
+        #: 障碍物
+        e: 当前状态的父节点
+        *: 已关闭状态
+        s: 当前状态
         """
         if state not in ["s", ".", "#", "e", "*"]:
             return
@@ -174,7 +174,7 @@ class Dstar:
         s.set_state("e")
         tmp = start
 
-        AddNewObstacle(self.map) # add new obstacle after the first search finished
+        AddNewObstacle(self.map) # 第一次搜索结束后添加新障碍物
 
         while tmp != end:
             tmp.set_state("*")

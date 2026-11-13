@@ -1,13 +1,13 @@
 """
 
-eta^3 polynomials trajectory planner
+eta^3 多项式轨迹规划器
 
-author: Joe Dinius, Ph.D (https://jwdinius.github.io)
+作者：Joe Dinius 博士 (https://jwdinius.github.io)
         Atsushi Sakai (@Atsushi_twi)
 
 Refs:
 - https://jwdinius.github.io/blog/2018/eta3traj/
-- [eta^3-Splines for the Smooth Path Generation of Wheeled Mobile Robots]
+- [轮式移动机器人平滑路径生成的 eta^3 样条]
 (https://ieeexplore.ieee.org/document/4339545/)
 
 """
@@ -33,12 +33,12 @@ class Eta3SplineTrajectory(Eta3Path):
     """
     eta3_trajectory
 
-    input
-        segments: list of `eta3_trajectory_segment` instances defining a continuous trajectory
+    输入
+        segments：定义连续轨迹的 `eta3_trajectory_segment` 实例列表
     """
 
     def __init__(self, segments, max_vel, v0=0.0, a0=0.0, max_accel=2.0, max_jerk=5.0):
-        # ensure that all inputs obey the assumptions of the model
+        # 确保所有输入满足模型假设
         assert max_vel > 0 and v0 >= 0 and a0 >= 0 and max_accel > 0 and max_jerk > 0 \
             and a0 <= max_accel and v0 <= max_vel
         super(__class__, self).__init__(segments=segments)
@@ -49,10 +49,10 @@ class Eta3SplineTrajectory(Eta3Path):
         self.max_accel = float(max_accel)
         self.max_jerk = float(max_jerk)
         length_array = np.array([s.segment_length for s in self.segments])
-        # add a zero to the beginning for finding the correct segment_id
+        # 在开头补一个零，以便找到正确的 segment_id
         self.cum_lengths = np.concatenate(
             (np.array([0]), np.cumsum(length_array)))
-        # compute velocity profile on top of the path
+        # 在路径上计算速度剖面
         self.velocity_profile()
         self.ui_prev = 0
         self.prev_seg_id = 0
@@ -66,27 +66,27 @@ class Eta3SplineTrajectory(Eta3Path):
         (v=v0, a=a0) ~~~~~                               \
                                                           \
                                                            \ ~~~~~ (vf=0, af=0)
-                     pos.|pos.|neg.|   cruise at    |neg.| neg. |neg.
-                     max |max.|max.|     max.       |max.| max. |max.
-                     jerk|acc.|jerk|    velocity    |jerk| acc. |jerk
-            index     0    1    2      3 (optional)   4     5     6
+                     正 |正 |负 |   以最大速度   |负 | 负 |负
+                     最大|最大|最大|     巡航       |最大| 最大|最大
+                   加加速度|加速度|加加速度|    速度    |加加速度|加速度|加加速度
+            索引      0    1    2      3（可选）     4     5     6
         """
-        # delta_a: accel change from initial position to end of maximal jerk section
+        # delta_a：从初始位置到最大加加速度段结束时的加速度变化
         delta_a = self.max_accel - self.a0
-        # t_s1: time of traversal of maximal jerk section
+        # t_s1：通过最大加加速度段的时间
         t_s1 = delta_a / self.max_jerk
-        # v_s1: velocity at the end of the maximal jerk section
+        # v_s1：最大加加速度段结束时的速度
         v_s1 = self.v0 + self.a0 * t_s1 + self.max_jerk * t_s1**2 / 2.
-        # s_s1: length of the maximal jerk section
+        # s_s1：最大加加速度段的长度
         s_s1 = self.v0 * t_s1 + self.a0 * t_s1**2 / 2. + self.max_jerk * t_s1**3 / 6.
-        # t_sf: time of traversal  of final section, which is also maximal jerk, but has final velocity 0
+        # t_sf：末段的通过时间，该段同样为最大加加速度，但末速度为 0
         t_sf = self.max_accel / self.max_jerk
-        # v_sf: velocity at beginning of final section
+        # v_sf：末段开始时的速度
         v_sf = self.max_jerk * t_sf**2 / 2.
-        # s_sf: length of final section
+        # s_sf：末段长度
         s_sf = self.max_jerk * t_sf**3 / 6.
-        # solve for the maximum achievable velocity based on the kinematic limits imposed by max_accel and max_jerk
-        # this leads to a quadratic equation in v_max: a*v_max**2 + b*v_max + c = 0
+        # 根据 max_accel 与 max_jerk 施加的运动学约束，求解可达的最大速度
+        # 由此得到关于 v_max 的二次方程：a*v_max**2 + b*v_max + c = 0
         a = 1 / self.max_accel
         b = 3. * self.max_accel / (2. * self.max_jerk) + v_s1 / self.max_accel - (
             self.max_accel**2 / self.max_jerk + v_s1) / self.max_accel
@@ -96,26 +96,26 @@ class Eta3SplineTrajectory(Eta3Path):
                self.max_accel)**2 / (2. * self.max_accel)
         v_max = (-b + np.sqrt(b**2 - 4. * a * c)) / (2. * a)
 
-        # v_max represents the maximum velocity that could be attained if there was no cruise period
-        # (i.e. driving at constant speed without accelerating or jerking)
-        # if this velocity is less than our desired max velocity, the max velocity needs to be updated
+        # v_max 表示若不存在巡航段时所能达到的最大速度
+        # （即以恒定速度行驶，不再加速或加加速）
+        # 若该速度小于期望的最大速度，则需要更新最大速度
         if self.max_vel > v_max:
-            # when this condition is tripped, there will be no cruise period (s_cruise=0)
+            # 触发该条件时将没有巡航段（s_cruise=0）
             self.max_vel = v_max
 
-        # setup arrays to store values at END of trajectory sections
+        # 建立数组，存储各轨迹段结束时的值
         self.times = np.zeros((7,))
         self.vels = np.zeros((7,))
         self.seg_lengths = np.zeros((7,))
 
-        # Section 0: max jerk up to max acceleration
+        # 第 0 段：以最大加加速度加速到最大加速度
         self.times[0] = t_s1
         self.vels[0] = v_s1
         self.seg_lengths[0] = s_s1
 
-        # Section 1: accelerate at max_accel
+        # 第 1 段：以 max_accel 加速
         index = 1
-        # compute change in velocity over the section
+        # 计算该段内的速度变化
         delta_v = (self.max_vel - self.max_jerk * (self.max_accel /
                                                    self.max_jerk)**2 / 2.) - self.vels[index - 1]
         self.times[index] = delta_v / self.max_accel
@@ -124,22 +124,22 @@ class Eta3SplineTrajectory(Eta3Path):
         self.seg_lengths[index] = self.vels[index - 1] * \
             self.times[index] + self.max_accel * self.times[index]**2 / 2.
 
-        # Section 2: decrease acceleration (down to 0) until max speed is hit
+        # 第 2 段：减小加速度（直至 0），直到达到最大速度
         index = 2
         self.times[index] = self.max_accel / self.max_jerk
         self.vels[index] = self.vels[index - 1] + self.max_accel * self.times[index] \
             - self.max_jerk * self.times[index]**2 / 2.
 
-        # as a check, the velocity at the end of the section should be self.max_vel
+        # 作为校验，该段结束时的速度应为 self.max_vel
         if not np.isclose(self.vels[index], self.max_vel):
             raise MaxVelocityNotReached(self.vels[index], self.max_vel)
 
         self.seg_lengths[index] = self.vels[index - 1] * self.times[index] + self.max_accel * self.times[index]**2 / 2. \
             - self.max_jerk * self.times[index]**3 / 6.
 
-        # Section 3: will be done last
+        # 第 3 段：最后处理
 
-        # Section 4: apply min jerk until min acceleration is hit
+        # 第 4 段：施加最小加加速度，直到达到最小加速度
         index = 4
         self.times[index] = self.max_accel / self.max_jerk
         self.vels[index] = self.max_vel - \
@@ -147,9 +147,9 @@ class Eta3SplineTrajectory(Eta3Path):
         self.seg_lengths[index] = self.max_vel * self.times[index] - \
             self.max_jerk * self.times[index]**3 / 6.
 
-        # Section 5: continue deceleration at max rate
+        # 第 5 段：以最大减速度继续减速
         index = 5
-        # compute velocity change over sections
+        # 计算各段上的速度变化
         delta_v = self.vels[index - 1] - v_sf
         self.times[index] = delta_v / self.max_accel
         self.vels[index] = self.vels[index - 1] - \
@@ -157,7 +157,7 @@ class Eta3SplineTrajectory(Eta3Path):
         self.seg_lengths[index] = self.vels[index - 1] * \
             self.times[index] - self.max_accel * self.times[index]**2 / 2.
 
-        # Section 6(final): max jerk to get to zero velocity and zero acceleration simultaneously
+        # 第 6 段（末段）：以最大加加速度同时到达零速度和零加速度
         index = 6
         self.times[index] = t_sf
         self.vels[index] = self.vels[index - 1] - self.max_jerk * t_sf**2 / 2.
@@ -172,16 +172,16 @@ class Eta3SplineTrajectory(Eta3Path):
 
         if self.seg_lengths.sum() < self.total_length:
             index = 3
-            # the length of the cruise section is whatever length hasn't already been accounted for
-            # NOTE: the total array self.seg_lengths is summed because the entry for the cruise segment is
-            # initialized to 0!
+            # 巡航段长度是尚未计入的剩余长度
+            # 注意：对整个 self.seg_lengths 求和，是因为巡航段对应项
+            # 被初始化为 0！
             self.seg_lengths[index] = self.total_length - \
                 self.seg_lengths.sum()
             self.vels[index] = self.max_vel
             self.times[index] = self.seg_lengths[index] / self.max_vel
 
-        # make sure that all of the times are positive, otherwise the kinematic limits
-        # chosen cannot be enforced on the path
+        # 确保所有时间均为正，否则所选运动学约束
+        # 无法在该路径上实现
         assert(np.all(self.times >= 0))
         self.total_time = self.times.sum()
 
@@ -197,7 +197,7 @@ class Eta3SplineTrajectory(Eta3Path):
         return ui
 
     def calc_traj_point(self, time):
-        # compute velocity at time
+        # 计算该时刻的速度
         if time <= self.times[0]:
             linear_velocity = self.v0 + self.max_jerk * time**2 / 2.
             s = self.v0 * time + self.max_jerk * time**3 / 6
@@ -245,12 +245,12 @@ class Eta3SplineTrajectory(Eta3Path):
             linear_accel = 0.
         seg_id = np.max(np.argwhere(self.cum_lengths <= s))
 
-        # will happen at the end of the segment
+        # 会发生在路段末端
         if seg_id == len(self.segments):
             seg_id -= 1
             ui = 1
         else:
-            # compute interpolation parameter using length from current segment's starting point
+            # 用从当前路段起点起的长度计算插值参数
             curr_segment_length = s - self.cum_lengths[seg_id]
             ui = self.get_interp_param(
                 seg_id=seg_id, s=curr_segment_length, ui=self.ui_prev)
@@ -261,15 +261,15 @@ class Eta3SplineTrajectory(Eta3Path):
             self.ui_prev = ui
 
         self.prev_seg_id = seg_id
-        # compute angular velocity of current point= (ydd*xd - xdd*yd) / (xd**2 + yd**2)
+        # 计算当前点的角速度 = (ydd*xd - xdd*yd) / (xd**2 + yd**2)
         d = self.segments[seg_id].calc_deriv(ui, order=1)
         dd = self.segments[seg_id].calc_deriv(ui, order=2)
-        # su - the rate of change of arclength wrt u
+        # su：弧长对 u 的变化率
         su = self.segments[seg_id].s_dot(ui)
         if not np.isclose(su, 0.) and not np.isclose(linear_velocity, 0.):
-            # ut - time-derivative of interpolation parameter u
+            # ut：插值参数 u 的时间导数
             ut = linear_velocity / su
-            # utt - time-derivative of ut
+            # utt：ut 的时间导数
             utt = linear_accel / su - \
                 (d[0] * dd[0] + d[1] * dd[1]) / su**2 * ut
             xt = d[0] * ut
@@ -280,7 +280,7 @@ class Eta3SplineTrajectory(Eta3Path):
         else:
             angular_velocity = 0.
 
-        # combine path point with orientation and velocities
+        # 将路径点与航向及速度组合
         pos = self.segments[seg_id].calc_point(ui)
         state = np.array([pos[0], pos[1], np.arctan2(
             d[1], d[0]), linear_velocity, angular_velocity])
@@ -291,10 +291,10 @@ def test1(max_vel=0.5):
 
     for i in range(10):
         trajectory_segments = []
-        # segment 1: lane-change curve
+        # 路段 1：换道曲线
         start_pose = [0, 0, 0]
         end_pose = [4, 3.0, 0]
-        # NOTE: The ordering on kappa is [kappa_A, kappad_A, kappa_B, kappad_B], with kappad_* being the curvature derivative
+        # 注意：kappa 的顺序为 [kappa_A, kappad_A, kappa_B, kappad_B]，其中 kappad_* 为曲率导数
         kappa = [0, 0, 0, 0]
         eta = [i, i, 0, 0, 0, 0]
         trajectory_segments.append(Eta3PathSegment(
@@ -303,14 +303,14 @@ def test1(max_vel=0.5):
         traj = Eta3SplineTrajectory(trajectory_segments,
                                     max_vel=max_vel, max_accel=0.5)
 
-        # interpolate at several points along the path
+        # 沿路径在若干点处插值
         times = np.linspace(0, traj.total_time, 101)
         state = np.empty((5, times.size))
         for j, t in enumerate(times):
             state[:, j] = traj.calc_traj_point(t)
 
         if show_animation:  # pragma: no cover
-            # plot the path
+            # 绘制路径
             plt.plot(state[0, :], state[1, :])
             plt.pause(1.0)
 
@@ -323,13 +323,13 @@ def test2(max_vel=0.5):
 
     for i in range(10):
         trajectory_segments = []
-        # segment 1: lane-change curve
+        # 路段 1：换道曲线
         start_pose = [0, 0, 0]
         end_pose = [4, 3.0, 0]
-        # NOTE: The ordering on kappa is [kappa_A, kappad_A, kappa_B, kappad_B], with kappad_* being the curvature derivative
+        # 注意：kappa 的顺序为 [kappa_A, kappad_A, kappa_B, kappad_B]，其中 kappad_* 为曲率导数
         kappa = [0, 0, 0, 0]
-        # NOTE: INTEGRATOR ERROR EXPLODES WHEN eta[:1] IS ZERO!
-        # was: eta = [0, 0, (i - 5) * 20, (5 - i) * 20, 0, 0], now is:
+        # 注意：当 eta[:1] 为零时积分误差会爆炸！
+        # 原为：eta = [0, 0, (i - 5) * 20, (5 - i) * 20, 0, 0]，现为：
         eta = [0.1, 0.1, (i - 5) * 20, (5 - i) * 20, 0, 0]
         trajectory_segments.append(Eta3PathSegment(
             start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
@@ -337,14 +337,14 @@ def test2(max_vel=0.5):
         traj = Eta3SplineTrajectory(trajectory_segments,
                                     max_vel=max_vel, max_accel=0.5)
 
-        # interpolate at several points along the path
+        # 沿路径在若干点处插值
         times = np.linspace(0, traj.total_time, 101)
         state = np.empty((5, times.size))
         for j, t in enumerate(times):
             state[:, j] = traj.calc_traj_point(t)
 
         if show_animation:
-            # plot the path
+            # 绘制路径
             plt.plot(state[0, :], state[1, :])
             plt.pause(1.0)
 
@@ -356,26 +356,26 @@ def test2(max_vel=0.5):
 def test3(max_vel=2.0):
     trajectory_segments = []
 
-    # segment 1: lane-change curve
+    # 路段 1：换道曲线
     start_pose = [0, 0, 0]
     end_pose = [4, 1.5, 0]
-    # NOTE: The ordering on kappa is [kappa_A, kappad_A, kappa_B, kappad_B], with kappad_* being the curvature derivative
+    # 注意：kappa 的顺序为 [kappa_A, kappad_A, kappa_B, kappad_B]，其中 kappad_* 为曲率导数
     kappa = [0, 0, 0, 0]
     eta = [4.27, 4.27, 0, 0, 0, 0]
     trajectory_segments.append(Eta3PathSegment(
         start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
-    # segment 2: line segment
+    # 路段 2：直线段
     start_pose = [4, 1.5, 0]
     end_pose = [5.5, 1.5, 0]
     kappa = [0, 0, 0, 0]
-    # NOTE: INTEGRATOR ERROR EXPLODES WHEN eta[:1] IS ZERO!
-    # was: eta = [0, 0, 0, 0, 0, 0], now is:
+    # 注意：当 eta[:1] 为零时积分误差会爆炸！
+    # 原为：eta = [0, 0, 0, 0, 0, 0]，现为：
     eta = [0.5, 0.5, 0, 0, 0, 0]
     trajectory_segments.append(Eta3PathSegment(
         start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
-    # segment 3: cubic spiral
+    # 路段 3：三次螺旋线
     start_pose = [5.5, 1.5, 0]
     end_pose = [7.4377, 1.8235, 0.6667]
     kappa = [0, 0, 1, 1]
@@ -383,7 +383,7 @@ def test3(max_vel=2.0):
     trajectory_segments.append(Eta3PathSegment(
         start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
-    # segment 4: generic twirl arc
+    # 路段 4：一般扭转弧
     start_pose = [7.4377, 1.8235, 0.6667]
     end_pose = [7.8, 4.3, 1.8]
     kappa = [1, 1, 0.5, 0]
@@ -391,7 +391,7 @@ def test3(max_vel=2.0):
     trajectory_segments.append(Eta3PathSegment(
         start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
-    # segment 5: circular arc
+    # 路段 5：圆弧
     start_pose = [7.8, 4.3, 1.8]
     end_pose = [5.4581, 5.8064, 3.3416]
     kappa = [0.5, 0, 0.5, 0]
@@ -399,17 +399,17 @@ def test3(max_vel=2.0):
     trajectory_segments.append(Eta3PathSegment(
         start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
-    # construct the whole path
+    # 构造整条轨迹
     traj = Eta3SplineTrajectory(trajectory_segments,
                                 max_vel=max_vel, max_accel=0.5, max_jerk=1)
 
-    # interpolate at several points along the path
+    # 沿轨迹在若干点处插值
     times = np.linspace(0, traj.total_time, 1001)
     state = np.empty((5, times.size))
     for i, t in enumerate(times):
         state[:, i] = traj.calc_traj_point(t)
 
-    # plot the path
+    # 绘制路径
 
     if show_animation:
         fig, ax = plt.subplots()
@@ -445,7 +445,7 @@ def test3(max_vel=2.0):
 
 def main():
     """
-    recreate path from reference (see Table 1)
+    复现参考文献中的路径（见表 1）
     """
     # test1()
     # test2()

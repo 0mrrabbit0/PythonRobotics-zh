@@ -8,14 +8,14 @@ from PathPlanning.TimeBasedPathPlanning.Node import NodePath
 import random
 import numpy.random as numpy_random
 
-# Seed randomness for reproducibility
+# 固定随机种子以保证可复现
 RANDOM_SEED = 50
 random.seed(RANDOM_SEED)
 numpy_random.seed(RANDOM_SEED)
 
 class SingleAgentPlanner(ABC):
     """
-    Base class for single agent planners
+    单智能体规划器基类
     """
     
     @staticmethod
@@ -25,11 +25,11 @@ class SingleAgentPlanner(ABC):
 
 @dataclass
 class StartAndGoal:
-    # Index of this agent
+    # 该智能体的索引
     index: int
-    # Start position of the robot
+    # 机器人的起点位置
     start: Position
-    # Goal position of the robot
+    # 机器人的目标点位置
     goal: Position
 
     def distance_start_to_goal(self) -> float:
@@ -37,13 +37,13 @@ class StartAndGoal:
 
 class MultiAgentPlanner(ABC):
     """
-    Base class for multi-agent planners
+    多智能体规划器基类
     """       
     
     @staticmethod
     @abstractmethod
     def plan(grid: Grid, start_and_goal_positions: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool = False) -> tuple[list[StartAndGoal], list[NodePath]]:
         """
-        Plan for all agents. Returned paths are in order corresponding to the returned list of `StartAndGoal` objects
+        为所有智能体规划。返回的路径顺序与返回的 `StartAndGoal` 对象列表相对应
         """
         pass

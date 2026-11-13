@@ -29,10 +29,10 @@ class Position:
         return hash((self.x, self.y))
 
 @dataclass()
-# Note: Total_ordering is used instead of adding `order=True` to the @dataclass decorator because
-#     this class needs to override the __lt__ and __eq__ methods to ignore parent_index. Parent
-#     index is just used to track the path found by the algorithm, and has no effect on the quality
-#     of a node.
+# 注：使用 total_ordering，而不是在 @dataclass 装饰器中加入 `order=True`，因为
+#     该类需要重写 __lt__ 与 __eq__，以忽略 parent_index。父节点
+#     索引仅用于记录算法找到的路径，不影响节点的
+#     优劣。
 @total_ordering
 class Node:
     position: Position
@@ -64,7 +64,7 @@ class Node:
 class NodePath:
     path: Sequence[Node]
     positions_at_time: dict[int, Position]
-    # Number of nodes expanded while finding this path
+    # 找到该路径过程中扩展的节点数量
     expanded_node_count: int
 
     def __init__(self, path: Sequence[Node], expanded_node_count: int):
