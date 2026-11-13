@@ -3,29 +3,29 @@ import conftest
 
 
 def test_1():
-    # A* with beam search
+    # 带束搜索的 A*
     a_star.show_animation = False
 
     a_star.use_beam_search = True
     a_star.main()
     reset_all()
 
-    # A* with iterative deepening
+    # 带迭代加深的 A*
     a_star.use_iterative_deepening = True
     a_star.main()
     reset_all()
 
-    # A* with dynamic weighting
+    # 带动态加权的 A*
     a_star.use_dynamic_weighting = True
     a_star.main()
     reset_all()
 
-    # theta*
+    # Theta* 算法
     a_star.use_theta_star = True
     a_star.main()
     reset_all()
 
-    # A* with jump point
+    # 带跳点的 A*
     a_star.use_jump_point = True
     a_star.main()
     reset_all()

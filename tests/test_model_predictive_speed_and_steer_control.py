@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 
 from PathTracking.model_predictive_speed_and_steer_control \
     import model_predictive_speed_and_steer_control as m

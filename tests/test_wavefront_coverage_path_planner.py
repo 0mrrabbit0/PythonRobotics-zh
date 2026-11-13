@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 import os
 import matplotlib.pyplot as plt
 from PathPlanning.WavefrontCPP import wavefront_coverage_path_planner
@@ -15,12 +15,12 @@ def wavefront_cpp(img, start, goal):
     DT = wavefront_coverage_path_planner.transform(
         img, goal, transform_type='distance')
     DT_path = wavefront_coverage_path_planner.wavefront(DT, start, goal)
-    assert len(DT_path) == num_free  # assert complete coverage
+    assert len(DT_path) == num_free  # 断言完全覆盖
 
     PT = wavefront_coverage_path_planner.transform(
         img, goal, transform_type='path', alpha=0.01)
     PT_path = wavefront_coverage_path_planner.wavefront(PT, start, goal)
-    assert len(PT_path) == num_free  # assert complete coverage
+    assert len(PT_path) == num_free  # 断言完全覆盖
 
 
 def test_wavefront_CPP_1():

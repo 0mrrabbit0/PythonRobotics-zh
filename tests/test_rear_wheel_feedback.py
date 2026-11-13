@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 from PathTracking.rear_wheel_feedback_control import rear_wheel_feedback_control as m
 
 

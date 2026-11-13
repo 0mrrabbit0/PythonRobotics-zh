@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 import numpy as np
 from PathPlanning.ProbabilisticRoadMap import probabilistic_road_map
 

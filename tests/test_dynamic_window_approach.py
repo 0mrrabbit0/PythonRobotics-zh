@@ -16,10 +16,10 @@ def test_main2():
 
 def test_stuck_main():
     m.show_animation = False
-    # adjust cost
+    # 调整代价
     m.config.to_goal_cost_gain = 0.2
     m.config.obstacle_cost_gain = 2.0
-    # obstacles and goals for stuck condition
+    # 用于陷入困境情形的障碍物与目标
     m.config.ob = -1 * np.array([[-1.0, -1.0],
                                  [0.0, 2.0],
                                  [2.0, 6.0],

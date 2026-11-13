@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 from Mapping.ray_casting_grid_map import ray_casting_grid_map as m
 
 

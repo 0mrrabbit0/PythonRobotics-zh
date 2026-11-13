@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 from PathPlanning.StateLatticePlanner import state_lattice_planner as m
 
 

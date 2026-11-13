@@ -1,6 +1,6 @@
 import itertools
 import numpy as np
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 from PathTracking.move_to_pose import move_to_pose as m
 
 
@@ -11,7 +11,7 @@ def test_random():
 
 def test_stability():
     """
-    This unit test tests the move_to_pose.py program for stability
+    本单元测试检查 move_to_pose.py 程序的稳定性
     """
     m.show_animation = False
     x_start = 5
@@ -30,7 +30,7 @@ def test_stability():
     def w_is_change(current, previous):
         return abs(current - previous) > m.MAX_ANGULAR_SPEED
 
-    # Check if the speed is changing too much
+    # 检查速度是否变化过大
     window_size = 10
     count_threshold = 4
     v_change = [v_is_change(v_traj[i], v_traj[i - 1]) for i in range(1, len(v_traj))]
@@ -52,7 +52,7 @@ def test_stability():
 
 def test_reach_goal():
     """
-    This unit test tests the move_to_pose.py program for reaching the goal
+    本单元测试检查 move_to_pose.py 程序是否到达目标
     """
     m.show_animation = False
     x_start = 5
@@ -77,7 +77,7 @@ def test_reach_goal():
 
 def test_max_speed():
     """
-    This unit test tests the move_to_pose.py program for a MAX_LINEAR_SPEED and
+    本单元测试检查 move_to_pose.py 程序的 MAX_LINEAR_SPEED 与
     MAX_ANGULAR_SPEED
     """
     m.show_animation = False

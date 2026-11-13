@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 from PathPlanning.RRTStar import rrt_star as m
 
 
@@ -10,7 +10,7 @@ def test1():
 def test_no_obstacle():
     obstacle_list = []
 
-    # Set Initial parameters
+    # 设置初始参数
     rrt_star = m.RRTStar(start=[0, 0],
                          goal=[6, 10],
                          rand_area=[-2, 15],
@@ -22,7 +22,7 @@ def test_no_obstacle():
 def test_no_obstacle_and_robot_radius():
     obstacle_list = []
 
-    # Set Initial parameters
+    # 设置初始参数
     rrt_star = m.RRTStar(start=[0, 0],
                          goal=[6, 10],
                          rand_area=[-2, 15],

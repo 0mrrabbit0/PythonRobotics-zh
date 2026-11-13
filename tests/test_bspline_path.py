@@ -7,7 +7,7 @@ from PathPlanning.BSplinePath import bspline_path
 def test_list_input():
     way_point_x = [-1.0, 3.0, 4.0, 2.0, 1.0]
     way_point_y = [0.0, -3.0, 1.0, 1.0, 3.0]
-    n_course_point = 50  # sampling number
+    n_course_point = 50  # 采样点数
 
     rax, ray, heading, curvature = bspline_path.approximate_b_spline_path(
         way_point_x, way_point_y, n_course_point, s=0.5)
@@ -23,7 +23,7 @@ def test_list_input():
 def test_array_input():
     way_point_x = np.array([-1.0, 3.0, 4.0, 2.0, 1.0])
     way_point_y = np.array([0.0, -3.0, 1.0, 1.0, 3.0])
-    n_course_point = 50  # sampling number
+    n_course_point = 50  # 采样点数
 
     rax, ray, heading, curvature = bspline_path.approximate_b_spline_path(
         way_point_x, way_point_y, n_course_point, s=0.5)
@@ -39,7 +39,7 @@ def test_array_input():
 def test_degree_change():
     way_point_x = np.array([-1.0, 3.0, 4.0, 2.0, 1.0])
     way_point_y = np.array([0.0, -3.0, 1.0, 1.0, 3.0])
-    n_course_point = 50  # sampling number
+    n_course_point = 50  # 采样点数
 
     rax, ray, heading, curvature = bspline_path.approximate_b_spline_path(
         way_point_x, way_point_y, n_course_point, s=0.5, degree=4)

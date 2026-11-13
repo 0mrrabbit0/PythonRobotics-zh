@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 from utils import angle
 from numpy.testing import assert_allclose
 import numpy as np

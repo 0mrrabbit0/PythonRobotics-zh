@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 from PathPlanning.RRTDubins import rrt_dubins as m
 
 

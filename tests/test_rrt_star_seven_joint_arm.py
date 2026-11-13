@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 from ArmNavigation.rrt_star_seven_joint_arm_control \
     import rrt_star_seven_joint_arm_control as m
 

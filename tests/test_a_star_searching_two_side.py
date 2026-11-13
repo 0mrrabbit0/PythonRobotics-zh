@@ -9,7 +9,7 @@ def test1():
 
 def test2():
     m.show_animation = False
-    m.main(5000)  # increase obstacle number, block path
+    m.main(5000)  # 增加障碍物数量，阻断路径
 
 
 if __name__ == '__main__':

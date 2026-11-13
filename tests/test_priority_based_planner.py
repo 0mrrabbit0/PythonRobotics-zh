@@ -30,7 +30,7 @@ def test_1():
     paths: list[NodePath]
     start_and_goals, paths = m.PriorityBasedPlanner.plan(grid, start_and_goals, SafeIntervalPathPlanner, False)
 
-    # All paths should start at the specified position and reach the goal
+    # 所有路径应从指定位置出发并到达目标
     for i, start_and_goal in enumerate(start_and_goals):
         assert paths[i].path[0].position == start_and_goal.start
         assert paths[i].path[-1].position == start_and_goal.goal

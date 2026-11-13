@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 import os
 import matplotlib.pyplot as plt
 from PathPlanning.SpiralSpanningTreeCPP \
@@ -23,7 +23,7 @@ def spiral_stc_cpp(img, start):
         covered_nodes.add(p)
         covered_nodes.add(q)
 
-    # assert complete coverage
+    # 断言完全覆盖
     assert len(covered_nodes) == num_free / 4
 
 

@@ -5,7 +5,7 @@ from PathPlanning.DynamicMovementPrimitives import \
 
 
 def test_1():
-    # test that trajectory can be learned from user-passed data
+    # 测试能否从用户传入的数据学习轨迹
     T = 5
     t = np.arange(0, T, 0.01)
     sin_t = np.sin(t)
@@ -16,7 +16,7 @@ def test_1():
 
 
 def test_2():
-    # test that length of trajectory is equal to desired number of timesteps
+    # 测试轨迹长度是否等于期望的时间步数
     T = 5
     t = np.arange(0, T, 0.01)
     sin_t = np.sin(t)
@@ -30,7 +30,7 @@ def test_2():
 
 
 def test_3():
-    # check that learned trajectory is close to initial
+    # 检查学习到的轨迹是否接近初始轨迹
     T = 3*np.pi/2
     A_noise = 0.02
     t = np.arange(0, T, 0.01)

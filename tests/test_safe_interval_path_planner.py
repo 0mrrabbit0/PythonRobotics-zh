@@ -20,10 +20,10 @@ def test_1():
     m.show_animation = False
     path = m.SafeIntervalPathPlanner.plan(grid, start, goal)
 
-    # path should have 31 entries
+    # 路径应有 31 个条目
     assert len(path.path) == 31
 
-    # path should end at the goal
+    # 路径应终止于目标
     assert path.path[-1].position == goal
 
 

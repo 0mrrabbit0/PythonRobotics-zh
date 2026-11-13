@@ -1,40 +1,36 @@
 """
-Diff code style checker with ruff
+用 ruff 检查差异代码风格
 
-This code come from:
+本代码来自：
 https://github.com/scipy/scipy/blob/main/tools/lint.py
 
-Scipy's licence: https://github.com/scipy/scipy/blob/main/LICENSE.txt
-Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
-All rights reserved.
+Scipy 许可证: https://github.com/scipy/scipy/blob/main/LICENSE.txt
+版权所有 (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+保留所有权利。
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
+在满足下列条件的前提下，允许以源代码或二进制形式再分发和使用，
+无论是否修改：
 
-1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
+1. 再分发源代码时必须保留上述版权
+   声明、本条件列表以及下列免责声明。
 
-2. Redistributions in binary form must reproduce the above
-   copyright notice, this list of conditions and the following
-   disclaimer in the documentation and/or other materials provided
-   with the distribution.
+2. 以二进制形式再分发时，必须在文档和/或
+   随分发提供的其他材料中复制上述版权声明、
+   本条件列表以及下列免责声明。
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived
-   from this software without specific prior written permission.
+3. 未经事先书面特别许可，不得使用版权持有人的名称
+   或其贡献者的名称来认可或推广由本软件衍生的产品。
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+本软件由版权持有人与贡献者“按原样”提供，
+不提供任何明示或暗示的担保，包括但不限于
+对适销性和特定用途适用性的暗示担保。
+在任何情况下，版权所有者或贡献者均不对任何直接、间接、
+附带、特殊、惩戒性或后果性损害承担责任
+（包括但不限于采购替代商品或服务；使用损失、
+数据或利润损失；或业务中断），无论其成因为何，
+也无论是基于合同、严格责任或侵权
+（包括过失或其他）因使用本软件而以任何方式产生的责任，
+即使已被告知发生此类损害的可能性。
 """
 import conftest
 import os
@@ -62,8 +58,8 @@ def run_ruff(files, fix):
 
 
 def rev_list(branch, num_commits):
-    """List commits in reverse chronological order.
-    Only the first `num_commits` are shown.
+    """按时间倒序列出提交。
+    只显示前 `num_commits` 个。
     """
     res = subprocess.run(
         [
@@ -82,8 +78,8 @@ def rev_list(branch, num_commits):
 
 
 def find_branch_point(branch):
-    """Find when the current branch split off from the given branch.
-    It is based off of this Stackoverflow post:
+    """查找当前分支从给定分支分出的位置。
+    方法基于这篇 Stackoverflow 帖子：
     https://stackoverflow.com/questions/1527234/finding-a-branch-point-with-git#4991675
     """
     branch_commits = rev_list('HEAD', 1000)
@@ -92,14 +88,14 @@ def find_branch_point(branch):
         if branch_commit in main_commits:
             return branch_commit
 
-    # If a branch split off over 1000 commits ago we will fail to find
-    # the ancestor.
+    # 若分支在 1000 次提交之前分出，将无法找到
+    # 该祖先。
     raise RuntimeError(
         'Failed to find a common ancestor in the last 1000 commits')
 
 
 def find_diff(sha):
-    """Find the diff since the given sha."""
+    """查找自给定 sha 以来的差异。"""
     files = ['*.py']
     res = subprocess.run(
         ['git', 'diff', '--unified=0', sha, '--'] + files,
@@ -111,7 +107,7 @@ def find_diff(sha):
 
 
 def diff_files(sha):
-    """Find the diff since the given SHA."""
+    """查找自给定 SHA 以来的差异。"""
     res = subprocess.run(
         ['git', 'diff', '--name-only', '--diff-filter=ACMR', '-z', sha, '--',
          '*.py', '*.pyx', '*.pxd', '*.pxi'],

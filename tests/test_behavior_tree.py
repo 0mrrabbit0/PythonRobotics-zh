@@ -144,7 +144,7 @@ def test_while_do_else_node():
 
 
 def test_node_children():
-    # ControlNode Must have children
+    # 控制节点必须有子节点
     xml_string = """
         <Sequence>
         </Sequence>
@@ -153,7 +153,7 @@ def test_node_children():
     with pytest.raises(ValueError):
         bt_factory.build_tree(xml_string)
 
-    # DecoratorNode Must have child
+    # 装饰节点必须有子节点
     xml_string = """
         <Inverter>
         </Inverter>
@@ -161,7 +161,7 @@ def test_node_children():
     with pytest.raises(ValueError):
         bt_factory.build_tree(xml_string)
 
-    # DecoratorNode Must have only one child
+    # 装饰节点必须只有一个子节点
     xml_string = """
         <Inverter>
             <Echo name="Echo 1" message="Hello, World1!" />
@@ -171,7 +171,7 @@ def test_node_children():
     with pytest.raises(ValueError):
         bt_factory.build_tree(xml_string)
 
-    # ActionNode Must have no children
+    # 动作节点必须没有子节点
     xml_string = """
         <Echo name="Echo 1" message="Hello, World1!">
             <Echo name="Echo 2" message="Hello, World2!" />
@@ -180,7 +180,7 @@ def test_node_children():
     with pytest.raises(ValueError):
         bt_factory.build_tree(xml_string)
 
-    # WhileDoElse Must have exactly 2 or 3 children
+    # WhileDoElse 必须恰好有 2 或 3 个子节点
     xml_string = """
         <WhileDoElse>
             <Echo name="Echo 1" message="Hello, World1!" />

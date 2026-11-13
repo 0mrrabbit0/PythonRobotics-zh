@@ -11,7 +11,7 @@ def test_body_frame_acceleration_and_bias_compensation():
     imu = np.array([2.2, -0.1, 0.13])
     original = state.copy()
     result = m.motion_model(state, imu, 0.5)
-    # Body x points along world y, so only vy has acceleration.
+    # 机体 x 轴沿世界 y 轴，因此只有 vy 有加速度。
     expected = [2.5, 4.25, 3.0, 5.0, np.pi / 2 + 0.05, 0.2, -0.1, 0.03]
     np.testing.assert_allclose(result, expected, atol=1e-12)
     np.testing.assert_array_equal(state, original)
@@ -103,7 +103,7 @@ def test_fusion_reduces_drift_with_gps_outage(seed):
 
 def test_no_bias_filter_uses_imu_and_gps():
     without_gps = m.simulate(duration=2.0, gps_outage=(0.0, 3.0))
-    # With no GPS and no bias compensation, this is IMU-only integration.
+    # 没有 GPS 也没有偏差补偿时，这是仅使用 IMU 的积分。
     np.testing.assert_array_equal(without_gps["no_bias_estimate"],
                                   without_gps["dead_reckoning"][:, :5])
     with_gps = m.simulate(duration=2.0, gps_outage=None)
@@ -125,10 +125,10 @@ def test_gps_schedule_outage_and_recovery():
     np.testing.assert_array_equal(available, expected)
     for key in ["covariance", "no_bias_covariance"]:
         uncertainty = np.trace(history[key][:, :2, :2], axis1=1, axis2=2)
-        assert uncertainty[599] > uncertainty[399]  # grows without GPS
-        assert uncertainty[600] < uncertainty[599]  # shrinks on GPS recovery
+        assert uncertainty[599] > uncertainty[399]  # 没有 GPS 时增大
+        assert uncertainty[600] < uncertainty[599]  # GPS 恢复后减小
     continuous = m.simulate(gps_outage=None)
-    # Removing GPS corrections must not change simulated IMU noise or truth.
+    # 去掉 GPS 校正不得改变仿真的 IMU 噪声或真值。
     np.testing.assert_array_equal(history["dead_reckoning"], continuous["dead_reckoning"])
     np.testing.assert_array_equal(history["truth"], continuous["truth"])
     np.testing.assert_array_equal(history["gps"][available], continuous["gps"][available])

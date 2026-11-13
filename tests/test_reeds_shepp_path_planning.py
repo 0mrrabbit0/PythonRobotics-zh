@@ -1,6 +1,6 @@
 import numpy as np
 
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 from PathPlanning.ReedsSheppPath import reeds_shepp_path_planning as m
 
 

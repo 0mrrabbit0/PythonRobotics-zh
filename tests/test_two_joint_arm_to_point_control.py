@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 from ArmNavigation.two_joint_arm_to_point_control \
     import two_joint_arm_to_point_control as m
 

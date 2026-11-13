@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 from PathTracking.pure_pursuit import pure_pursuit as m
 
 

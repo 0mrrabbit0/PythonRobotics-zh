@@ -8,7 +8,7 @@ def test_1():
     obstacles_points = np.load("PathPlanning/ElasticBands/obstacles.npy")
     obstacles = np.zeros((500, 500))
     for x, y in obstacles_points:
-        size = 30  # Side length of the square
+        size = 30  # 正方形边长
         half_size = size // 2
         x_start = max(0, x - half_size)
         x_end = min(obstacles.shape[0], x + half_size)

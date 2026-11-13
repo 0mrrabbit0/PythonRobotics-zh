@@ -1,4 +1,4 @@
-import conftest  # Add root path to sys.path
+import conftest  # 将根路径加入 sys.path
 from PathPlanning.ParticleSwarmOptimization import particle_swarm_optimization as m
 
 

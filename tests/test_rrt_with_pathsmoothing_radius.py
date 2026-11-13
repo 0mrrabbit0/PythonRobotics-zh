@@ -4,7 +4,7 @@ import math
 from PathPlanning.RRT import rrt_with_pathsmoothing as rrt_module
 
 def test_smoothed_path_safety():
-    # Define test environment
+    # 定义测试环境
     obstacle_list = [
         (5, 5, 1.0),
         (3, 6, 2.0),
@@ -15,10 +15,10 @@ def test_smoothed_path_safety():
     ]
     robot_radius = 0.5
 
-    # Disable animation for testing
+    # 测试时关闭动画
     rrt_module.show_animation = False
 
-    # Create RRT planner
+    # 创建 RRT 规划器
     rrt = rrt_module.RRT(
         start=[0, 0],
         goal=[6, 10],
@@ -27,15 +27,15 @@ def test_smoothed_path_safety():
         robot_radius=robot_radius
     )
 
-    # Run RRT
+    # 运行 RRT
     path = rrt.planning(animation=False)
 
-    # Smooth the path
+    # 平滑路径
     smoothed = rrt_module.path_smoothing(path, max_iter=1000,
                                          obstacle_list=obstacle_list,
                                          robot_radius=robot_radius)
 
-    # Check if all points on the smoothed path are safely distant from obstacles
+    # 检查平滑路径上的所有点是否与障碍物保持安全距离
     for x, y in smoothed:
         for ox, oy, obs_radius in obstacle_list:
             d = math.hypot(x - ox, y - oy)
