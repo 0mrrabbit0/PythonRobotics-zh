@@ -4,7 +4,7 @@ from scipy.spatial.transform import Rotation as Rot
 
 def rot_mat_2d(angle):
     """
-    Create 2D rotation matrix from an angle
+    由角度创建二维旋转矩阵
 
     Parameters
     ----------
@@ -12,7 +12,7 @@ def rot_mat_2d(angle):
 
     Returns
     -------
-    A 2D rotation matrix
+    二维旋转矩阵
 
     Examples
     --------
@@ -25,25 +25,25 @@ def rot_mat_2d(angle):
 
 def angle_mod(x, zero_2_2pi=False, degree=False):
     """
-    Angle modulo operation
-    Default angle modulo range is [-pi, pi)
+    角度取模运算
+    默认的角度取模区间为 [-pi, pi)
 
     Parameters
     ----------
-    x : float or array_like
-        A angle or an array of angles. This array is flattened for
-        the calculation. When an angle is provided, a float angle is returned.
-    zero_2_2pi : bool, optional
-        Change angle modulo range to [0, 2pi)
-        Default is False.
-    degree : bool, optional
-        If True, then the given angles are assumed to be in degrees.
-        Default is False.
+    x : float 或 array_like
+        一个角度或角度数组。计算时会将该数组展平。
+        若传入单个角度，则返回浮点角度。
+    zero_2_2pi : bool，可选
+        将角度取模区间改为 [0, 2pi)
+        默认值为 False。
+    degree : bool，可选
+        若为 True，则给定角度按度数解释。
+        默认值为 False。
 
     Returns
     -------
-    ret : float or ndarray
-        an angle or an array of modulated angle.
+    ret : float 或 ndarray
+        一个角度或取模后的角度数组。
 
     Examples
     --------

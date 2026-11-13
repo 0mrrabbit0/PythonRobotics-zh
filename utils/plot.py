@@ -1,5 +1,5 @@
 """
-Matplotlib based plotting utilities
+基于 Matplotlib 的绘图工具
 """
 import math
 import matplotlib.pyplot as plt
@@ -14,18 +14,18 @@ from utils.angle import rot_mat_2d
 
 def plot_covariance_ellipse(x, y, cov, chi2=3.0, color="-r", ax=None):
     """
-    This function plots an ellipse that represents a covariance matrix. The ellipse is centered at (x, y) and its shape, size and rotation are determined by the covariance matrix.
+    绘制表示协方差矩阵的椭圆。椭圆中心位于 (x, y)，其形状、大小与旋转由协方差矩阵决定。
 
     Parameters:
-    x : (float) The x-coordinate of the center of the ellipse.
-    y : (float) The y-coordinate of the center of the ellipse.
-    cov : (numpy.ndarray) A 2x2 covariance matrix that determines the shape, size, and rotation of the ellipse.
-    chi2 : (float, optional) A scalar value that scales the ellipse size. This value is typically set based on chi-squared distribution quantiles to achieve certain confidence levels (e.g., 3.0 corresponds to ~95% confidence for a 2D Gaussian). Defaults to 3.0.
-    color : (str, optional) The color and line style of the ellipse plot, following matplotlib conventions. Defaults to "-r" (a red solid line).
-    ax : (matplotlib.axes.Axes, optional) The Axes object to draw the ellipse on. If None (default), a new figure and axes are created.
+    x : (float) 椭圆中心的 x 坐标。
+    y : (float) 椭圆中心的 y 坐标。
+    cov : (numpy.ndarray) 2x2 协方差矩阵，决定椭圆的形状、大小与旋转。
+    chi2 : (float, optional) 缩放椭圆大小的标量。该值通常按卡方分布分位数选取，以对应一定的置信水平（例如 3.0 约对应二维高斯的 95% 置信度）。默认值为 3.0。
+    color : (str, optional) 椭圆的颜色与线型，遵循 matplotlib 约定。默认值为 "-r"（红色实线）。
+    ax : (matplotlib.axes.Axes, optional) 用于绘制椭圆的 Axes 对象。若为 None（默认），则新建图形与坐标轴。
 
     Returns:
-    None. This function plots the covariance ellipse on the specified axes.
+    None。本函数在指定坐标轴上绘制协方差椭圆。
     """
     eig_val, eig_vec = np.linalg.eig(cov)
 
@@ -43,22 +43,22 @@ def plot_covariance_ellipse(x, y, cov, chi2=3.0, color="-r", ax=None):
 
 def plot_ellipse(x, y, a, b, angle, color="-r", ax=None, **kwargs):
     """
-    This function plots an ellipse based on the given parameters.
+    根据给定参数绘制椭圆。
 
     Parameters
     ----------
-    x : (float) The x-coordinate of the center of the ellipse.
-    y : (float) The y-coordinate of the center of the ellipse.
-    a : (float) The length of the semi-major axis of the ellipse.
-    b : (float) The length of the semi-minor axis of the ellipse.
-    angle : (float) The rotation angle of the ellipse, in radians.
-    color : (str, optional) The color and line style of the ellipse plot, following matplotlib conventions. Defaults to "-r" (a red solid line).
-    ax : (matplotlib.axes.Axes, optional) The Axes object to draw the ellipse on. If None (default), a new figure and axes are created.
-    **kwargs: Additional keyword arguments to pass to plt.plot or ax.plot.
+    x : (float) 椭圆中心的 x 坐标。
+    y : (float) 椭圆中心的 y 坐标。
+    a : (float) 椭圆半长轴的长度。
+    b : (float) 椭圆半短轴的长度。
+    angle : (float) 椭圆的旋转角，单位为弧度。
+    color : (str, optional) 椭圆的颜色与线型，遵循 matplotlib 约定。默认值为 "-r"（红色实线）。
+    ax : (matplotlib.axes.Axes, optional) 用于绘制椭圆的 Axes 对象。若为 None（默认），则新建图形与坐标轴。
+    **kwargs: 传递给 plt.plot 或 ax.plot 的其他关键字参数。
 
     Returns
     ---------
-    None. This function plots the ellipse based on the specified parameters.
+    None。本函数根据指定参数绘制椭圆。
     """
 
     t = np.arange(0, 2 * math.pi + 0.1, 0.1)
@@ -77,30 +77,30 @@ def plot_arrow(x, y, yaw, arrow_length=1.0,
                origin_point_plot_style="xr",
                head_width=0.1, fc="r", ec="k", **kwargs):
     """
-    Plot an arrow or arrows based on 2D state (x, y, yaw)
+    根据二维状态 (x, y, yaw) 绘制一个或多个箭头
 
-    All optional settings of matplotlib.pyplot.arrow can be used.
+    可以使用 matplotlib.pyplot.arrow 的全部可选设置。
     - matplotlib.pyplot.arrow:
     https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.arrow.html
 
     Parameters
     ----------
-    x : a float or array_like
-        a value or a list of arrow origin x position.
-    y : a float or array_like
-        a value or a list of arrow origin y position.
-    yaw : a float or array_like
-        a value or a list of arrow yaw angle (orientation).
-    arrow_length : a float (optional)
-        arrow length. default is 1.0
-    origin_point_plot_style : str (optional)
-        origin point plot style. If None, not plotting.
-    head_width : a float (optional)
-        arrow head width. default is 0.1
-    fc : string (optional)
-        face color
-    ec : string (optional)
-        edge color
+    x : float 或 array_like
+        箭头起点的 x 位置，或位置列表。
+    y : float 或 array_like
+        箭头起点的 y 位置，或位置列表。
+    yaw : float 或 array_like
+        箭头的航向角（朝向），或角度列表。
+    arrow_length : float（可选）
+        箭头长度。默认值为 1.0
+    origin_point_plot_style : str（可选）
+        起点的绘图样式。若为 None，则不绘制起点。
+    head_width : float（可选）
+        箭头头部宽度。默认值为 0.1
+    fc : string（可选）
+        填充颜色
+    ec : string（可选）
+        边缘颜色
     """
     if not isinstance(x, float):
         for (i_x, i_y, i_yaw) in zip(x, y, yaw):
@@ -120,28 +120,27 @@ def plot_arrow(x, y, yaw, arrow_length=1.0,
 def plot_curvature(x_list, y_list, heading_list, curvature,
                    k=0.01, c="-c", label="Curvature"):
     """
-    Plot curvature on 2D path. This plot is a line from the original path,
-    the lateral distance from the original path shows curvature magnitude.
-    Left turning shows right side plot, right turning shows left side plot.
-    For straight path, the curvature plot will be on the path, because
-    curvature is 0 on the straight path.
+    在二维路径上绘制曲率。该图是从原始路径引出的一条线，
+    相对原始路径的横向距离表示曲率大小。
+    左转显示在路径右侧，右转显示在路径左侧。
+    直线路径上曲率为 0，因此曲率图与路径重合。
 
     Parameters
     ----------
     x_list : array_like
-        x position list of the path
+        路径的 x 位置列表
     y_list : array_like
-        y position list of the path
+        路径的 y 位置列表
     heading_list : array_like
-        heading list of the path
+        路径的航向列表
     curvature : array_like
-        curvature list of the path
+        路径的曲率列表
     k : float
-        curvature scale factor to calculate distance from the original path
+        曲率比例因子，用于计算相对原始路径的距离
     c : string
-        color of the plot
+        绘图颜色
     label : string
-        label of the plot
+        绘图标签
     """
     cx = [x + d * k * np.cos(yaw - np.pi / 2.0) for x, y, yaw, d in
           zip(x_list, y_list, heading_list, curvature)]
@@ -181,7 +180,7 @@ class Arrow3D(FancyArrowPatch):
 
 
 def _arrow3D(ax, x, y, z, dx, dy, dz, *args, **kwargs):
-    '''Add an 3d arrow to an `Axes3D` instance.'''
+    '''向 `Axes3D` 实例添加三维箭头。'''
     arrow = Arrow3D(x, y, z, dx, dy, dz, *args, **kwargs)
     ax.add_artist(arrow)
 
@@ -200,28 +199,28 @@ def plot_triangle(p1, p2, p3, ax):
 
 
 def set_equal_3d_axis(ax, x_lims, y_lims, z_lims):
-    """Helper function to set equal axis
+    """将坐标轴设为等比例的辅助函数
 
     Args:
-        ax (Axes3DSubplot): matplotlib 3D axis, created by
-        `ax = fig.add_subplot(projection='3d')`
-        x_lims (np.array): array containing min and max value of x
-        y_lims (np.array): array containing min and max value of y
-        z_lims (np.array): array containing min and max value of z
+        ax (Axes3DSubplot): matplotlib 三维坐标轴，由
+        `ax = fig.add_subplot(projection='3d')` 创建
+        x_lims (np.array): 包含 x 最小值与最大值的数组
+        y_lims (np.array): 包含 y 最小值与最大值的数组
+        z_lims (np.array): 包含 z 最小值与最大值的数组
     """
     x_lims = np.asarray(x_lims)
     y_lims = np.asarray(y_lims)
     z_lims = np.asarray(z_lims)
-    # compute max required range
+    # 计算所需的最大范围
     max_range = np.array([x_lims.max() - x_lims.min(),
                           y_lims.max() - y_lims.min(),
                           z_lims.max() - z_lims.min()]).max() / 2.0
-    # compute mid-point along each axis
+    # 计算各轴中点
     mid_x = (x_lims.max() + x_lims.min()) * 0.5
     mid_y = (y_lims.max() + y_lims.min()) * 0.5
     mid_z = (z_lims.max() + z_lims.min()) * 0.5
 
-    # set limits to axis
+    # 设置坐标轴范围
     ax.set_xlim(mid_x - max_range, mid_x + max_range)
     ax.set_ylim(mid_y - max_range, mid_y + max_range)
     ax.set_zlim(mid_z - max_range, mid_z + max_range)
