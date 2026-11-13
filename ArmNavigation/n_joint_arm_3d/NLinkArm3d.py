@@ -1,6 +1,6 @@
 """
-Class of n-link arm in 3D
-Author: Takayuki Murooka (takayuki5168)
+三维 n 连杆机械臂类
+作者: Takayuki Murooka (takayuki5168)
 """
 import numpy as np
 import math

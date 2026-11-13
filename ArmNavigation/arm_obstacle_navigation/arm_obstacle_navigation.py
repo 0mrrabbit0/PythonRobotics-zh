@@ -1,7 +1,7 @@
 """
-Obstacle navigation using A* on a toroidal grid
+在环形网格上用 A* 进行避障导航
 
-Author: Daniel Ingram (daniel-s-ingram)
+作者: Daniel Ingram (daniel-s-ingram)
 """
 from math import pi
 import numpy as np
@@ -10,7 +10,7 @@ from matplotlib.colors import from_levels_and_colors
 
 plt.ion()
 
-# Simulation parameters
+# 仿真参数
 M = 100
 obstacles = [[1.75, 0.75, 0.6], [0.55, 1.5, 0.5], [0, -1, 0.25]]
 
@@ -32,17 +32,16 @@ def main():
 
 def detect_collision(line_seg, circle):
     """
-    Determines whether a line segment (arm link) is in contact
-    with a circle (obstacle).
-    Credit to: https://web.archive.org/web/20200130224918/http://doswa.com/2009/07/13/circle-segment-intersectioncollision.html
+    判断线段（机械臂连杆）是否与圆（障碍物）接触。
+    出处: https://web.archive.org/web/20200130224918/http://doswa.com/2009/07/13/circle-segment-intersectioncollision.html
     Args:
-        line_seg: List of coordinates of line segment endpoints e.g. [[1, 1], [2, 2]]
-        circle: List of circle coordinates and radius e.g. [0, 0, 0.5] is a circle centered
-                at the origin with radius 0.5
+        line_seg: 线段端点坐标列表，例如 [[1, 1], [2, 2]]
+        circle: 圆心坐标与半径列表，例如 [0, 0, 0.5] 表示圆心在
+                原点、半径为 0.5 的圆
 
     Returns:
-        True if the line segment is in contact with the circle
-        False otherwise
+        若线段与圆接触则为 True
+        否则为 False
     """
     a_vec = np.array([line_seg[0][0], line_seg[0][1]])
     b_vec = np.array([line_seg[1][0], line_seg[1][1]])
@@ -66,18 +65,17 @@ def detect_collision(line_seg, circle):
 
 def get_occupancy_grid(arm, obstacles):
     """
-    Discretizes joint space into M values from -pi to +pi
-    and determines whether a given coordinate in joint space
-    would result in a collision between a robot arm and obstacles
-    in its environment.
+    将关节空间在 -pi 到 +pi 之间离散为 M 个取值，
+    并判断关节空间中给定坐标是否会使机械臂
+    与环境中的障碍物发生碰撞。
 
     Args:
-        arm: An instance of NLinkArm
-        obstacles: A list of obstacles, with each obstacle defined as a list
-                   of xy coordinates and a radius.
+        arm: NLinkArm 的实例
+        obstacles: 障碍物列表，每个障碍物由
+                   xy 坐标与半径组成的列表定义。
 
     Returns:
-        Occupancy grid in joint space
+        关节空间中的占据栅格
     """
     grid = [[0 for _ in range(M)] for _ in range(M)]
     theta_list = [2 * i * pi / M for i in range(-M // 2, M // 2 + 1)]
@@ -100,16 +98,15 @@ def get_occupancy_grid(arm, obstacles):
 
 def astar_torus(grid, start_node, goal_node):
     """
-    Finds a path between an initial and goal joint configuration using
-    the A* Algorithm on a tororiadal grid.
+    在环形网格上用 A* 算法，寻找初始关节构型与目标关节构型之间的路径。
 
     Args:
-        grid: An occupancy grid (ndarray)
-        start_node: Initial joint configuration (tuple)
-        goal_node: Goal joint configuration (tuple)
+        grid: 占据栅格（ndarray）
+        start_node: 初始关节构型（tuple）
+        goal_node: 目标关节构型（tuple）
 
     Returns:
-        Obstacle-free route in joint space from start_node to goal_node
+        关节空间中从 start_node 到 goal_node 的无障碍路径
     """
     colors = ['white', 'black', 'red', 'pink', 'yellow', 'green', 'orange']
     levels = [0, 1, 2, 3, 4, 5, 6, 7]
@@ -162,7 +159,7 @@ def astar_torus(grid, start_node, goal_node):
         for i in range(1, len(route)):
             grid[route[i]] = 6
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 Esc 键停止仿真。
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             plt.imshow(grid, cmap=cmap, norm=norm, interpolation=None)
@@ -214,7 +211,7 @@ def calc_heuristic_map(M, goal_node):
 
 class NLinkArm:
     """
-    Class for controlling and plotting a planar arm with an arbitrary number of links.
+    用于控制并绘制任意连杆数平面机械臂的类。
     """
 
     def __init__(self, link_lengths, joint_angles):

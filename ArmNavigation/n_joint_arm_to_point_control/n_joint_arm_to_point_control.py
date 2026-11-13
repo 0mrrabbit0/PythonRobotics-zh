@@ -1,7 +1,7 @@
 """
-Inverse kinematics for an n-link arm using the Jacobian inverse method
+用雅可比矩阵逆方法求解 n 连杆机械臂的逆运动学
 
-Author: Daniel Ingram (daniel-s-ingram)
+作者: Daniel Ingram (daniel-s-ingram)
         Atsushi Sakai (@Atsushi_twi)
 """
 
@@ -13,13 +13,13 @@ import numpy as np
 from ArmNavigation.n_joint_arm_to_point_control.NLinkArm import NLinkArm
 from utils.angle import angle_mod
 
-# Simulation parameters
+# 仿真参数
 Kp = 2
 dt = 0.1
 N_LINKS = 10
 N_ITERATIONS = 10000
 
-# States
+# 状态
 WAIT_FOR_NEW_GOAL = 1
 MOVING_TO_GOAL = 2
 
@@ -28,8 +28,8 @@ show_animation = True
 
 def main():  # pragma: no cover
     """
-    Creates an arm using the NLinkArm class and uses its inverse kinematics
-    to move it to the desired position.
+    用 NLinkArm 类创建机械臂，并利用其逆运动学
+    将其移动到期望位置。
     """
     link_lengths = [1] * N_LINKS
     joint_angles = np.array([0] * N_LINKS)
@@ -43,7 +43,7 @@ def main():  # pragma: no cover
         end_effector = arm.end_effector
         errors, distance = distance_to_goal(end_effector, goal_pos)
 
-        # State machine to allow changing of goal before current goal has been reached
+        # 状态机：在到达当前目标前允许更换目标
         if state is WAIT_FOR_NEW_GOAL:
             if distance > 0.1 and not solution_found:
                 joint_goal_angles, solution_found = inverse_kinematics(
@@ -67,7 +67,7 @@ def main():  # pragma: no cover
 
 def inverse_kinematics(link_lengths, joint_angles, goal_pos):
     """
-    Calculates the inverse kinematics using the Jacobian inverse method.
+    用雅可比矩阵逆方法计算逆运动学。
     """
     for iteration in range(N_ITERATIONS):
         current_pos = forward_kinematics(link_lengths, joint_angles)
@@ -102,7 +102,7 @@ def animation():
         end_effector = arm.end_effector
         errors, distance = distance_to_goal(end_effector, goal_pos)
 
-        # State machine to allow changing of goal before current goal has been reached
+        # 状态机：在到达当前目标前允许更换目标
         if state is WAIT_FOR_NEW_GOAL:
 
             if distance > 0.1 and not solution_found:
@@ -158,7 +158,7 @@ def distance_to_goal(current_pos, goal_pos):
 
 def ang_diff(theta1, theta2):
     """
-    Returns the difference between two angles in the range -pi to +pi
+    返回两个角度之差，范围在 -pi 到 +pi
     """
     return angle_mod(theta1 - theta2)
 

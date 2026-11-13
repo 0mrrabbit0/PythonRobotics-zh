@@ -1,7 +1,7 @@
 """
-Class for controlling and plotting an arm with an arbitrary number of links.
+用于控制并绘制任意连杆数机械臂的类。
 
-Author: Daniel Ingram
+作者: Daniel Ingram
 """
 
 import numpy as np
@@ -51,7 +51,7 @@ class NLinkArm(object):
 
     def plot(self):  # pragma: no cover
         plt.cla()
-        # for stopping simulation with the esc key.
+        # 按 Esc 键停止仿真。
         plt.gcf().canvas.mpl_connect('key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
 

@@ -1,6 +1,6 @@
 """
-RRT* path planner for a seven joint arm
-Author: Mahyar Abdeetedal (mahyaret)
+七关节机械臂的 RRT* 路径规划器
+作者: Mahyar Abdeetedal (mahyaret)
 """
 import math
 import random
@@ -40,7 +40,7 @@ class RobotArm(NLinkArm):
 
 class RRTStar:
     """
-    Class for RRT Star planning
+    用于 RRT* 规划的类
     """
 
     class Node:
@@ -57,12 +57,12 @@ class RRTStar:
                  connect_circle_dist=50.0
                  ):
         """
-        Setting Parameter
+        设置参数
 
-        start:Start Position [q1,...,qn]
-        goal:Goal Position [q1,...,qn]
-        obstacleList:obstacle Positions [[x,y,z,size],...]
-        randArea:Random Sampling Area [min,max]
+        start:起始位置 [q1,...,qn]
+        goal:目标位置 [q1,...,qn]
+        obstacleList:障碍物位置 [[x,y,z,size],...]
+        randArea:随机采样区域 [min,max]
 
         """
         self.start = self.Node(start)
@@ -84,11 +84,11 @@ class RRTStar:
 
     def planning(self, animation=False, search_until_max_iter=False):
         """
-        rrt star path planning
+        RRT* 路径规划
 
-        animation: flag for animation on or off
-        search_until_max_iter: search until max iteration for path
-        improving or not
+        animation: 是否开启动画的标志
+        search_until_max_iter: 是否一直搜索到最大迭代次数，
+        以改进路径
         """
 
         self.node_list = [self.start]
@@ -128,7 +128,7 @@ class RRTStar:
         if not near_inds:
             return None
 
-        # search nearest cost in near_inds
+        # 在 near_inds 中搜索代价最小者
         costs = []
         for i in near_inds:
             near_node = self.node_list[i]
@@ -138,7 +138,7 @@ class RRTStar:
                                                self.obstacle_list):
                 costs.append(self.calc_new_cost(near_node, new_node))
             else:
-                costs.append(float("inf"))  # the cost of collision node
+                costs.append(float("inf"))  # 碰撞节点的代价
         min_cost = min(costs)
 
         if min_cost == float("inf"):
@@ -177,8 +177,8 @@ class RRTStar:
     def find_near_nodes(self, new_node):
         nnode = len(self.node_list) + 1
         r = self.connect_circle_dist * math.sqrt(math.log(nnode) / nnode)
-        # if expand_dist exists, search vertices in
-        # a range no more than expand_dist
+        # 若存在 expand_dist，则在
+        # 不超过 expand_dist 的范围内搜索顶点
         if hasattr(self, 'expand_dis'):
             r = min(r, self.expand_dis)
         dist_list = [np.sum((np.array(node.x) - np.array(new_node.x)) ** 2)
@@ -233,7 +233,7 @@ class RRTStar:
             rnd = self.Node(np.random.uniform(self.min_rand,
                                               self.max_rand,
                                               self.dimension))
-        else:  # goal point sampling
+        else:  # 目标点采样
             rnd = self.Node(self.end.x)
         return rnd
 
@@ -338,15 +338,15 @@ class RRTStar:
                                                   dz_list)]
 
                 if min(d_list) <= size ** 2:
-                    return False  # collision
+                    return False  # 碰撞
 
-        return True  # safe
+        return True  # 安全
 
 
 def main():
     print("Start " + __file__)
 
-    # init NLinkArm with Denavit-Hartenberg parameters of panda
+    # 用 panda 的 Denavit-Hartenberg 参数初始化 NLinkArm
     # https://frankaemika.github.io/docs/control_parameters.html
     # [theta, alpha, a, d]
     seven_joint_arm = RobotArm([[0., math.pi/2., 0., .333],
@@ -356,15 +356,15 @@ def main():
                                 [0., math.pi/2., 0., 0.3840],
                                 [0., math.pi/2., 0.088, 0.],
                                 [0., 0., 0., 0.107]])
-    # ====Search Path with RRT====
+    # ====用 RRT 搜索路径====
     obstacle_list = [
         (-.3, -.3, .7, .1),
         (.0, -.3, .7, .1),
         (.2, -.1, .3, .15),
-    ]  # [x,y,size(radius)]
+    ]  # [x,y,尺寸(半径)]
     start = [0 for _ in range(len(seven_joint_arm.link_list))]
     end = [1.5 for _ in range(len(seven_joint_arm.link_list))]
-    # Set Initial parameters
+    # 设置初始参数
     rrt_star = RRTStar(start=start,
                        goal=end,
                        rand_area=[0, 2],
@@ -379,11 +379,11 @@ def main():
     else:
         print("Found path!")
 
-        # Draw final path
+        # 绘制最终路径
         if show_animation:
             ax = rrt_star.draw_graph()
 
-            # Plot final configuration
+            # 绘制最终构型
             x_points, y_points, z_points = seven_joint_arm.get_points(path[-1])
             ax.plot([x for x in x_points],
                     [y for y in y_points],

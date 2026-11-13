@@ -1,11 +1,11 @@
 """
-Inverse kinematics of a two-joint arm
-Left-click the plot to set the goal position of the end effector
+两关节机械臂的逆运动学
+在图上左键单击以设置末端执行器的目标位置
 
-Author: Daniel Ingram (daniel-s-ingram)
+作者: Daniel Ingram (daniel-s-ingram)
         Atsushi Sakai (@Atsushi_twi)
 
-Reference: P. I. Corke, "Robotics, Vision & Control", Springer 2017,
+参考文献: P. I. Corke, "Robotics, Vision & Control", Springer 2017,
  ISBN 978-3-319-54413-7 p102
 - [Robotics, Vision and Control]
 (https://link.springer.com/book/10.1007/978-3-642-20144-8)
@@ -18,14 +18,14 @@ import math
 from utils.angle import angle_mod
 
 
-# Simulation parameters
+# 仿真参数
 Kp = 15
 dt = 0.01
 
-# Link lengths
+# 连杆长度
 l1 = l2 = 1
 
-# Set initial goal position to the initial end-effector position
+# 将初始目标位置设为末端执行器的初始位置
 x = 2
 y = 0
 
@@ -37,8 +37,8 @@ if show_animation:
 
 def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
     """
-    Computes the inverse kinematics for a planar 2DOF arm
-    When out of bounds, rewrite x and y with last correct values
+    计算平面二自由度机械臂的逆运动学
+    超出工作空间时，用上一次的正确值改写 x 与 y
     """
     global x, y
     x_prev, y_prev = None, None
@@ -72,7 +72,7 @@ def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
 
         wrist = plot_arm(theta1, theta2, x, y)
 
-        # check goal
+        # 检查目标
         d2goal = None
         if x is not None and y is not None:
             d2goal = np.hypot(wrist[0] - x, wrist[1] - y)
@@ -110,7 +110,7 @@ def plot_arm(theta1, theta2, target_x, target_y):  # pragma: no cover
 
 
 def ang_diff(theta1, theta2):
-    # Returns the difference between two angles in the range -pi to +pi
+    # 返回两个角度之差，范围在 -pi 到 +pi
     return angle_mod(theta1 - theta2)
 
 
@@ -134,7 +134,7 @@ def animation():
 def main():  # pragma: no cover
     fig = plt.figure()
     fig.canvas.mpl_connect("button_press_event", click)
-    # for stopping simulation with the esc key.
+    # 按 Esc 键停止仿真。
     fig.canvas.mpl_connect('key_release_event', lambda event: [
                            exit(0) if event.key == 'escape' else None])
     two_joint_arm()
