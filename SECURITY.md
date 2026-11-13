@@ -1,13 +1,15 @@
-# Security Policy
+# 安全策略
 
-## Supported Versions
+## 受支持的版本
 
-In this project, we are only support latest code.
+本项目仅支持最新代码。
 
-| Version | Supported          |
-| ------- | ------------------ |
-| latest   | :white_check_mark: |
+| 版本 | 是否支持 |
+| --- | --- |
+| 最新 | :white_check_mark: |
 
-## Reporting a Vulnerability
+## 报告漏洞
 
-If you find any security related problem, let us know by creating an issue about it.
+如果你发现任何与安全相关的问题，请通过创建 Issue 告知我们。
+
+算法或安全方面的缺陷请提交到 https://github.com/AtsushiSakai/PythonRobotics/issues ；翻译问题请留在本仓库。

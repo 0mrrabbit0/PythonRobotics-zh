@@ -1,24 +1,25 @@
 <!-- 
-Thanks for contributing a pull request! 
-Please check this document before submitting:
-- [How to contribute](https://atsushisakai.github.io/PythonRobotics/modules/0_getting_started/3_how_to_contribute.html#adding-a-new-algorithm-example)
+感谢你提交拉取请求！
+提交前请先阅读这篇文档：
+- [如何贡献](https://atsushisakai.github.io/PythonRobotics/modules/0_getting_started/3_how_to_contribute.html#adding-a-new-algorithm-example)
 
-Note that this is my hobby project; I appreciate your
-patience during the review process.
+请注意，这是我的业余项目；审核期间感谢你的耐心。
 
-Again, thanks for contributing!
+再次感谢你的贡献！
 -->
 
-#### Reference issue
-<!--Example: fix #392-->
+翻译问题请提交到本仓库；算法或代码缺陷请改到上游 https://github.com/AtsushiSakai/PythonRobotics/issues 。
 
-#### What does this implement/fix?
-<!--Please explain your changes.-->
+#### 相关议题
+<!--示例：fix #392-->
 
-#### Additional information
-<!--Any additional information you think is important.-->
+#### 这项改动实现或修复了什么？
+<!--请说明你的改动。-->
 
-#### CheckList
-- [ ] Did you add an unittest for your new example or defect fix?
-- [ ] Did you add documents for your new example?
-- [ ] All CIs are green? (You can check it after submitting)
+#### 补充信息
+<!--任何你认为重要的补充信息。-->
+
+#### 检查清单
+- [ ] 你是否为新示例或缺陷修复添加了单元测试？
+- [ ] 你是否为新示例添加了文档？
+- [ ] 所有 CI 是否均为通过（绿色）？（提交后可以查看）
