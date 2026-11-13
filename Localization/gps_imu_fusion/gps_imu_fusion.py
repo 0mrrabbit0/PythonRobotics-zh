@@ -1,18 +1,18 @@
-"""Planar GPS/IMU fusion with an extended Kalman filter.
+"""使用扩展卡尔曼滤波进行平面 GPS/惯性测量单元（IMU）融合。
 
-State: [x, y, vx, vy, yaw, accelerometer_bias_x, accelerometer_bias_y,
-        gyroscope_bias]. Positions and velocities are in a local metric world
-frame. IMU acceleration is in the body frame, with gravity already removed.
-Only horizontal motion is modeled; roll, pitch, altitude, magnetometers and
-barometers are outside this example. GPS and IMU are assumed time-aligned and
-co-located. Initial heading and velocity are assumed approximately known.
+状态：[x, y, vx, vy, yaw, accelerometer_bias_x, accelerometer_bias_y,
+        gyroscope_bias]。位置与速度处于局部米制世界坐标系。
+惯性测量单元（IMU）加速度处于机体坐标系，且已去除重力。
+仅建模水平运动；横滚、俯仰、高度、磁力计与气压计不在本示例范围内。
+假定 GPS 与惯性测量单元（IMU）时间对齐且安装在同一位置。
+假定初始航向与速度近似已知。
 
-Run this file to compare fusion with and without bias estimation against
-IMU-only dead reckoning, including a GPS outage. Without bias estimation, the
-state contains only [x, y, vx, vy, yaw] and biases are assumed zero.
-No external data or dependencies beyond NumPy/Matplotlib are needed.
+运行本文件，可将带偏差估计与不带偏差估计的融合结果，与仅使用
+惯性测量单元（IMU）的航位推算进行比较，其中包含一段 GPS 中断。
+不估计偏差时，状态仅包含 [x, y, vx, vy, yaw]，并假定偏差为零。
+除 NumPy/Matplotlib 外不需要外部数据或依赖。
 
-Reference: Oliver J. Woodman, An introduction to inertial navigation, 2007.
+Reference: Oliver J. Woodman, 《惯性导航导论》, 2007.
 https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-696.pdf
 """
 
@@ -21,18 +21,18 @@ from matplotlib.animation import FuncAnimation
 import numpy as np
 
 
-DT = 0.05  # IMU sample period [s] (20 Hz)
-GPS_INTERVAL = 20  # one GPS position every 20 IMU samples (1 Hz)
+DT = 0.05  # 惯性测量单元（IMU）采样周期 [s]（20 Hz）
+GPS_INTERVAL = 20  # 每 20 个惯性测量单元（IMU）样本一个 GPS 位置（1 Hz）
 SIM_TIME = 50.0  # [s]
 IMU_STD = np.array([0.1, 0.1, np.deg2rad(0.3)])  # [m/s^2, m/s^2, rad/s]
-GPS_STD = 0.8  # per-axis position standard deviation [m]
-BIAS_RW_STD = np.array([0.002, 0.002, np.deg2rad(0.02)])  # per sqrt(second)
+GPS_STD = 0.8  # 各轴位置标准差 [m]
+BIAS_RW_STD = np.array([0.002, 0.002, np.deg2rad(0.02)])  # 每 sqrt(秒)
 TRUE_BIAS = np.array([0.04, -0.03, np.deg2rad(0.4)])
 show_animation = True
 
 
 def rotation(yaw):
-    """Rotate a 2D body-frame vector into the world frame."""
+    """将二维机体坐标系向量旋转到世界坐标系。"""
     c, s = np.cos(yaw), np.sin(yaw)
     return np.array([[c, -s], [s, c]])
 
@@ -42,7 +42,7 @@ def wrap_angle(angle):
 
 
 def motion_model(state, imu, dt):
-    """Propagate one IMU sample, holding world acceleration constant for dt."""
+    """传播一个惯性测量单元（IMU）样本，并在 dt 内保持世界系加速度不变。"""
     bias = state[5:] if len(state) == 8 else np.zeros(3)
     acceleration = rotation(state[4]) @ (imu[:2] - bias[:2])
     predicted = state.copy()
@@ -53,7 +53,7 @@ def motion_model(state, imu, dt):
 
 
 def motion_jacobians(state, imu, dt):
-    """Return state and IMU-input Jacobians of the discrete motion model."""
+    """返回离散运动模型对状态与惯性测量单元（IMU）输入的雅可比矩阵。"""
     rot = rotation(state[4])
     bias = state[5:7] if len(state) == 8 else np.zeros(2)
     acceleration = rot @ (imu[:2] - bias)
@@ -75,11 +75,11 @@ def motion_jacobians(state, imu, dt):
 
 
 def predict(state, covariance, imu, dt=DT):
-    """Predict at the IMU rate, including sensor noise and bias random walk.
+    """按惯性测量单元（IMU）频率进行预测，包含传感器噪声与偏差随机游走。
 
-    IMU_STD describes independent noise on each discrete IMU sample, while
-    BIAS_RW_STD describes continuous bias random walk per sqrt(second).
-    A five-state filter assumes zero bias and has no bias random walk.
+    IMU_STD 描述每个离散惯性测量单元（IMU）样本上的独立噪声，而
+    BIAS_RW_STD 描述按每 sqrt(秒) 计的连续偏差随机游走。
+    五状态滤波器假定偏差为零，且没有偏差随机游走。
     """
     f, g = motion_jacobians(state, imu, dt)
     process_noise = g @ np.diag(IMU_STD**2) @ g.T
@@ -91,10 +91,10 @@ def predict(state, covariance, imu, dt=DT):
 
 
 def update_gps(state, covariance, position):
-    """Correct the predicted state when a new 2D GPS position is available.
+    """当有新的二维 GPS 位置时，校正预测状态。
 
-    GPS observes only position. Velocity, heading and biases are corrected
-    through cross-covariances accumulated during IMU prediction.
+    GPS 只观测位置。速度、航向与偏差通过惯性测量单元（IMU）
+    预测过程中积累的互协方差得到校正。
     """
     h = np.zeros((2, len(state)))
     h[:, :2] = np.eye(2)
@@ -103,14 +103,14 @@ def update_gps(state, covariance, position):
     gain = np.linalg.solve(innovation_covariance, h @ covariance).T
     updated = state + gain @ (position - h @ state)
     updated[4] = wrap_angle(updated[4])
-    # Joseph form preserves covariance symmetry and positive semidefiniteness.
+    # Joseph 形式保持协方差的对称性与半正定性。
     residual = np.eye(len(state)) - gain @ h
     updated_covariance = residual @ covariance @ residual.T + gain @ r @ gain.T
     return updated, (updated_covariance + updated_covariance.T) / 2.0
 
 
 def reference_motion(time):
-    """Analytic figure-eight truth and ideal body-frame IMU measurements."""
+    """解析的八字形真值，以及理想的机体坐标系惯性测量单元（IMU）量测。"""
     position = np.array([20.0 * np.sin(0.1 * time), 10.0 * np.sin(0.2 * time)])
     velocity = np.array([2.0 * np.cos(0.1 * time), 2.0 * np.cos(0.2 * time)])
     acceleration = np.array([-0.2 * np.sin(0.1 * time), -0.4 * np.sin(0.2 * time)])
@@ -123,13 +123,12 @@ def reference_motion(time):
 
 
 def simulate(duration=SIM_TIME, seed=0, gps_outage=(20.0, 30.0)):
-    """Run a deterministic simulation with multi-rate sensors.
+    """用多速率传感器运行一次确定性仿真。
 
-    GPS outages cover [start, end); pass None for uninterrupted GPS. Truth is
-    computed analytically, independently of the filter's discrete integrator.
-    All three estimates share the same biased, noisy measurements and start
-    with the known initial pose/velocity. The eight-state EKF starts with zero
-    estimated bias; the five-state EKF and dead reckoning assume zero bias.
+    GPS 中断覆盖区间 [start, end)；传入 None 表示 GPS 不中断。真值以解析方式
+    计算，独立于滤波器的离散积分器。三种估计共用同一组带偏差、带噪声的量测，
+    并从已知的初始位姿/速度出发。八状态扩展卡尔曼滤波从零估计偏差开始；
+    五状态扩展卡尔曼滤波与航位推算假定偏差为零。
     """
     rng = np.random.default_rng(seed)
     times = np.arange(int(round(duration / DT)) + 1) * DT
@@ -155,8 +154,8 @@ def simulate(duration=SIM_TIME, seed=0, gps_outage=(20.0, 30.0)):
         state, covariance = predict(state, covariance, imu)
         no_bias_state, no_bias_covariance = predict(no_bias_state, no_bias_covariance, imu)
         dead_state = motion_model(dead_state, imu, DT)
-        # Draw every scheduled fix, even during outages, to keep sensor noise
-        # identical when comparing different outage schedules with the same seed.
+        # 即使在中断期间也抽取每一次预定定位，以便在相同随机种子下
+        # 比较不同中断时段时传感器噪声保持一致。
         if i % GPS_INTERVAL == 0:
             measurement = truth[i, :2] + rng.normal(size=2) * GPS_STD
             if gps_outage is None or not gps_outage[0] <= times[i] < gps_outage[1]:
@@ -173,17 +172,17 @@ def simulate(duration=SIM_TIME, seed=0, gps_outage=(20.0, 30.0)):
 
 
 def position_covariance_ellipse(position, covariance):
-    """Return the 2D position ellipse with semi-axes of three standard deviations."""
+    """返回半轴为三倍标准差的二维位置椭圆。"""
     eigenvalues, eigenvectors = np.linalg.eigh(covariance[:2, :2])
     angles = np.linspace(0.0, 2.0 * np.pi, 61)
     circle = np.array([np.cos(angles), np.sin(angles)])
-    # Clip roundoff at zero for positive semidefinite covariances.
+    # 对半正定协方差，将舍入误差截断到零。
     radii = 3.0 * np.sqrt(np.maximum(eigenvalues, 0.0))
     return position[:2, None] + eigenvectors @ (radii[:, None] * circle)
 
 
 def create_animation(history):  # pragma: no cover
-    """Animate paths, position errors and bias estimates against ground truth."""
+    """相对真值动画显示路径、位置误差与偏差估计。"""
     fig = plt.figure(figsize=(12, 8))
     grid = fig.add_gridspec(2, 6, height_ratios=[1.3, 1])
     path_ax = fig.add_subplot(grid[0, :3])
@@ -222,7 +221,7 @@ def create_animation(history):  # pragma: no cover
               for key in ["estimate", "no_bias_estimate", "dead_reckoning"]}
     error_lines = {key: error_ax.plot([], [], color=colors[key], linestyle=styles[key], label=labels[key])[0]
                    for key in errors}
-    # This is the ellipse's enclosing radius, not a 1D error standard deviation.
+    # 这是椭圆的外接半径，不是一维误差标准差。
     position_radius = 3.0 * np.sqrt(np.maximum(
         np.linalg.eigvalsh(history["covariance"][:, :2, :2])[:, -1], 0.0))
     radius_line, = error_ax.plot([], [], "--", color="tab:blue", label="EKF 3σ major radius")
@@ -237,7 +236,7 @@ def create_animation(history):  # pragma: no cover
     path_ax.grid(True)
     error_ax.grid(True)
 
-    # Accelerometer biases stay in m/s^2; show gyroscope bias in deg/s.
+    # 加速度计偏差保持 m/s^2；陀螺仪偏差以 deg/s 显示。
     bias_scale = np.array([1.0, 1.0, 180.0 / np.pi])
     bias_estimates = history["estimate"][:, 5:8] * bias_scale
     bias_truth = history["truth"][:, 5:8] * bias_scale

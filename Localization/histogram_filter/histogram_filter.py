@@ -1,13 +1,13 @@
 """
 
-Histogram Filter 2D localization example
+直方图滤波二维定位示例
 
 
-In this simulation, x,y are unknown, yaw is known.
+在本仿真中，x、y 未知，航向角已知。
 
-Initial position is not needed.
+不需要初始位置。
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
 
 """
 
@@ -20,24 +20,24 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 from scipy.stats import norm
 
-# Parameters
-EXTEND_AREA = 10.0  # [m] grid map extended length
-SIM_TIME = 50.0  # simulation time [s]
-DT = 0.1  # time tick [s]
-MAX_RANGE = 10.0  # maximum observation range
-MOTION_STD = 1.0  # standard deviation for motion gaussian distribution
-RANGE_STD = 3.0  # standard deviation for observation gaussian distribution
+# 参数
+EXTEND_AREA = 10.0  # [m] 栅格地图扩展长度
+SIM_TIME = 50.0  # 仿真时间 [s]
+DT = 0.1  # 时间步长 [s]
+MAX_RANGE = 10.0  # 最大观测距离
+MOTION_STD = 1.0  # 运动高斯分布的标准差
+RANGE_STD = 3.0  # 观测高斯分布的标准差
 
-# grid map param
-XY_RESOLUTION = 0.5  # xy grid resolution
+# 栅格地图参数
+XY_RESOLUTION = 0.5  # xy 栅格分辨率
 MIN_X = -15.0
 MIN_Y = -5.0
 MAX_X = 15.0
 MAX_Y = 25.0
 
-# simulation parameters
-NOISE_RANGE = 2.0  # [m] 1σ range noise parameter
-NOISE_SPEED = 0.5  # [m/s] 1σ speed noise parameter
+# 仿真参数
+NOISE_RANGE = 2.0  # [m] 1σ 距离噪声参数
+NOISE_SPEED = 0.5  # [m/s] 1σ 速率噪声参数
 
 show_animation = True
 
@@ -53,8 +53,8 @@ class GridMap:
         self.max_y = None
         self.x_w = None
         self.y_w = None
-        self.dx = 0.0  # movement distance
-        self.dy = 0.0  # movement distance
+        self.dx = 0.0  # 移动距离
+        self.dy = 0.0  # 移动距离
 
 
 def histogram_filter_localization(grid_map, u, z, yaw):
@@ -66,12 +66,12 @@ def histogram_filter_localization(grid_map, u, z, yaw):
 
 
 def calc_gaussian_observation_pdf(grid_map, z, iz, ix, iy, std):
-    # predicted range
+    # 预测距离
     x = ix * grid_map.xy_resolution + grid_map.min_x
     y = iy * grid_map.xy_resolution + grid_map.min_y
     d = math.hypot(x - z[iz, 1], y - z[iz, 2])
 
-    # likelihood
+    # 似然
     pdf = norm.pdf(d - z[iz, 0], 0.0, std)
 
     return pdf
@@ -130,12 +130,12 @@ def observation(xTrue, u, RFID):
         dy = xTrue[1, 0] - RFID[i, 1]
         d = math.hypot(dx, dy)
         if d <= MAX_RANGE:
-            # add noise to range observation
+            # 为距离观测添加噪声
             dn = d + np.random.randn() * NOISE_RANGE
             zi = np.array([dn, RFID[i, 0], RFID[i, 1]])
             z = np.vstack((z, zi))
 
-    # add noise to speed
+    # 为速率添加噪声
     ud = u[:, :]
     ud[0] += np.random.randn() * NOISE_SPEED
 
@@ -194,12 +194,12 @@ def motion_update(grid_map, u, yaw):
     x_shift = grid_map.dx // grid_map.xy_resolution
     y_shift = grid_map.dy // grid_map.xy_resolution
 
-    if abs(x_shift) >= 1.0 or abs(y_shift) >= 1.0:  # map should be shifted
+    if abs(x_shift) >= 1.0 or abs(y_shift) >= 1.0:  # 应平移地图
         grid_map = map_shift(grid_map, int(x_shift[0]), int(y_shift[0]))
         grid_map.dx -= x_shift * grid_map.xy_resolution
         grid_map.dy -= y_shift * grid_map.xy_resolution
 
-    # Add motion noise
+    # 添加运动噪声
     grid_map.data = gaussian_filter(grid_map.data, sigma=MOTION_STD)
 
     return grid_map
@@ -219,7 +219,7 @@ def calc_grid_index(grid_map):
 def main():
     print(__file__ + " start!!")
 
-    # RF_ID positions [x, y]
+    # RFID 位置 [x, y]
     RF_ID = np.array([[10.0, 0.0],
                       [10.0, 10.0],
                       [0.0, 15.0],
@@ -229,7 +229,7 @@ def main():
 
     xTrue = np.zeros((4, 1))
     grid_map = init_grid_map(XY_RESOLUTION, MIN_X, MIN_Y, MAX_X, MAX_Y)
-    mx, my = calc_grid_index(grid_map)  # for grid map visualization
+    mx, my = calc_grid_index(grid_map)  # 用于栅格地图可视化
 
     while SIM_TIME >= time:
         time += DT
@@ -237,14 +237,14 @@ def main():
 
         u = calc_control_input()
 
-        yaw = xTrue[2, 0]  # Orientation is known
+        yaw = xTrue[2, 0]  # 朝向已知
         xTrue, z, ud = observation(xTrue, u, RF_ID)
 
         grid_map = histogram_filter_localization(grid_map, u, z, yaw)
 
         if show_animation:
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])

@@ -1,34 +1,34 @@
 """
-Cubature Kalman filter using Constant Turn Rate and Velocity (CTRV) model
-Fuse sensor data from IMU and GPS to obtain accurate position
+使用恒定转弯率与速度（CTRV）模型的容积卡尔曼滤波
+融合惯性测量单元（IMU）与 GPS 的传感器数据以获得准确位置
 
 https://ieeexplore.ieee.org/document/4982682
 
-Author: Raghuram Shankar
+作者：Raghuram Shankar
 
-state matrix:                       2D x-y position, yaw, velocity and yaw rate
-measurement matrix:                 2D x-y position, velocity and yaw rate
+状态矩阵：                          二维 x-y 位置、航向角、速度与航向角速度
+量测矩阵：                          二维 x-y 位置、速度与航向角速度
 
-dt:                                 Duration of time step
-N:                                  Number of time steps
-show_final:                         Flag for showing final result
-show_animation:                     Flag for showing each animation frame
-show_ellipse:                       Flag for showing covariance ellipse
-z_noise:                            Measurement noise
-x_0:                                Prior state estimate matrix
-P_0:                                Prior state estimate covariance matrix
-q:                                  Process noise covariance
-hx:                                 Measurement model matrix
-r:                                  Sensor noise covariance
-SP:                                 Sigma Points
-W:                                  Weights
+dt:                                 时间步长
+N:                                  时间步数
+show_final:                         是否显示最终结果的标志
+show_animation:                     是否显示每一动画帧的标志
+show_ellipse:                       是否显示协方差椭圆的标志
+z_noise:                            量测噪声
+x_0:                                先验状态估计矩阵
+P_0:                                先验状态估计协方差矩阵
+q:                                  过程噪声协方差
+hx:                                 量测模型矩阵
+r:                                  传感器噪声协方差
+SP:                                 sigma 点
+W:                                  权重
 
-x_est:                              State estimate
-P_est:                              State estimate covariance
-x_true:                             Ground truth value of state
-x_true_cat:                         Concatenate all ground truth states
-x_est_cat:                          Concatenate all state estimates
-z_cat:                              Concatenate all measurements
+x_est:                              状态估计
+P_est:                              状态估计协方差
+x_true:                             状态的真值
+x_true_cat:                         拼接全部真值状态
+x_est_cat:                          拼接全部状态估计
+z_cat:                              拼接全部量测
 
 """
 
@@ -46,17 +46,17 @@ show_animation = 0
 show_ellipse = 0
 
 
-z_noise = np.array([[0.1, 0.0, 0.0, 0.0],               # x position    [m]
-                    [0.0, 0.1, 0.0, 0.0],               # y position    [m]
-                    [0.0, 0.0, 0.1, 0.0],               # velocity      [m/s]
-                    [0.0, 0.0, 0.0, 0.1]])              # yaw rate      [rad/s]
+z_noise = np.array([[0.1, 0.0, 0.0, 0.0],               # x 位置        [m]
+                    [0.0, 0.1, 0.0, 0.0],               # y 位置        [m]
+                    [0.0, 0.0, 0.1, 0.0],               # 速度          [m/s]
+                    [0.0, 0.0, 0.0, 0.1]])              # 航向角速度    [rad/s]
 
 
-x_0 = np.array([[0.0],                                  # x position    [m]
-                [0.0],                                  # y position    [m]
-                [0.0],                                  # yaw           [rad]
-                [1.0],                                  # velocity      [m/s]
-                [0.1]])                                 # yaw rate      [rad/s]
+x_0 = np.array([[0.0],                                  # x 位置        [m]
+                [0.0],                                  # y 位置        [m]
+                [0.0],                                  # 航向角        [rad]
+                [1.0],                                  # 速度          [m/s]
+                [0.1]])                                 # 航向角速度    [rad/s]
 
 
 p_0 = np.array([[1e-3, 0.0, 0.0, 0.0, 0.0],
@@ -93,7 +93,7 @@ def cubature_kalman_filter(x_est, p_est, z):
 
 def f(x):
     """
-    Motion Model
+    运动模型
     References:
     http://fusion.isif.org/proceedings/fusion08CD/papers/1569107835.pdf
     https://github.com/balzer82/Kalman
@@ -107,18 +107,18 @@ def f(x):
 
 
 def h(x):
-    """Measurement Model"""
+    """量测模型"""
     x = hx @ x
     return x
 
 
 def sigma(x, p):
     """
-    Unscented Transform with Cubature Rule
-    Generate 2n Sigma Points to represent the nonlinear motion
-    Assign Weights to each Sigma Point, Wi = 1/2n
-    Cubature Rule - Special Case of Unscented Transform
-    W0 = 0, no extra tuning parameters, no negative weights
+    采用容积规则的无迹变换
+    生成 2n 个 sigma 点以表示非线性运动
+    为每个 sigma 点分配权重，Wi = 1/2n
+    容积规则是无迹变换的特例
+    W0 = 0，没有额外整定参数，也没有负权重
     """
     n = np.shape(x)[0]
     SP = np.zeros((n, 2*n))

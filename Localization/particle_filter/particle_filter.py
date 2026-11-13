@@ -1,8 +1,8 @@
 """
 
-Particle Filter localization sample
+粒子滤波定位示例
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
 
 """
 import sys
@@ -16,21 +16,21 @@ import numpy as np
 
 from utils.angle import rot_mat_2d
 
-# Estimation parameter of PF
-Q = np.diag([0.2]) ** 2  # range error
-R = np.diag([2.0, np.deg2rad(40.0)]) ** 2  # input error
+# 粒子滤波（PF）的估计参数
+Q = np.diag([0.2]) ** 2  # 距离误差
+R = np.diag([2.0, np.deg2rad(40.0)]) ** 2  # 输入误差
 
-#  Simulation parameter
+#  仿真参数
 Q_sim = np.diag([0.2]) ** 2
 R_sim = np.diag([1.0, np.deg2rad(30.0)]) ** 2
 
-DT = 0.1  # time tick [s]
-SIM_TIME = 50.0  # simulation time [s]
-MAX_RANGE = 20.0  # maximum observation range
+DT = 0.1  # 时间步长 [s]
+SIM_TIME = 50.0  # 仿真时间 [s]
+MAX_RANGE = 20.0  # 最大观测距离
 
-# Particle filter parameter
-NP = 100  # Number of Particle
-NTh = NP / 2.0  # Number of particle for re-sampling
+# 粒子滤波参数
+NP = 100  # 粒子数量
+NTh = NP / 2.0  # 重采样的粒子数量阈值
 
 show_animation = True
 
@@ -45,7 +45,7 @@ def calc_input():
 def observation(x_true, xd, u, rf_id):
     x_true = motion_model(x_true, u)
 
-    # add noise to gps x-y
+    # 为 GPS 的 x-y 添加噪声
     z = np.zeros((0, 3))
 
     for i in range(len(rf_id[:, 0])):
@@ -54,11 +54,11 @@ def observation(x_true, xd, u, rf_id):
         dy = x_true[1, 0] - rf_id[i, 1]
         d = math.hypot(dx, dy)
         if d <= MAX_RANGE:
-            dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # add noise
+            dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # 添加噪声
             zi = np.array([[dn, rf_id[i, 0], rf_id[i, 1]]])
             z = np.vstack((z, zi))
 
-    # add noise to input
+    # 为输入添加噪声
     ud1 = u[0, 0] + np.random.randn() * R_sim[0, 0] ** 0.5
     ud2 = u[1, 0] + np.random.randn() * R_sim[1, 1] ** 0.5
     ud = np.array([[ud1, ud2]]).T
@@ -93,8 +93,8 @@ def gauss_likelihood(x, sigma):
 
 def calc_covariance(x_est, px, pw):
     """
-    calculate covariance matrix
-    see ipynb doc
+    计算协方差矩阵
+    参见 ipynb 文档
     """
     cov = np.zeros((4, 4))
     n_particle = px.shape[1]
@@ -108,20 +108,20 @@ def calc_covariance(x_est, px, pw):
 
 def pf_localization(px, pw, z, u):
     """
-    Localization with Particle filter
+    使用粒子滤波进行定位
     """
 
     for ip in range(NP):
         x = np.array([px[:, ip]]).T
         w = pw[0, ip]
 
-        #  Predict with random input sampling
+        #  用随机输入采样进行预测
         ud1 = u[0, 0] + np.random.randn() * R[0, 0] ** 0.5
         ud2 = u[1, 0] + np.random.randn() * R[1, 1] ** 0.5
         ud = np.array([[ud1, ud2]]).T
         x = motion_model(x, ud)
 
-        #  Calc Importance Weight
+        #  计算重要性权重
         for i in range(len(z[:, 0])):
             dx = x[0, 0] - z[i, 1]
             dy = x[1, 0] - z[i, 2]
@@ -132,12 +132,12 @@ def pf_localization(px, pw, z, u):
         px[:, ip] = x[:, 0]
         pw[0, ip] = w
 
-    pw = pw / pw.sum()  # normalize
+    pw = pw / pw.sum()  # 归一化
 
     x_est = px.dot(pw.T)
     p_est = calc_covariance(x_est, px, pw)
 
-    N_eff = 1.0 / (pw.dot(pw.T))[0, 0]  # Effective particle number
+    N_eff = 1.0 / (pw.dot(pw.T))[0, 0]  # 有效粒子数
     if N_eff < NTh:
         px, pw = re_sampling(px, pw)
     return x_est, p_est, px, pw
@@ -145,7 +145,7 @@ def pf_localization(px, pw, z, u):
 
 def re_sampling(px, pw):
     """
-    low variance re-sampling
+    低方差重采样
     """
 
     w_cum = np.cumsum(pw)
@@ -159,7 +159,7 @@ def re_sampling(px, pw):
         indexes.append(ind)
 
     px = px[:, indexes]
-    pw = np.zeros((1, NP)) + 1.0 / NP  # init weight
+    pw = np.zeros((1, NP)) + 1.0 / NP  # 初始化权重
 
     return px, pw
 
@@ -177,9 +177,8 @@ def plot_covariance_ellipse(x_est, p_est):  # pragma: no cover
 
     t = np.arange(0, 2 * math.pi + 0.1, 0.1)
 
-    # eig_val[big_ind] or eiq_val[small_ind] were occasionally negative
-    # numbers extremely close to 0 (~10^-20), catch these cases and set the
-    # respective variable to 0
+    # eig_val[big_ind] 或 eiq_val[small_ind] 偶尔为极其接近 0
+    # （约 10^-20）的负数，捕获这些情况并将相应变量置为 0
     try:
         a = math.sqrt(eig_val[big_ind])
     except ValueError:
@@ -204,21 +203,21 @@ def main():
 
     time = 0.0
 
-    # RF_ID positions [x, y]
+    # RFID 位置 [x, y]
     rf_id = np.array([[10.0, 0.0],
                       [10.0, 10.0],
                       [0.0, 15.0],
                       [-5.0, 20.0]])
 
-    # State Vector [x y yaw v]'
+    # 状态向量 [x y yaw v]'
     x_est = np.zeros((4, 1))
     x_true = np.zeros((4, 1))
 
-    px = np.zeros((4, NP))  # Particle store
-    pw = np.zeros((1, NP)) + 1.0 / NP  # Particle weight
-    x_dr = np.zeros((4, 1))  # Dead reckoning
+    px = np.zeros((4, NP))  # 粒子存储
+    pw = np.zeros((1, NP)) + 1.0 / NP  # 粒子权重
+    x_dr = np.zeros((4, 1))  # 航位推算
 
-    # history
+    # 历史记录
     h_x_est = x_est
     h_x_true = x_true
     h_x_dr = x_true
@@ -231,14 +230,14 @@ def main():
 
         x_est, PEst, px, pw = pf_localization(px, pw, z, ud)
 
-        # store data history
+        # 存储数据历史
         h_x_est = np.hstack((h_x_est, x_est))
         h_x_dr = np.hstack((h_x_dr, x_dr))
         h_x_true = np.hstack((h_x_true, x_true))
 
         if show_animation:
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])

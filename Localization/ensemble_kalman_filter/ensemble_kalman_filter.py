@@ -1,11 +1,11 @@
 """
 
-Ensemble Kalman Filter(EnKF) localization sample
+集合卡尔曼滤波（EnKF）定位示例
 
-author: Ryohei Sasaki(rsasaki0109)
+作者：Ryohei Sasaki(rsasaki0109)
 
 Reference:
-Ensemble Kalman filtering
+集合卡尔曼滤波
 (https://rmets.onlinelibrary.wiley.com/doi/10.1256/qj.05.135)
 
 """
@@ -20,16 +20,16 @@ from utils.angle import angle_mod
 
 from utils.angle import rot_mat_2d
 
-#  Simulation parameter
+#  仿真参数
 Q_sim = np.diag([0.2, np.deg2rad(1.0)]) ** 2
 R_sim = np.diag([1.0, np.deg2rad(30.0)]) ** 2
 
-DT = 0.1  # time tick [s]
-SIM_TIME = 50.0  # simulation time [s]
-MAX_RANGE = 20.0  # maximum observation range
+DT = 0.1  # 时间步长 [s]
+SIM_TIME = 50.0  # 仿真时间 [s]
+MAX_RANGE = 20.0  # 最大观测距离
 
-# Ensemble Kalman filter parameter
-NP = 20  # Number of Particle
+# 集合卡尔曼滤波参数
+NP = 20  # 粒子数量
 
 show_animation = True
 
@@ -53,12 +53,12 @@ def observation(xTrue, xd, u, RFID):
         d = math.hypot(dx, dy)
         angle = pi_2_pi(math.atan2(dy, dx) - xTrue[2, 0])
         if d <= MAX_RANGE:
-            dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # add noise
+            dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # 添加噪声
             angle_with_noise = angle + np.random.randn() * Q_sim[1, 1] ** 0.5
             zi = np.array([dn, angle_with_noise, RFID[i, 0], RFID[i, 1]])
             z = np.vstack((z, zi))
 
-    # add noise to input
+    # 为输入添加噪声
     ud = np.array([[
         u[0, 0] + np.random.randn() * R_sim[0, 0] ** 0.5,
         u[1, 0] + np.random.randn() * R_sim[1, 1] ** 0.5]]).T
@@ -107,13 +107,13 @@ def calc_covariance(xEst, px):
 
 def enkf_localization(px, z, u):
     """
-    Localization with Ensemble Kalman filter
+    使用集合卡尔曼滤波进行定位
     """
-    pz = np.zeros((z.shape[0] * 2, NP))  # Particle store of z
+    pz = np.zeros((z.shape[0] * 2, NP))  # z 的粒子存储
     for ip in range(NP):
         x = np.array([px[:, ip]]).T
 
-        #  Predict with random input sampling
+        #  用随机输入采样进行预测
         ud1 = u[0, 0] + np.random.randn() * R_sim[0, 0] ** 0.5
         ud2 = u[1, 0] + np.random.randn() * R_sim[1, 1] ** 0.5
         ud = np.array([[ud1, ud2]]).T
@@ -131,7 +131,7 @@ def enkf_localization(px, z, u):
     U = 1 / (NP - 1) * x_dif @ z_dif.T
     V = 1 / (NP - 1) * z_dif @ z_dif.T
 
-    K = U @ np.linalg.inv(V)  # Kalman Gain
+    K = U @ np.linalg.inv(V)  # 卡尔曼增益
 
     z_lm_pos = z[:, [2, 3]].reshape(-1, )
 
@@ -156,9 +156,8 @@ def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
 
     t = np.arange(0, 2 * math.pi + 0.1, 0.1)
 
-    # eig_val[big_ind] or eiq_val[small_ind] were occasionally negative
-    # numbers extremely close to 0 (~10^-20), catch these cases and set
-    # the respective variable to 0
+    # eig_val[big_ind] 或 eiq_val[small_ind] 偶尔为极其接近 0
+    # （约 10^-20）的负数，捕获这些情况并将相应变量置为 0
     try:
         a = math.sqrt(eig_val[big_ind])
     except ValueError:
@@ -188,20 +187,20 @@ def main():
 
     time = 0.0
 
-    # RF_ID positions [x, y]
+    # RFID 位置 [x, y]
     RF_ID = np.array([[10.0, 0.0],
                       [10.0, 10.0],
                       [0.0, 15.0],
                       [-5.0, 20.0]])
 
-    # State Vector [x y yaw v]'
+    # 状态向量 [x y yaw v]'
     xEst = np.zeros((4, 1))
     xTrue = np.zeros((4, 1))
-    px = np.zeros((4, NP))  # Particle store of x
+    px = np.zeros((4, NP))  # x 的粒子存储
 
-    xDR = np.zeros((4, 1))  # Dead reckoning
+    xDR = np.zeros((4, 1))  # 航位推算
 
-    # history
+    # 历史记录
     hxEst = xEst
     hxTrue = xTrue
     hxDR = xTrue
@@ -214,14 +213,14 @@ def main():
 
         xEst, PEst, px = enkf_localization(px, z, ud)
 
-        # store data history
+        # 存储数据历史
         hxEst = np.hstack((hxEst, xEst))
         hxDR = np.hstack((hxDR, xDR))
         hxTrue = np.hstack((hxTrue, xTrue))
 
         if show_animation:
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
