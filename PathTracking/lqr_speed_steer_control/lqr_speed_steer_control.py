@@ -1,8 +1,8 @@
 """
 
-Path tracking simulation with LQR speed and steering control
+使用线性二次调节器（LQR）速率与转向控制的路径跟踪仿真
 
-author Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
 
 """
 import math
@@ -16,14 +16,14 @@ sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 from utils.angle import angle_mod
 from PathPlanning.CubicSpline import cubic_spline_planner
 
-# === Parameters =====
+# === 参数 =====
 
-# LQR parameter
+# 线性二次调节器（LQR）参数
 lqr_Q = np.eye(5)
 lqr_R = np.eye(2)
-dt = 0.1  # time tick[s]
-L = 0.5  # Wheel base of the vehicle [m]
-max_steer = np.deg2rad(45.0)  # maximum steering angle[rad]
+dt = 0.1  # 时间步长 [s]
+L = 0.5  # 车辆轴距 [m]
+max_steer = np.deg2rad(45.0)  # 最大转向角 [rad]
 
 show_animation = True
 
@@ -58,7 +58,7 @@ def pi_2_pi(angle):
 
 def solve_dare(A, B, Q, R):
     """
-    solve a discrete time_Algebraic Riccati equation (DARE)
+    求解离散时间代数 Riccati 方程（DARE）
     """
     x = Q
     x_next = Q
@@ -76,16 +76,16 @@ def solve_dare(A, B, Q, R):
 
 
 def dlqr(A, B, Q, R):
-    """Solve the discrete time lqr controller.
+    """求解离散时间线性二次调节器（LQR）控制器。
     x[k+1] = A x[k] + B u[k]
     cost = sum x[k].T*Q*x[k] + u[k].T*R*u[k]
-    # ref Bertsekas, p.151
+    # 参考文献 Bertsekas, p.151
     """
 
-    # first, try to solve the ricatti equation
+    # 首先尝试求解 Riccati 方程
     X = solve_dare(A, B, Q, R)
 
-    # compute the LQR gain
+    # 计算线性二次调节器（LQR）增益
     K = la.inv(B.T @ X @ B + R) @ (B.T @ X @ A)
 
     eig_result = la.eig(A - B @ K)
@@ -126,13 +126,13 @@ def lqr_speed_steering_control(state, cx, cy, cyaw, ck, pe, pth_e, sp, Q, R):
 
     K, _, _ = dlqr(A, B, Q, R)
 
-    # state vector
+    # 状态向量
     # x = [e, dot_e, th_e, dot_th_e, delta_v]
-    # e: lateral distance to the path
-    # dot_e: derivative of e
-    # th_e: angle difference to the path
-    # dot_th_e: derivative of th_e
-    # delta_v: difference between current speed and target speed
+    # e: 到路径的横向距离
+    # dot_e: e 的导数
+    # th_e: 相对路径的角度差
+    # dot_th_e: th_e 的导数
+    # delta_v: 当前速率与目标速率之差
     x = np.zeros((5, 1))
     x[0, 0] = e
     x[1, 0] = (e - pe) / dt
@@ -140,18 +140,18 @@ def lqr_speed_steering_control(state, cx, cy, cyaw, ck, pe, pth_e, sp, Q, R):
     x[3, 0] = (th_e - pth_e) / dt
     x[4, 0] = v - tv
 
-    # input vector
+    # 控制输入向量
     # u = [delta, accel]
-    # delta: steering angle
-    # accel: acceleration
+    # delta: 转向角
+    # accel: 加速度
     ustar = -K @ x
 
-    # calc steering input
-    ff = math.atan2(L * k, 1)  # feedforward steering angle
-    fb = pi_2_pi(ustar[0, 0])  # feedback steering angle
+    # 计算转向输入
+    ff = math.atan2(L * k, 1)  # 前馈转向角
+    fb = pi_2_pi(ustar[0, 0])  # 反馈转向角
     delta = ff + fb
 
-    # calc accel input
+    # 计算加速度输入
     accel = ustar[1, 0]
 
     return delta, ind, e, th_e, accel
@@ -180,7 +180,7 @@ def calc_nearest_index(state, cx, cy, cyaw):
 
 
 def do_simulation(cx, cy, cyaw, ck, speed_profile, goal):
-    T = 500.0  # max simulation time
+    T = 500.0  # 最大仿真时间
     goal_dis = 0.3
     stop_speed = 0.05
 
@@ -206,7 +206,7 @@ def do_simulation(cx, cy, cyaw, ck, speed_profile, goal):
 
         time = time + dt
 
-        # check goal
+        # 检查是否到达目标
         dx = state.x - goal[0]
         dy = state.y - goal[1]
         if math.hypot(dx, dy) <= goal_dis:
@@ -221,7 +221,7 @@ def do_simulation(cx, cy, cyaw, ck, speed_profile, goal):
 
         if target_ind % 1 == 0 and show_animation:
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
@@ -242,7 +242,7 @@ def calc_speed_profile(cyaw, target_speed):
 
     direction = 1.0
 
-    # Set stop point
+    # 设置停车点
     for i in range(len(cyaw) - 1):
         dyaw = abs(cyaw[i + 1] - cyaw[i])
         switch = math.pi / 4.0 <= dyaw < math.pi / 2.0
@@ -258,7 +258,7 @@ def calc_speed_profile(cyaw, target_speed):
         if switch:
             speed_profile[i] = 0.0
 
-    # speed down
+    # 减速
     for i in range(40):
         speed_profile[-i] = target_speed / (50 - i)
         if speed_profile[-i] <= 1.0 / 3.6:
@@ -275,7 +275,7 @@ def main():
 
     cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
         ax, ay, ds=0.1)
-    target_speed = 10.0 / 3.6  # simulation parameter km/h -> m/s
+    target_speed = 10.0 / 3.6  # 仿真参数 km/h -> m/s
 
     sp = calc_speed_profile(cyaw, target_speed)
 

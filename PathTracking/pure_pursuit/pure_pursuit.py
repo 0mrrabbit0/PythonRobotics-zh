@@ -1,8 +1,8 @@
 """
 
-Path tracking simulation with pure pursuit steering and PID speed control.
+使用纯追踪转向与 PID 速率控制的路径跟踪仿真。
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
         Guillaume Jacquenot (@Gjacquenot)
 
 """
@@ -15,25 +15,25 @@ import pathlib
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 from utils.angle import angle_mod
 
-# Parameters
-k = 0.1  # look forward gain
-Lfc = 2.0  # [m] look-ahead distance
-Kp = 1.0  # speed proportional gain
-dt = 0.1  # [s] time tick
-WB = 2.9  # [m] wheel base of vehicle
+# 参数
+k = 0.1  # 前视增益
+Lfc = 2.0  # [m] 前视距离
+Kp = 1.0  # 速率比例增益
+dt = 0.1  # [s] 时间步长
+WB = 2.9  # [m] 车辆轴距
 
 
-# Vehicle parameters
-LENGTH = WB + 1.0  # Vehicle length
-WIDTH = 2.0  # Vehicle width
-WHEEL_LEN = 0.6  # Wheel length
-WHEEL_WIDTH = 0.2  # Wheel width
-MAX_STEER = math.pi / 4  # Maximum steering angle [rad]
+# 车辆参数
+LENGTH = WB + 1.0  # 车辆长度
+WIDTH = 2.0  # 车辆宽度
+WHEEL_LEN = 0.6  # 车轮长度
+WHEEL_WIDTH = 0.2  # 车轮宽度
+MAX_STEER = math.pi / 4  # 最大转向角 [rad]
 
 
 show_animation = True
-pause_simulation = False  # Flag for pause simulation
-is_reverse_mode = False   # Flag for reverse driving mode
+pause_simulation = False  # 暂停仿真标志
+is_reverse_mode = False   # 倒车模式标志
 
 class State:
     def __init__(self, x=0.0, y=0.0, yaw=0.0, v=0.0, is_reverse=False):
@@ -41,7 +41,7 @@ class State:
         self.y = y
         self.yaw = yaw
         self.v = v
-        self.direction = -1 if is_reverse else 1  # Direction based on reverse flag
+        self.direction = -1 if is_reverse else 1  # 由倒车标志决定的方向
         self.rear_x = self.x - self.direction * ((WB / 2) * math.cos(self.yaw))
         self.rear_y = self.y - self.direction * ((WB / 2) * math.sin(self.yaw))
 
@@ -94,9 +94,9 @@ class TargetCourse:
 
     def search_target_index(self, state):
 
-        # To speed up nearest point search, doing it at only first time.
+        # 为加快最近点搜索，仅在首次执行。
         if self.old_nearest_point_index is None:
-            # search nearest point index
+            # 搜索最近点索引
             dx = [state.rear_x - icx for icx in self.cx]
             dy = [state.rear_y - icy for icy in self.cy]
             d = np.hypot(dx, dy)
@@ -115,12 +115,12 @@ class TargetCourse:
                 distance_this_index = distance_next_index
             self.old_nearest_point_index = ind
 
-        Lf = k * state.v + Lfc  # update look ahead distance
+        Lf = k * state.v + Lfc  # 更新前视距离
 
-        # search look ahead target point index
+        # 搜索前视目标点索引
         while Lf > state.calc_distance(self.cx[ind], self.cy[ind]):
             if (ind + 1) >= len(self.cx):
-                break  # not exceed goal
+                break  # 不超过目标点
             ind += 1
 
         return ind, Lf
@@ -142,10 +142,10 @@ def pure_pursuit_steer_control(state, trajectory, pind):
 
     alpha = math.atan2(ty - state.rear_y, tx - state.rear_x) - state.yaw
 
-    # Reverse steering angle when reversing
+    # 倒车时反转转向角
     delta = state.direction * math.atan2(2.0 * WB * math.sin(alpha) / Lf, 1.0)
 
-    # Limit steering angle to max value
+    # 将转向角限制在最大值以内
     delta = np.clip(delta, -MAX_STEER, MAX_STEER)
 
     return delta, ind
@@ -153,7 +153,7 @@ def pure_pursuit_steer_control(state, trajectory, pind):
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
     """
-    Plot arrow
+    绘制箭头
     """
 
     if not isinstance(x, float):
@@ -166,21 +166,21 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
 
 def plot_vehicle(x, y, yaw, steer=0.0, color='blue', is_reverse=False):
     """
-    Plot vehicle model with four wheels
+    绘制带四个车轮的车辆模型
     Args:
-        x, y: Vehicle center position
-        yaw: Vehicle heading angle
-        steer: Steering angle
-        color: Vehicle color
-        is_reverse: Flag for reverse mode
+        x, y: 车辆中心位置
+        yaw: 车辆航向角
+        steer: 转向角
+        color: 车辆颜色
+        is_reverse: 倒车模式标志
     """
-    # Adjust heading angle in reverse mode
+    # 在倒车模式下调整航向角
     if is_reverse:
-        yaw = angle_mod(yaw + math.pi)  # Rotate heading by 180 degrees
-        steer = -steer  # Reverse steering direction
+        yaw = angle_mod(yaw + math.pi)  # 将航向旋转 180 度
+        steer = -steer  # 反转转向方向
 
     def plot_wheel(x, y, yaw, steer=0.0, color=color):
-        """Plot single wheel"""
+        """绘制单个车轮"""
         wheel = np.array([
             [-WHEEL_LEN/2, WHEEL_WIDTH/2],
             [WHEEL_LEN/2, WHEEL_WIDTH/2],
@@ -189,25 +189,25 @@ def plot_vehicle(x, y, yaw, steer=0.0, color='blue', is_reverse=False):
             [-WHEEL_LEN/2, WHEEL_WIDTH/2]
         ])
 
-        # Rotate wheel if steering
+        # 若存在转向则旋转车轮
         if steer != 0:
             c, s = np.cos(steer), np.sin(steer)
             rot_steer = np.array([[c, -s], [s, c]])
             wheel = wheel @ rot_steer.T
 
-        # Apply vehicle heading rotation
+        # 施加车辆航向旋转
         c, s = np.cos(yaw), np.sin(yaw)
         rot_yaw = np.array([[c, -s], [s, c]])
         wheel = wheel @ rot_yaw.T
 
-        # Translate to position
+        # 平移到指定位置
         wheel[:, 0] += x
         wheel[:, 1] += y
 
-        # Plot wheel with color
+        # 用指定颜色绘制车轮
         plt.plot(wheel[:, 0], wheel[:, 1], color=color)
 
-    # Calculate vehicle body corners
+    # 计算车身角点
     corners = np.array([
         [-LENGTH/2, WIDTH/2],
         [LENGTH/2, WIDTH/2],
@@ -216,41 +216,41 @@ def plot_vehicle(x, y, yaw, steer=0.0, color='blue', is_reverse=False):
         [-LENGTH/2, WIDTH/2]
     ])
 
-    # Rotation matrix
+    # 旋转矩阵
     c, s = np.cos(yaw), np.sin(yaw)
     Rot = np.array([[c, -s], [s, c]])
 
-    # Rotate and translate vehicle body
+    # 旋转并平移车身
     rotated = corners @ Rot.T
     rotated[:, 0] += x
     rotated[:, 1] += y
 
-    # Plot vehicle body
+    # 绘制车身
     plt.plot(rotated[:, 0], rotated[:, 1], color=color)
 
-    # Plot wheels (darker color for front wheels)
+    # 绘制车轮（前轮使用更深的颜色）
     front_color = 'darkblue'
     rear_color = color
     
-    # Plot four wheels
-    # Front left
+    # 绘制四个车轮
+    # 左前轮
     plot_wheel(x + LENGTH/4 * c - WIDTH/2 * s,
               y + LENGTH/4 * s + WIDTH/2 * c,
               yaw, steer, front_color)
-    # Front right  
+    # 右前轮 
     plot_wheel(x + LENGTH/4 * c + WIDTH/2 * s,
               y + LENGTH/4 * s - WIDTH/2 * c,
               yaw, steer, front_color)
-    # Rear left
+    # 左后轮
     plot_wheel(x - LENGTH/4 * c - WIDTH/2 * s,
               y - LENGTH/4 * s + WIDTH/2 * c,
               yaw, color=rear_color)
-    # Rear right
+    # 右后轮
     plot_wheel(x - LENGTH/4 * c + WIDTH/2 * s,
               y - LENGTH/4 * s - WIDTH/2 * c,
               yaw, color=rear_color)
 
-    # Add direction arrow
+    # 添加方向箭头
     arrow_length = LENGTH/3
     plt.arrow(x, y,
              -arrow_length * math.cos(yaw) if is_reverse else arrow_length * math.cos(yaw),
@@ -258,24 +258,24 @@ def plot_vehicle(x, y, yaw, steer=0.0, color='blue', is_reverse=False):
              head_width=WIDTH/4, head_length=WIDTH/4,
              fc='r', ec='r', alpha=0.5)
 
-# Keyboard event handler
+# 键盘事件处理函数
 def on_key(event):
     global pause_simulation
-    if event.key == ' ':  # Space key
+    if event.key == ' ':  # 空格键
         pause_simulation = not pause_simulation
     elif event.key == 'escape':
         exit(0)
 
 def main():
-    #  target course
+    #  目标路径
     cx = -1 * np.arange(0, 50, 0.5) if is_reverse_mode else np.arange(0, 50, 0.5)
     cy = [math.sin(ix / 5.0) * ix / 2.0 for ix in cx]
 
     target_speed = 10.0 / 3.6  # [m/s]
 
-    T = 100.0  # max simulation time
+    T = 100.0  # 最大仿真时间
 
-    # initial state
+    # 初始状态
     state = State(x=-0.0, y=-3.0, yaw=math.pi if is_reverse_mode else 0.0, v=0.0, is_reverse=is_reverse_mode)
 
     lastIndex = len(cx) - 1
@@ -287,20 +287,20 @@ def main():
 
     while T >= time and lastIndex > target_ind:
 
-        # Calc control input
+        # 计算控制输入
         ai = proportional_control(target_speed, state.v)
         di, target_ind = pure_pursuit_steer_control(
             state, target_course, target_ind)
 
-        state.update(ai, di)  # Control vehicle
+        state.update(ai, di)  # 控制车辆
 
         time += dt
         states.append(time, state)
         if show_animation:  # pragma: no cover
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect('key_release_event', on_key)
-            # Pass is_reverse parameter
+            # 传入 is_reverse 参数
             plot_vehicle(state.x, state.y, state.yaw, di, is_reverse=is_reverse_mode)
             plt.plot(cx, cy, "-r", label="course")
             plt.plot(states.x, states.y, "-b", label="trajectory")
@@ -308,22 +308,22 @@ def main():
             plt.axis("equal")
             plt.grid(True)
             plt.title("Speed[km/h]:" + str(state.v * 3.6)[:4])
-            plt.legend()  # Add legend display
+            plt.legend()  # 添加图例显示
 
-            # Add pause state display
+            # 添加暂停状态显示
             if pause_simulation:
                 plt.text(0.02, 0.95, 'PAUSED', transform=plt.gca().transAxes,
                         bbox=dict(facecolor='red', alpha=0.5))
 
             plt.pause(0.001)
 
-            # Handle pause state
+            # 处理暂停状态
             while pause_simulation:
-                plt.pause(0.1)  # Reduce CPU usage
-                if not plt.get_fignums():  # Check if window is closed
+                plt.pause(0.1)  # 降低 CPU 占用
+                if not plt.get_fignums():  # 检查窗口是否已关闭
                     exit(0)
 
-    # Test
+    # 测试
     assert lastIndex >= target_ind, "Cannot goal"
 
     if show_animation:  # pragma: no cover

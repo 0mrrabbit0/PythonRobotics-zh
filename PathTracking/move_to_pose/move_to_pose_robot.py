@@ -1,12 +1,12 @@
 """
 
-Move to specified pose (with Robot class)
+移动到指定位姿（使用 Robot 类）
 
-Author: Daniel Ingram (daniel-s-ingram)
+作者：Daniel Ingram (daniel-s-ingram)
         Atsushi Sakai (@Atsushi_twi)
         Seied Muhammad Yazdian (@Muhammad-Yazdian)
 
-P.I. Corke, "Robotics, Vision & Control", Springer 2017, ISBN 978-3-319-54413-7
+P.I. Corke, 《机器人学、视觉与控制》, Springer 2017, ISBN 978-3-319-54413-7
 
 """
 
@@ -15,7 +15,7 @@ import numpy as np
 import copy
 from move_to_pose import PathFinderController
 
-# Simulation parameters
+# 仿真参数
 TIME_DURATION = 1000
 TIME_STEP = 0.01
 AT_TARGET_ACCEPTANCE_THRESHOLD = 0.01
@@ -29,7 +29,7 @@ all_robots_are_at_target = False
 
 
 class Pose:
-    """2D pose"""
+    """二维位姿"""
 
     def __init__(self, x, y, theta):
         self.x = x
@@ -39,23 +39,20 @@ class Pose:
 
 class Robot:
     """
-    Constructs an instantiate of the 3-DOF wheeled Robot navigating on a
-    2D plane
+    构造在二维平面上导航的三自由度轮式 Robot 的一个实例
 
     Parameters
     ----------
-    name : (string)
-        The name of the robot
-    color : (string)
-        The color of the robot
+    name : (字符串)
+        机器人名称
+    color : (字符串)
+        机器人颜色
     max_linear_speed : (float)
-        The maximum linear speed that the robot can go
+        机器人能够达到的最大线速率
     max_angular_speed : (float)
-        The maximum angular speed that the robot can rotate about its vertical
-        axis
+        机器人绕其竖直轴旋转的最大角速率
     path_finder_controller : (PathFinderController)
-        A configurable controller to finds the path and calculates command
-        linear and angular velocities.
+        可配置的控制器，用于寻找路径并计算指令线速度与角速度。
     """
 
     def __init__(self, name, color, max_linear_speed, max_angular_speed,
@@ -74,14 +71,14 @@ class Robot:
 
     def set_start_target_poses(self, pose_start, pose_target):
         """
-        Sets the start and target positions of the robot
+        设置机器人的起始位姿与目标位姿
 
         Parameters
         ----------
         pose_start : (Pose)
-            Start position of the robot (see the Pose class)
+            机器人的起始位姿（参见 Pose 类）
         pose_target : (Pose)
-            Target position of the robot (see the Pose class)
+            机器人的目标位姿（参见 Pose 类）
         """
         self.pose_start = copy.copy(pose_start)
         self.pose_target = pose_target
@@ -89,12 +86,12 @@ class Robot:
 
     def move(self, dt):
         """
-        Moves the robot for one time step increment
+        将机器人推进一个时间步
 
         Parameters
         ----------
         dt : (float)
-            time step
+            时间步长
         """
         self.x_traj.append(self.pose.x)
         self.y_traj.append(self.pose.y)
@@ -124,7 +121,7 @@ class Robot:
 
 
 def run_simulation(robots):
-    """Simulates all robots simultaneously"""
+    """同时仿真所有机器人"""
     global all_robots_are_at_target
     global simulation_running
 
@@ -150,7 +147,7 @@ def run_simulation(robots):
             plt.xlim(0, PLOT_WINDOW_SIZE_X)
             plt.ylim(0, PLOT_WINDOW_SIZE_Y)
 
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
@@ -187,7 +184,7 @@ def run_simulation(robots):
 
 
 def plot_vehicle(x, y, theta, x_traj, y_traj, color):
-    # Corners of triangular vehicle when pointing to the right (0 radians)
+    # 三角车辆朝右（0 弧度）时的顶点
     p1_i = np.array([0.5, 0, 1]).T
     p2_i = np.array([-0.5, 0.25, 1]).T
     p3_i = np.array([-0.5, -0.25, 1]).T

@@ -1,13 +1,13 @@
 """
 
-Move to specified pose
+移动到指定位姿
 
-Author: Daniel Ingram (daniel-s-ingram)
+作者：Daniel Ingram (daniel-s-ingram)
         Atsushi Sakai (@Atsushi_twi)
         Seied Muhammad Yazdian (@Muhammad-Yazdian)
         Wang Zheng (@Aglargil)
 
-P. I. Corke, "Robotics, Vision & Control", Springer 2017, ISBN 978-3-319-54413-7
+P. I. Corke, 《机器人学、视觉与控制》, Springer 2017, ISBN 978-3-319-54413-7
 
 """
 
@@ -23,17 +23,15 @@ from random import random
 
 class PathFinderController:
     """
-    Constructs an instantiate of the PathFinderController for navigating a
-    3-DOF wheeled robot on a 2D plane
+    构造 PathFinderController 的一个实例，用于在二维平面上引导
+    三自由度轮式机器人
 
     Parameters
     ----------
-    Kp_rho : The linear velocity gain to translate the robot along a line
-             towards the goal
-    Kp_alpha : The angular velocity gain to rotate the robot towards the goal
-    Kp_beta : The offset angular velocity gain accounting for smooth merging to
-              the goal angle (i.e., it helps the robot heading to be parallel
-              to the target angle.)
+    Kp_rho : 沿指向目标的直线平移机器人的线速度增益
+    Kp_alpha : 使机器人转向目标的角速度增益
+    Kp_beta : 用于平滑并入目标角度的偏置角速度增益
+              （即帮助机器人航向与目标角度平行）
     """
 
     def __init__(self, Kp_rho, Kp_alpha, Kp_beta):
@@ -43,47 +41,40 @@ class PathFinderController:
 
     def calc_control_command(self, x_diff, y_diff, theta, theta_goal):
         """
-        Returns the control command for the linear and angular velocities as
-        well as the distance to goal
+        返回线速度与角速度的控制指令，以及到目标的距离
 
         Parameters
         ----------
-        x_diff : The position of target with respect to current robot position
-                 in x direction
-        y_diff : The position of target with respect to current robot position
-                 in y direction
-        theta : The current heading angle of robot with respect to x axis
-        theta_goal: The target angle of robot with respect to x axis
+        x_diff : 目标相对当前机器人位置在 x 方向上的位置
+        y_diff : 目标相对当前机器人位置在 y 方向上的位置
+        theta : 机器人相对 x 轴的当前航向角
+        theta_goal: 机器人相对 x 轴的目标角度
 
         Returns
         -------
-        rho : The distance between the robot and the goal position
-        v : Command linear velocity
-        w : Command angular velocity
+        rho : 机器人与目标位置之间的距离
+        v : 指令线速度
+        w : 指令角速度
         """
 
-        # Description of local variables:
-        # - alpha is the angle to the goal relative to the heading of the robot
-        # - beta is the angle between the robot's position and the goal
-        #   position plus the goal angle
-        # - Kp_rho*rho and Kp_alpha*alpha drive the robot along a line towards
-        #   the goal
-        # - Kp_beta*beta rotates the line so that it is parallel to the goal
-        #   angle
+        # 局部变量说明：
+        # - alpha 是目标相对机器人航向的角度
+        # - beta 是机器人位置与目标位置之间的角度再加上目标角度
+        # - Kp_rho*rho 与 Kp_alpha*alpha 驱动机器人沿直线驶向目标
+        # - Kp_beta*beta 旋转该直线，使其与目标角度平行
         #
-        # Note:
-        # we restrict alpha and beta (angle differences) to the range
-        # [-pi, pi] to prevent unstable behavior e.g. difference going
-        # from 0 rad to 2*pi rad with slight turn
+        # 注意：
+        # 将 alpha 与 beta（角度差）限制在 [-pi, pi] 范围内，
+        # 以避免不稳定行为，例如轻微转向时差值从 0 rad 跳到 2*pi rad
 
-        # The velocity v always has a constant sign which depends on the initial value of α.
+        # 速度 v 的符号始终保持不变，该符号取决于 α 的初值。
         rho = np.hypot(x_diff, y_diff)
         v = self.Kp_rho * rho
 
         alpha = angle_mod(np.arctan2(y_diff, x_diff) - theta)
         beta = angle_mod(theta_goal - theta - alpha)
         if alpha > np.pi / 2 or alpha < -np.pi / 2:
-            # recalculate alpha to make alpha in the range of [-pi/2, pi/2]
+            # 重新计算 alpha，使其落在 [-pi/2, pi/2] 范围内
             alpha = angle_mod(np.arctan2(-y_diff, -x_diff) - theta)
             beta = angle_mod(theta_goal - theta - alpha)
             w = self.Kp_alpha * alpha - self.Kp_beta * beta
@@ -94,12 +85,12 @@ class PathFinderController:
         return rho, v, w
 
 
-# simulation parameters
+# 仿真参数
 controller = PathFinderController(9, 15, 3)
 dt = 0.01
-MAX_SIM_TIME = 5  # seconds, robot will stop moving when time exceeds this value
+MAX_SIM_TIME = 5  # 秒，超过该时间后机器人停止运动
 
-# Robot specifications
+# 机器人规格
 MAX_LINEAR_SPEED = 15
 MAX_ANGULAR_SPEED = 7
 
@@ -165,7 +156,7 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
 
 
 def plot_vehicle(x, y, theta, x_traj, y_traj):  # pragma: no cover
-    # Corners of triangular vehicle when pointing to the right (0 radians)
+    # 三角车辆朝右（0 弧度）时的顶点
     p1_i = np.array([0.5, 0, 1]).T
     p2_i = np.array([-0.5, 0.25, 1]).T
     p3_i = np.array([-0.5, -0.25, 1]).T
@@ -181,7 +172,7 @@ def plot_vehicle(x, y, theta, x_traj, y_traj):  # pragma: no cover
 
     plt.plot(x_traj, y_traj, "b--")
 
-    # for stopping simulation with the esc key.
+    # 按 esc 键停止仿真。
     plt.gcf().canvas.mpl_connect(
         "key_release_event", lambda event: [exit(0) if event.key == "escape" else None]
     )

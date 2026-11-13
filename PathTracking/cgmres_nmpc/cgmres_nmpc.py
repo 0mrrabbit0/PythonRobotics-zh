@@ -1,12 +1,12 @@
 """
 
-Nonlinear MPC simulation with CGMRES
+使用 CGMRES 的非线性模型预测控制（MPC）仿真
 
-author Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
 
 Reference:
-Shunichi09/nonlinear_control: Implementing the nonlinear model predictive
-control, sliding mode control https://github.com/Shunichi09/PythonLinearNonlinearControl
+Shunichi09/nonlinear_control：非线性模型预测控制与滑模控制的实现
+https://github.com/Shunichi09/PythonLinearNonlinearControl
 
 """
 
@@ -19,7 +19,7 @@ U_A_MAX = 1.0
 U_OMEGA_MAX = radians(45.0)
 PHI_V = 0.01
 PHI_OMEGA = 0.01
-WB = 0.25  # [m] wheel base
+WB = 0.25  # [m] 轴距
 
 show_animation = True
 
@@ -28,7 +28,7 @@ def differential_model(v, yaw, u_1, u_2):
     dx = cos(yaw) * v
     dy = sin(yaw) * v
     dv = u_1
-    # tangent is not good for nonlinear optimization
+    # 正切函数不适合非线性优化
     d_yaw = v / WB * sin(u_2)
 
     return dx, dy, d_yaw, dv
@@ -54,7 +54,7 @@ class TwoWheeledSystem:
         self.yaw += dt * d_yaw
         self.v += dt * dv
 
-        # save
+        # 保存
         self.history_x.append(self.x)
         self.history_y.append(self.y)
         self.history_yaw.append(self.yaw)
@@ -64,10 +64,10 @@ class TwoWheeledSystem:
 class NMPCSimulatorSystem:
 
     def calc_predict_and_adjoint_state(self, x, y, yaw, v, u_1s, u_2s, N, dt):
-        # by using state equation
+        # 利用状态方程
         x_s, y_s, yaw_s, v_s = self._calc_predict_states(
             x, y, yaw, v, u_1s, u_2s, N, dt)
-        # by using adjoint equation
+        # 利用伴随方程
         lam_1s, lam_2s, lam_3s, lam_4s = self._calc_adjoint_states(
             x_s, y_s, yaw_s, v_s, u_2s, N, dt)
 
@@ -95,7 +95,7 @@ class NMPCSimulatorSystem:
         lam_3s = [yaw_s[-1]]
         lam_4s = [v_s[-1]]
 
-        # backward adjoint state calc
+        # 反向伴随状态计算
         for i in range(N - 1, 0, -1):
             temp_lam_1, temp_lam_2, temp_lam_3, temp_lam_4 = self._adjoint_state_with_oylar(
                 yaw_s[i], v_s[i], lam_1s[0], lam_2s[0], lam_3s[0], lam_4s[0],
@@ -139,65 +139,65 @@ class NMPCControllerCGMRES:
     Attributes
     ------------
     zeta : float
-        gain of optimal answer stability
+        最优解稳定性增益
     ht : float
-        update value of NMPC this should be decided by zeta
+        非线性模型预测控制（NMPC）的更新量，应由 zeta 决定
     tf : float
-        predict time
+        预测时间
     alpha : float
-        gain of predict time
+        预测时间增益
     N : int
-        predict step, discrete value
+        预测步数，离散值
     threshold : float
-        cgmres's threshold value
+        cgmres 的阈值
     input_num : int
-        system input length, this should include dummy u and constraint variables
+        系统输入长度，应包含虚拟输入 u 与约束变量
     max_iteration : int
-        decide by the solved matrix size
-    simulator : NMPCSimulatorSystem class
-    u_1s : list of float
-        estimated optimal system input
-    u_2s : list of float
-        estimated optimal system input
-    dummy_u_1s : list of float
-        estimated dummy input
-    dummy_u_2s : list of float
-        estimated dummy input
-    raw_1s : list of float
-        estimated constraint variable
-    raw_2s : list of float
-        estimated constraint variable
-    history_u_1 : list of float
-        time history of actual system input
-    history_u_2 : list of float
-        time history of actual system input
-    history_dummy_u_1 : list of float
-        time history of actual dummy u_1
-    history_dummy_u_2 : list of float
-        time history of actual dummy u_2
-    history_raw_1 : list of float
-        time history of actual raw_1
-    history_raw_2 : list of float
-        time history of actual raw_2
-    history_f : list of float
-        time history of error of optimal
+        由所求解矩阵的规模决定
+    simulator : NMPCSimulatorSystem 类
+    u_1s : float 列表
+        估计的最优系统输入
+    u_2s : float 列表
+        估计的最优系统输入
+    dummy_u_1s : float 列表
+        估计的虚拟输入
+    dummy_u_2s : float 列表
+        估计的虚拟输入
+    raw_1s : float 列表
+        估计的约束变量
+    raw_2s : float 列表
+        估计的约束变量
+    history_u_1 : float 列表
+        实际系统输入的时间历史
+    history_u_2 : float 列表
+        实际系统输入的时间历史
+    history_dummy_u_1 : float 列表
+        实际虚拟输入 u_1 的时间历史
+    history_dummy_u_2 : float 列表
+        实际虚拟输入 u_2 的时间历史
+    history_raw_1 : float 列表
+        实际 raw_1 的时间历史
+    history_raw_2 : float 列表
+        实际 raw_2 的时间历史
+    history_f : float 列表
+        最优性误差的时间历史
     """
 
     def __init__(self):
-        # parameters
-        self.zeta = 100.  # stability gain
-        self.ht = 0.01  # difference approximation tick
-        self.tf = 3.0  # final time
-        self.alpha = 0.5  # time gain
-        self.N = 10  # division number
+        # 参数
+        self.zeta = 100.  # 稳定性增益
+        self.ht = 0.01  # 差分近似步长
+        self.tf = 3.0  # 终止时间
+        self.alpha = 0.5  # 时间增益
+        self.N = 10  # 分段数
         self.threshold = 0.001
-        self.input_num = 6  # input number of dummy, constraints
+        self.input_num = 6  # 含虚拟输入与约束的输入个数
         self.max_iteration = self.input_num * self.N
 
-        # simulator
+        # 仿真器
         self.simulator = NMPCSimulatorSystem()
 
-        # initial input, initialize as 1.0
+        # 初始输入，初始化为 1.0
         self.u_1s = np.ones(self.N)
         self.u_2s = np.ones(self.N)
         self.dummy_u_1s = np.ones(self.N)
@@ -215,10 +215,10 @@ class NMPCControllerCGMRES:
 
     def calc_input(self, x, y, yaw, v, time):
 
-        # calculating sampling time
+        # 计算采样时间
         dt = self.tf * (1. - np.exp(-self.alpha * time)) / float(self.N)
 
-        # x_dot
+        # 状态导数
         x_1_dot, x_2_dot, x_3_dot, x_4_dot = differential_model(
             v, yaw, self.u_1s[0], self.u_2s[0])
 
@@ -267,7 +267,7 @@ class NMPCControllerCGMRES:
 
         left = ((Fuxt - Fxt) / self.ht)
 
-        # calculating cgmres
+        # 计算 cgmres
         r0 = right - left
         r0_norm = np.linalg.norm(r0)
 
@@ -276,7 +276,7 @@ class NMPCControllerCGMRES:
 
         hs = np.zeros((self.max_iteration + 1, self.max_iteration + 1))
 
-        # in this case the state is 3(u and dummy_u)
+        # 此时状态为 3（u 与 dummy_u）
         e = np.zeros((self.max_iteration + 1, 1))
         e[0] = 1.0
 
@@ -308,7 +308,7 @@ class NMPCControllerCGMRES:
 
             sum_Av = np.zeros(self.max_iteration)
 
-            # Gram–Schmidt orthonormalization
+            # 格拉姆-施密特正交化
             for j in range(i + 1):
                 hs[j, i] = np.dot(Av, vs[:, j])
                 sum_Av = sum_Av + hs[j, i] * vs[:, j]
@@ -339,7 +339,7 @@ class NMPCControllerCGMRES:
 
             ys_pre = ys
 
-        # update input
+        # 更新输入
         self.u_1s += du_1_new * self.ht
         self.u_2s += du_2_new * self.ht
         self.dummy_u_1s += ddummy_u_1_new * self.ht
@@ -356,7 +356,7 @@ class NMPCControllerCGMRES:
 
         print("norm(F) = {0}".format(np.linalg.norm(F)))
 
-        # for save
+        # 用于保存
         self.history_f.append(np.linalg.norm(F))
         self.history_u_1.append(self.u_1s[0])
         self.history_u_2.append(self.u_2s[0])
@@ -389,13 +389,13 @@ class NMPCControllerCGMRES:
 
 def plot_figures(plant_system, controller, iteration_num,
                  dt):  # pragma: no cover
-    # figure
-    # time history
+    # 图形
+    # 时间历史
     fig_p = plt.figure()
     fig_u = plt.figure()
     fig_f = plt.figure()
 
-    # trajectory
+    # 轨迹
     fig_t = plt.figure()
     fig_trajectory = fig_t.add_subplot(111)
     fig_trajectory.set_aspect('equal')
@@ -466,14 +466,14 @@ def plot_figures(plant_system, controller, iteration_num,
     fig_trajectory.set_ylabel("y [m]")
     fig_trajectory.axis("equal")
 
-    # start state
+    # 起始状态
     plot_car(plant_system.history_x[0],
              plant_system.history_y[0],
              plant_system.history_yaw[0],
              controller.history_u_2[0],
              )
 
-    # goal state
+    # 目标状态
     plot_car(0.0, 0.0, 0.0, 0.0)
 
     plt.show()
@@ -481,7 +481,7 @@ def plot_figures(plant_system, controller, iteration_num,
 
 def plot_car(x, y, yaw, steer=0.0, truck_color="-k"):  # pragma: no cover
 
-    # Vehicle parameters
+    # 车辆参数
     LENGTH = 0.4  # [m]
     WIDTH = 0.2  # [m]
     BACK_TO_WHEEL = 0.1  # [m]
@@ -548,7 +548,7 @@ def plot_car(x, y, yaw, steer=0.0, truck_color="-k"):  # pragma: no cover
 
 
 def animation(plant, controller, dt):
-    skip = 2  # skip index for animation
+    skip = 2  # 动画跳帧索引
 
     for t in range(1, len(controller.history_u_1), skip):
         x = plant.history_x[t]
@@ -564,7 +564,7 @@ def animation(plant, controller, dt):
             steer = atan2(controller.history_u_2[t] * WB / v, 1.0)
 
         plt.cla()
-        # for stopping simulation with the esc key.
+        # 按 esc 键停止仿真。
         plt.gcf().canvas.mpl_connect(
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
@@ -581,7 +581,7 @@ def animation(plant, controller, dt):
 
 
 def main():
-    # simulation time
+    # 仿真时间
     dt = 0.1
     iteration_time = 150.0  # [s]
 
@@ -590,21 +590,21 @@ def main():
     init_yaw = radians(45.0)
     init_v = -1.0
 
-    # plant
+    # 被控对象
     plant_system = TwoWheeledSystem(
         init_x, init_y, init_yaw, init_v)
 
-    # controller
+    # 控制器
     controller = NMPCControllerCGMRES()
 
     iteration_num = int(iteration_time / dt)
     for i in range(1, iteration_num):
         time = float(i) * dt
-        # make input
+        # 生成输入
         u_1s, u_2s = controller.calc_input(
             plant_system.x, plant_system.y, plant_system.yaw, plant_system.v,
             time)
-        # update state
+        # 更新状态
         plant_system.update_state(u_1s[0], u_2s[0])
 
     if show_animation:  # pragma: no cover

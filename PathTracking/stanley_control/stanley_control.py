@@ -1,12 +1,12 @@
 """
 
-Path tracking simulation with Stanley steering control and PID speed control.
+使用 Stanley 转向控制与 PID 速率控制的路径跟踪仿真。
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
 
 Reference:
-    - [Stanley: The robot that won the DARPA grand challenge](http://isl.ecst.csuchico.edu/DOCS/darpa2005/DARPA%202005%20Stanley.pdf)
-    - [Autonomous Automobile Path Tracking](https://www.ri.cmu.edu/pub_files/2009/2/Automatic_Steering_Methods_for_Autonomous_Automobile_Path_Tracking.pdf)
+    - [Stanley：赢得 DARPA Grand Challenge 的机器人](http://isl.ecst.csuchico.edu/DOCS/darpa2005/DARPA%202005%20Stanley.pdf)
+    - [自动驾驶汽车路径跟踪](https://www.ri.cmu.edu/pub_files/2009/2/Automatic_Steering_Methods_for_Autonomous_Automobile_Path_Tracking.pdf)
 
 """
 import numpy as np
@@ -18,27 +18,27 @@ sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 from utils.angle import angle_mod
 from PathPlanning.CubicSpline import cubic_spline_planner
 
-k = 0.5  # control gain
-Kp = 1.0  # speed proportional gain
-dt = 0.1  # [s] time difference
-L = 2.9  # [m] Wheel base of vehicle
-max_steer = np.radians(30.0)  # [rad] max steering angle
+k = 0.5  # 控制增益
+Kp = 1.0  # 速率比例增益
+dt = 0.1  # [s] 时间间隔
+L = 2.9  # [m] 车辆轴距
+max_steer = np.radians(30.0)  # [rad] 最大转向角
 
 show_animation = True
 
 
 class State:
     """
-    Class representing the state of a vehicle.
+    表示车辆状态的类。
 
-    :param x: (float) x-coordinate
-    :param y: (float) y-coordinate
-    :param yaw: (float) yaw angle
-    :param v: (float) speed
+    :param x: (float) x 坐标
+    :param y: (float) y 坐标
+    :param yaw: (float) 航向角
+    :param v: (float) 速率
     """
 
     def __init__(self, x=0.0, y=0.0, yaw=0.0, v=0.0):
-        """Instantiate the object."""
+        """实例化该对象。"""
         super().__init__()
         self.x = x
         self.y = y
@@ -47,12 +47,12 @@ class State:
 
     def update(self, acceleration, delta):
         """
-        Update the state of the vehicle.
+        更新车辆状态。
 
-        Stanley Control uses bicycle model.
+        Stanley 控制使用自行车模型。
 
-        :param acceleration: (float) Acceleration
-        :param delta: (float) Steering
+        :param acceleration: (float) 加速度
+        :param delta: (float) 转向
         """
         delta = np.clip(delta, -max_steer, max_steer)
 
@@ -65,7 +65,7 @@ class State:
 
 def pid_control(target, current):
     """
-    Proportional control for the speed.
+    速率的比例控制。
 
     :param target: (float)
     :param current: (float)
@@ -76,9 +76,9 @@ def pid_control(target, current):
 
 def stanley_control(state, cx, cy, cyaw, last_target_idx):
     """
-    Stanley steering control.
+    Stanley 转向控制。
 
-    :param state: (State object)
+    :param state: (State 对象)
     :param cx: ([float])
     :param cy: ([float])
     :param cyaw: ([float])
@@ -90,11 +90,11 @@ def stanley_control(state, cx, cy, cyaw, last_target_idx):
     if last_target_idx >= current_target_idx:
         current_target_idx = last_target_idx
 
-    # theta_e corrects the heading error
+    # theta_e 修正航向误差
     theta_e = normalize_angle(cyaw[current_target_idx] - state.yaw)
-    # theta_d corrects the cross track error
+    # theta_d 修正横向误差
     theta_d = np.arctan2(k * error_front_axle, state.v)
-    # Steering control
+    # 转向控制
     delta = theta_e + theta_d
 
     return delta, current_target_idx
@@ -102,34 +102,34 @@ def stanley_control(state, cx, cy, cyaw, last_target_idx):
 
 def normalize_angle(angle):
     """
-    Normalize an angle to [-pi, pi].
+    将角度归一化到 [-pi, pi]。
 
     :param angle: (float)
-    :return: (float) Angle in radian in [-pi, pi]
+    :return: (float) 以弧度表示、位于 [-pi, pi] 内的角度
     """
     return angle_mod(angle)
 
 
 def calc_target_index(state, cx, cy):
     """
-    Compute index in the trajectory list of the target.
+    计算目标在轨迹列表中的索引。
 
-    :param state: (State object)
+    :param state: (State 对象)
     :param cx: [float]
     :param cy: [float]
     :return: (int, float)
     """
-    # Calc front axle position
+    # 计算前轴位置
     fx = state.x + L * np.cos(state.yaw)
     fy = state.y + L * np.sin(state.yaw)
 
-    # Search nearest point index
+    # 搜索最近点索引
     dx = [fx - icx for icx in cx]
     dy = [fy - icy for icy in cy]
     d = np.hypot(dx, dy)
     target_idx = np.argmin(d)
 
-    # Project RMS error onto front axle vector
+    # 将均方根误差投影到前轴向量上
     front_axle_vec = [-np.cos(state.yaw + np.pi / 2),
                       -np.sin(state.yaw + np.pi / 2)]
     error_front_axle = np.dot([dx[target_idx], dy[target_idx]], front_axle_vec)
@@ -138,8 +138,8 @@ def calc_target_index(state, cx, cy):
 
 
 def main():
-    """Plot an example of Stanley steering control on a cubic spline."""
-    #  target course
+    """绘制三次样条上 Stanley 转向控制的示例。"""
+    #  目标路径
     ax = [0.0, 100.0, 100.0, 50.0, 60.0]
     ay = [0.0, 0.0, -30.0, -20.0, 0.0]
 
@@ -150,7 +150,7 @@ def main():
 
     max_simulation_time = 100.0
 
-    # Initial state
+    # 初始状态
     state = State(x=-0.0, y=5.0, yaw=np.radians(20.0), v=0.0)
 
     last_idx = len(cx) - 1
@@ -177,7 +177,7 @@ def main():
 
         if show_animation:  # pragma: no cover
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(cx, cy, ".r", label="course")
@@ -188,7 +188,7 @@ def main():
             plt.title("Speed[km/h]:" + str(state.v * 3.6)[:4])
             plt.pause(0.001)
 
-    # Test
+    # 测试
     assert last_idx >= target_idx, "Cannot reach goal"
 
     if show_animation:  # pragma: no cover

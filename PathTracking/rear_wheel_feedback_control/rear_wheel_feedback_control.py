@@ -1,8 +1,8 @@
 """
 
-Path tracking simulation with rear wheel feedback steering control and PID speed control.
+使用后轮反馈转向控制与 PID 速率控制的路径跟踪仿真。
 
-author: Atsushi Sakai(@Atsushi_twi)
+作者：Atsushi Sakai(@Atsushi_twi)
 
 """
 import matplotlib.pyplot as plt
@@ -16,8 +16,8 @@ from scipy import optimize
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 from utils.angle import angle_mod
 
-Kp = 1.0  # speed proportional gain
-# steering control parameter
+Kp = 1.0  # 速率比例增益
+# 转向控制参数
 KTH = 1.0
 KE = 0.5
 
@@ -118,7 +118,7 @@ def rear_wheel_feedback_control(state, e, k, yaw_ref):
 
 
 def simulate(path_ref, goal):
-    T = 500.0  # max simulation time
+    T = 500.0  # 最大仿真时间
     goal_dis = 0.3
 
     state = State(x=-0.0, y=-0.0, yaw=0.0, v=0.0)
@@ -144,7 +144,7 @@ def simulate(path_ref, goal):
 
         time = time + dt
 
-        # check goal
+        # 检查是否到达目标
         dx = state.x - goal[0]
         dy = state.y - goal[1]
         if math.hypot(dx, dy) <= goal_dis:
@@ -160,7 +160,7 @@ def simulate(path_ref, goal):
 
         if show_animation:
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(path_ref.X(s), path_ref.Y(s), "-r", label="course")
@@ -199,7 +199,7 @@ def main():
 
     t, x, y, yaw, v, goal_flag = simulate(reference_path, goal)
 
-    # Test
+    # 测试
     assert goal_flag, "Cannot goal"
 
     if show_animation:  # pragma: no cover
