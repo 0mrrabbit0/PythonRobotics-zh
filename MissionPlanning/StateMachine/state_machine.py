@@ -1,9 +1,9 @@
 """
-State Machine
+状态机
 
-author: Wang Zheng (@Aglargil)
+作者: Wang Zheng (@Aglargil)
 
-Reference:
+参考文献:
 
 - [State Machine]
 (https://en.wikipedia.org/wiki/Finite-state_machine)
@@ -21,9 +21,9 @@ from matplotlib import pyplot as plt
 
 def deflate_and_encode(plantuml_text):
     """
-    zlib compress the plantuml text and encode it for the plantuml server.
+    用 zlib 压缩 plantuml 文本，并编码后供 plantuml 服务器使用。
 
-    Reference https://plantuml.com/en/text-encoding
+    参考文献 https://plantuml.com/en/text-encoding
     """
     plantuml_alphabet = (
         string.digits + string.ascii_uppercase + string.ascii_lowercase + "-_"
@@ -58,14 +58,13 @@ class State:
 
 class StateMachine:
     def __init__(self, name: str, model=object):
-        """Initialize the state machine.
+        """初始化状态机。
 
         Args:
-            name (str): Name of the state machine.
-            model (object, optional): Model object used to automatically look up callback functions
-                for states and transitions:
-                State callbacks: Automatically searches for 'on_enter_<state>' and 'on_exit_<state>' methods.
-                Transition callbacks: When action or guard parameters are strings, looks up corresponding methods in the model.
+            name (str): 状态机的名称。
+            model (object, optional): 用于自动查找状态与转移回调函数的模型对象：
+                状态回调：自动查找名为 'on_enter_<state>' 与 'on_exit_<state>' 的方法。
+                转移回调：当 action 或 guard 参数为字符串时，在模型中查找对应方法。
 
         Example:
             >>> class MyModel:
@@ -107,23 +106,23 @@ class StateMachine:
         guard: str | Callable = None,
         action: str | Callable = None,
     ) -> None:
-        """Add a transition to the state machine.
+        """向状态机添加一条转移。
 
         Args:
-            src_state (str | State): The source state where the transition begins.
-                Can be either a state name or a State object.
-            event (str): The event that triggers this transition.
-            dst_state (str | State): The destination state where the transition ends.
-                Can be either a state name or a State object.
-            guard (str | Callable, optional): Guard condition for the transition.
-                If callable: Function that returns bool.
-                If str: Name of a method in the model class.
-                If returns True: Transition proceeds.
-                If returns False: Transition is skipped.
-            action (str | Callable, optional): Action to execute during transition.
-                If callable: Function to execute.
-                If str: Name of a method in the model class.
-                Executed after guard passes and before entering new state.
+            src_state (str | State): 转移开始的源状态。
+                可以是状态名或 State 对象。
+            event (str): 触发该转移的事件。
+            dst_state (str | State): 转移结束的目标状态。
+                可以是状态名或 State 对象。
+            guard (str | Callable, optional): 转移的守卫条件。
+                若为可调用对象：返回 bool 的函数。
+                若为 str：模型类中某个方法的名称。
+                若返回 True：执行转移。
+                若返回 False：跳过转移。
+            action (str | Callable, optional): 转移期间要执行的动作。
+                若为可调用对象：要执行的函数。
+                若为 str：模型类中某个方法的名称。
+                在守卫通过之后、进入新状态之前执行。
 
         Example:
             >>> machine.add_transition(
@@ -134,7 +133,7 @@ class StateMachine:
             ...     action="on_start"
             ... )
         """
-        # Convert string parameters to objects if necessary
+        # 必要时把字符串参数转换为对象
         self.register_state(src_state)
         self._register_event(event)
         self.register_state(dst_state)
@@ -189,17 +188,17 @@ class StateMachine:
             )
 
     def register_state(self, state: str | State, on_enter=None, on_exit=None):
-        """Register a state in the state machine.
+        """在状态机中注册一个状态。
 
         Args:
-            state (str | State): The state to register. Can be either a string (state name)
-                                or a State object.
-            on_enter (Callable, optional): Callback function to be executed when entering the state.
-                                         If state is a string and on_enter is None, it will look for
-                                         a method named 'on_enter_<state>' in the model.
-            on_exit (Callable, optional): Callback function to be executed when exiting the state.
-                                        If state is a string and on_exit is None, it will look for
-                                        a method named 'on_exit_<state>' in the model.
+            state (str | State): 要注册的状态。可以是字符串（状态名）
+                                或 State 对象。
+            on_enter (Callable, optional): 进入该状态时执行的回调函数。
+                                         若 state 为字符串且 on_enter 为 None，则会在模型中查找
+                                         名为 'on_enter_<state>' 的方法。
+            on_exit (Callable, optional): 离开该状态时执行的回调函数。
+                                        若 state 为字符串且 on_exit 为 None，则会在模型中查找
+                                        名为 'on_exit_<state>' 的方法。
         Example:
             >>> machine.register_state("idle", on_enter=on_enter_idle, on_exit=on_exit_idle)
             >>> machine.register_state(State("running", on_enter=on_enter_running, on_exit=on_exit_running))
@@ -224,10 +223,10 @@ class StateMachine:
         return self._state
 
     def process(self, event: str) -> None:
-        """Process an event in the state machine.
+        """在状态机中处理一个事件。
 
         Args:
-            event: Event name.
+            event: 事件名称。
 
         Example:
             >>> machine.process("start")
@@ -241,10 +240,10 @@ class StateMachine:
             raise ValueError(f"Invalid event: {event}")
 
     def generate_plantuml(self) -> str:
-        """Generate PlantUML state diagram representation of the state machine.
+        """生成该状态机的 PlantUML 状态图表示。
 
         Returns:
-            str: PlantUML state diagram code.
+            str: PlantUML 状态图代码。
         """
         if self._state is None:
             raise ValueError("State machine is not initialized")
@@ -252,7 +251,7 @@ class StateMachine:
         plant_uml = ["@startuml"]
         plant_uml.append("[*] --> " + self._state.name)
 
-        # Generate transitions
+        # 生成转移
         for (src_state, event), (
             dst_state,
             guard,
@@ -260,7 +259,7 @@ class StateMachine:
         ) in self._transition_table.items():
             transition = f"{src_state} --> {dst_state.name} : {event}"
 
-            # Add guard and action if present
+            # 若存在守卫与动作则加入
             conditions = []
             if guard:
                 guard_name = guard.__name__ if callable(guard) else guard

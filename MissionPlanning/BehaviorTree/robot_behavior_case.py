@@ -1,7 +1,7 @@
 """
-Robot Behavior Tree Case
+机器人行为树案例
 
-This file demonstrates how to use a behavior tree to control robot behavior.
+本文件演示如何用行为树控制机器人行为。
 """
 
 from behavior_tree import (
@@ -16,18 +16,18 @@ import os
 
 class CheckBatteryNode(ActionNode):
     """
-    Node to check robot battery level
+    检查机器人电池电量的节点
 
-    If battery level is below threshold, returns FAILURE, otherwise returns SUCCESS
+    若电量低于阈值则返回 FAILURE，否则返回 SUCCESS
     """
 
     def __init__(self, name, threshold=20):
         super().__init__(name)
         self.threshold = threshold
-        self.battery_level = 100  # Initial battery level is 100%
+        self.battery_level = 100  # 初始电量为 100%
 
     def tick(self):
-        # Simulate battery level decreasing
+        # 模拟电量下降
         self.battery_level -= random.randint(1, 5)
         print(f"Current battery level: {self.battery_level}%")
 
@@ -38,7 +38,7 @@ class CheckBatteryNode(ActionNode):
 
 class ChargeBatteryNode(ActionNode):
     """
-    Node to charge the robot's battery
+    为机器人电池充电的节点
     """
 
     def __init__(self, name, charge_rate=10):
@@ -47,7 +47,7 @@ class ChargeBatteryNode(ActionNode):
         self.charging_time = 0
 
     def tick(self):
-        # Simulate charging process
+        # 模拟充电过程
         if self.charging_time == 0:
             print("Starting to charge...")
 
@@ -65,7 +65,7 @@ class ChargeBatteryNode(ActionNode):
 
 class MoveToPositionNode(ActionNode):
     """
-    Node to move to a specified position
+    移动到指定位置的节点
     """
 
     def __init__(self, name, position, move_duration=2):
@@ -94,7 +94,7 @@ class MoveToPositionNode(ActionNode):
 
 class DetectObstacleNode(ActionNode):
     """
-    Node to detect obstacles
+    检测障碍物的节点
     """
 
     def __init__(self, name, obstacle_probability=0.3):
@@ -102,7 +102,7 @@ class DetectObstacleNode(ActionNode):
         self.obstacle_probability = obstacle_probability
 
     def tick(self):
-        # Use random probability to simulate obstacle detection
+        # 用随机概率模拟障碍物检测
         if random.random() < self.obstacle_probability:
             print("Obstacle detected!")
             return Status.SUCCESS
@@ -113,7 +113,7 @@ class DetectObstacleNode(ActionNode):
 
 class AvoidObstacleNode(ActionNode):
     """
-    Node to avoid obstacles
+    避开障碍物的节点
     """
 
     def __init__(self, name, avoid_duration=1.5):
@@ -139,7 +139,7 @@ class AvoidObstacleNode(ActionNode):
 
 class PerformTaskNode(ActionNode):
     """
-    Node to perform a specific task
+    执行特定任务的节点
     """
 
     def __init__(self, name, task_name, task_duration=3):
@@ -168,12 +168,12 @@ class PerformTaskNode(ActionNode):
 
 def create_robot_behavior_tree():
     """
-    Create robot behavior tree
+    创建机器人行为树
     """
 
     factory = BehaviorTreeFactory()
 
-    # Register custom nodes
+    # 注册自定义节点
     factory.register_node_builder(
         "CheckBattery",
         lambda node: CheckBatteryNode(
@@ -223,20 +223,20 @@ def create_robot_behavior_tree():
             float(node.attrib.get("task_duration", "3")),
         ),
     )
-    # Read XML from file
+    # 从文件读取 XML
     xml_path = os.path.join(os.path.dirname(__file__), "robot_behavior_tree.xml")
     return factory.build_tree_from_file(xml_path)
 
 
 def main():
     """
-    Main function: Create and run the robot behavior tree
+    主函数：创建并运行机器人行为树
     """
     print("Creating robot behavior tree...")
     tree = create_robot_behavior_tree()
 
     print("\nStarting robot behavior tree execution...\n")
-    # Run for a period of time or until completion
+    # 运行一段时间或直到完成
 
     tree.tick_while_running(interval=0.01)
 

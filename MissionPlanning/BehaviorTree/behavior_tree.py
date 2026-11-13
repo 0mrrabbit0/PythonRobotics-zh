@@ -1,9 +1,9 @@
 """
-Behavior Tree
+行为树
 
-author: Wang Zheng (@Aglargil)
+作者: Wang Zheng (@Aglargil)
 
-Reference:
+参考文献:
 
 - [Behavior Tree](https://en.wikipedia.org/wiki/Behavior_tree_(artificial_intelligence,_robotics_and_control))
 """
@@ -27,7 +27,7 @@ class NodeType(Enum):
 
 class Node:
     """
-    Base class for all nodes in a behavior tree.
+    行为树中所有节点的基类。
     """
 
     def __init__(self, name):
@@ -36,42 +36,42 @@ class Node:
 
     def tick(self) -> Status:
         """
-        Tick the node.
+        对节点执行单次执行（tick）。
 
         Returns:
-            Status: The status of the node.
+            Status: 节点的状态。
         """
         raise ValueError("Node is not implemented")
 
     def tick_and_set_status(self) -> Status:
         """
-        Tick the node and set the status.
+        对节点执行单次执行（tick）并设置状态。
 
         Returns:
-            Status: The status of the node.
+            Status: 节点的状态。
         """
         self.status = self.tick()
         return self.status
 
     def reset(self):
         """
-        Reset the node.
+        重置该节点。
         """
         self.status = None
 
     def reset_children(self):
         """
-        Reset the children of the node.
+        重置该节点的子节点。
         """
         pass
 
 
 class ControlNode(Node):
     """
-    Base class for all control nodes in a behavior tree.
+    行为树中所有控制节点的基类。
 
-    Control nodes manage the execution flow of their child nodes according to specific rules.
-    They typically have multiple children and determine which children to execute and in what order.
+    控制节点按特定规则管理其子节点的执行流程。
+    它们通常拥有多个子节点，并决定执行哪些子节点以及执行顺序。
     """
 
     def __init__(self, name):
@@ -90,12 +90,12 @@ class ControlNode(Node):
 
 class SequenceNode(ControlNode):
     """
-    Executes child nodes in sequence until one fails or all succeed.
+    顺序节点：按顺序执行子节点，直到某一子节点失败或全部成功。
 
     Returns:
-        - Returns FAILURE if any child returns FAILURE
-        - Returns SUCCESS when all children have succeeded
-        - Returns RUNNING when a child is still running or when moving to the next child
+        - 若任一子节点返回 FAILURE，则返回 FAILURE
+        - 当全部子节点都成功时返回 SUCCESS
+        - 当某个子节点仍在运行，或即将转到下一个子节点时，返回 RUNNING
 
     Example:
         .. code-block:: xml
@@ -131,12 +131,12 @@ class SequenceNode(ControlNode):
 
 class SelectorNode(ControlNode):
     """
-    Executes child nodes in sequence until one succeeds or all fail.
+    选择节点：按顺序执行子节点，直到某一子节点成功或全部失败。
 
     Returns:
-        - Returns SUCCESS if any child returns SUCCESS
-        - Returns FAILURE when all children have failed
-        - Returns RUNNING when a child is still running or when moving to the next child
+        - 若任一子节点返回 SUCCESS，则返回 SUCCESS
+        - 当全部子节点都失败时返回 FAILURE
+        - 当某个子节点仍在运行，或即将转到下一个子节点时，返回 RUNNING
 
     Examples:
         .. code-block:: xml
@@ -172,13 +172,13 @@ class SelectorNode(ControlNode):
 
 class WhileDoElseNode(ControlNode):
     """
-    Conditional execution node with three parts: condition, do, and optional else.
+    条件执行节点，包含三部分：条件、执行，以及可选的否则分支。
 
     Returns:
-        First executes the condition node (child[0])
-        If condition succeeds, executes do node (child[1]) and returns RUNNING
-        If condition fails, executes else node (child[2]) if present and returns result of else node
-        If condition fails and there is no else node, returns SUCCESS
+        首先执行条件节点（child[0]）
+        若条件成功，则执行 do 节点（child[1]）并返回 RUNNING
+        若条件失败，则在存在 else 节点（child[2]）时执行它，并返回 else 节点的结果
+        若条件失败且没有 else 节点，则返回 SUCCESS
 
     Example:
         .. code-block:: xml
@@ -227,10 +227,10 @@ class WhileDoElseNode(ControlNode):
 
 class ActionNode(Node):
     """
-    Base class for all action nodes in a behavior tree.
+    行为树中所有动作节点的基类。
 
-    Action nodes are responsible for performing specific tasks or actions.
-    They do not have children and are typically used to execute logic or operations.
+    动作节点负责执行具体任务或动作。
+    它们没有子节点，通常用于执行逻辑或操作。
     """
 
     def __init__(self, name):
@@ -240,11 +240,11 @@ class ActionNode(Node):
 
 class SleepNode(ActionNode):
     """
-    Sleep node that sleeps for a specified duration.
+    休眠指定时长的休眠节点。
 
     Returns:
-        Returns SUCCESS after the specified duration has passed
-        Returns RUNNING if the duration has not yet passed
+        指定时长过去后返回 SUCCESS
+        若时长尚未过去则返回 RUNNING
 
     Example:
         .. code-block:: xml
@@ -267,10 +267,10 @@ class SleepNode(ActionNode):
 
 class EchoNode(ActionNode):
     """
-    Echo node that prints a message to the console.
+    向控制台打印一条消息的回显节点。
 
     Returns:
-        Returns SUCCESS after the message has been printed
+        消息打印后返回 SUCCESS
 
     Example:
         .. code-block:: xml
@@ -289,10 +289,10 @@ class EchoNode(ActionNode):
 
 class DecoratorNode(Node):
     """
-    Base class for all decorator nodes in a behavior tree.
+    行为树中所有装饰节点的基类。
 
-    Decorator nodes modify the behavior of their child node.
-    They must have a single child and can alter the status of the child node.
+    装饰节点修改其子节点的行为。
+    它们必须只有一个子节点，并且可以改变子节点的状态。
     """
 
     def __init__(self, name):
@@ -310,12 +310,12 @@ class DecoratorNode(Node):
 
 class InverterNode(DecoratorNode):
     """
-    Inverter node that inverts the status of its child node.
+    反转子节点状态的反相节点。
 
     Returns:
-        - Returns SUCCESS if the child returns FAILURE
-        - Returns FAILURE if the child returns SUCCESS
-        - Returns RUNNING if the child returns RUNNING
+        - 若子节点返回 FAILURE，则返回 SUCCESS
+        - 若子节点返回 SUCCESS，则返回 FAILURE
+        - 若子节点返回 RUNNING，则返回 RUNNING
 
     Examples:
         .. code-block:: xml
@@ -336,11 +336,11 @@ class InverterNode(DecoratorNode):
 
 class TimeoutNode(DecoratorNode):
     """
-    Timeout node that fails if the child node takes too long to execute
+    若子节点执行时间过长则失败的超时节点
 
     Returns:
-        - FAILURE: If the timeout duration has been exceeded
-        - Child's status: Otherwise, passes through the status of the child node
+        - FAILURE：若已超过超时时长
+        - 子节点的状态：否则透传子节点的状态
 
     Example:
         .. code-block:: xml
@@ -367,11 +367,11 @@ class TimeoutNode(DecoratorNode):
 
 class DelayNode(DecoratorNode):
     """
-    Delay node that delays the execution of its child node for a specified duration.
+    将子节点的执行延迟指定时长的延迟节点。
 
     Returns:
-        - Returns RUNNING if the duration has not yet passed
-        - Returns child's status after the duration has passed
+        - 若时长尚未过去，则返回 RUNNING
+        - 时长过去后返回子节点的状态
 
     Example:
         .. code-block:: xml
@@ -397,11 +397,11 @@ class DelayNode(DecoratorNode):
 
 class ForceSuccessNode(DecoratorNode):
     """
-    ForceSuccess node that always returns SUCCESS.
+    始终返回 SUCCESS 的 ForceSuccess 节点。
 
     Returns:
-        - Returns RUNNING if the child returns RUNNING
-        - Returns SUCCESS if the child returns SUCCESS or FAILURE
+        - 若子节点返回 RUNNING，则返回 RUNNING
+        - 若子节点返回 SUCCESS 或 FAILURE，则返回 SUCCESS
     """
 
     def __init__(self, name):
@@ -417,11 +417,11 @@ class ForceSuccessNode(DecoratorNode):
 
 class ForceFailureNode(DecoratorNode):
     """
-    ForceFailure node that always returns FAILURE.
+    始终返回 FAILURE 的 ForceFailure 节点。
 
     Returns:
-        - Returns RUNNING if the child returns RUNNING
-        - Returns FAILURE if the child returns SUCCESS or FAILURE
+        - 若子节点返回 RUNNING，则返回 RUNNING
+        - 若子节点返回 SUCCESS 或 FAILURE，则返回 FAILURE
     """
 
     def __init__(self, name):
@@ -437,7 +437,7 @@ class ForceFailureNode(DecoratorNode):
 
 class BehaviorTree:
     """
-    Behavior tree class that manages the execution of a behavior tree.
+    管理行为树执行的行为树类。
     """
 
     def __init__(self, root):
@@ -445,23 +445,23 @@ class BehaviorTree:
 
     def tick(self):
         """
-        Tick once on the behavior tree.
+        对行为树执行一次单次执行（tick）。
         """
         self.root.tick_and_set_status()
 
     def reset(self):
         """
-        Reset the behavior tree.
+        重置行为树。
         """
         self.root.reset()
 
     def tick_while_running(self, interval=None, enable_print=True):
         """
-        Tick the behavior tree while it is running.
+        在行为树处于运行状态时持续执行单次执行（tick）。
 
         Args:
-            interval (float, optional): The interval between ticks. Defaults to None.
-            enable_print (bool, optional): Whether to print the behavior tree. Defaults to True.
+            interval (float, optional): 两次 tick 之间的间隔。默认值为 None。
+            enable_print (bool, optional): 是否打印行为树。默认值为 True。
         """
         while self.root.tick_and_set_status() == Status.RUNNING:
             if enable_print:
@@ -473,17 +473,17 @@ class BehaviorTree:
 
     def to_text(self, root, indent=0):
         """
-        Recursively convert the behavior tree to a text representation.
+        递归地将行为树转换为文本表示。
         """
         current_text = ""
         if root.status == Status.RUNNING:
-            # yellow
+            # 黄色
             current_text = "\033[93m" + root.name + "\033[0m"
         elif root.status == Status.SUCCESS:
-            # green
+            # 绿色
             current_text = "\033[92m" + root.name + "\033[0m"
         elif root.status == Status.FAILURE:
-            # red
+            # 红色
             current_text = "\033[91m" + root.name + "\033[0m"
         else:
             current_text = root.name
@@ -500,17 +500,17 @@ class BehaviorTree:
 
     def print_tree(self):
         """
-        Print the behavior tree.
+        打印行为树。
 
-        Node print format:
-            Action: <Action>
-            Decorator: (Decorator)
-            Control: [Control]
+        节点打印格式:
+            动作: <Action>
+            装饰: (Decorator)
+            控制: [Control]
 
-        Node status colors:
-            Yellow: RUNNING
-            Green: SUCCESS
-            Red: FAILURE
+        节点状态颜色:
+            黄色: RUNNING
+            绿色: SUCCESS
+            红色: FAILURE
         """
         text = self.to_text(self.root)
         text = text.strip()
@@ -521,12 +521,12 @@ class BehaviorTree:
 
 class BehaviorTreeFactory:
     """
-    Factory class for creating behavior trees from XML strings.
+    用于从 XML 字符串创建行为树的工厂类。
     """
 
     def __init__(self):
         self.node_builders = {}
-        # Control nodes
+        # 控制节点
         self.register_node_builder(
             "Sequence",
             lambda node: SequenceNode(node.attrib.get("name", SequenceNode.__name__)),
@@ -541,7 +541,7 @@ class BehaviorTreeFactory:
                 node.attrib.get("name", WhileDoElseNode.__name__)
             ),
         )
-        # Decorator nodes
+        # 装饰节点
         self.register_node_builder(
             "Inverter",
             lambda node: InverterNode(node.attrib.get("name", InverterNode.__name__)),
@@ -572,7 +572,7 @@ class BehaviorTreeFactory:
                 node.attrib.get("name", ForceFailureNode.__name__)
             ),
         )
-        # Action nodes
+        # 动作节点
         self.register_node_builder(
             "Sleep",
             lambda node: SleepNode(
@@ -590,11 +590,11 @@ class BehaviorTreeFactory:
 
     def register_node_builder(self, node_name, builder):
         """
-        Register a builder for a node
+        为节点注册构建器
 
         Args:
-            node_name (str): The name of the node.
-            builder (function): The builder function.
+            node_name (str): 节点名称。
+            builder (function): 构建函数。
 
         Example:
             .. code-block:: python
@@ -612,13 +612,13 @@ class BehaviorTreeFactory:
 
     def build_node(self, node):
         """
-        Build a node from an XML element.
+        由 XML 元素构建节点。
 
         Args:
-            node (Element): The XML element to build the node from.
+            node (Element): 用于构建节点的 XML 元素。
 
         Returns:
-            BehaviorTree Node: the built node
+            BehaviorTree Node: 构建得到的节点
         """
         if node.tag in self.node_builders:
             root = self.node_builders[node.tag](node)
@@ -642,13 +642,13 @@ class BehaviorTreeFactory:
 
     def build_tree(self, xml_string):
         """
-        Build a behavior tree from an XML string.
+        由 XML 字符串构建行为树。
 
         Args:
-            xml_string (str): The XML string containing the behavior tree.
+            xml_string (str): 包含行为树的 XML 字符串。
 
         Returns:
-            BehaviorTree: The behavior tree.
+            BehaviorTree: 行为树。
         """
         xml_tree = ET.fromstring(xml_string)
         root = self.build_node(xml_tree)
@@ -656,13 +656,13 @@ class BehaviorTreeFactory:
 
     def build_tree_from_file(self, file_path):
         """
-        Build a behavior tree from a file.
+        从文件构建行为树。
 
         Args:
-            file_path (str): The path to the file containing the behavior tree.
+            file_path (str): 包含行为树的文件路径。
 
         Returns:
-            BehaviorTree: The behavior tree.
+            BehaviorTree: 行为树。
         """
         with open(file_path) as file:
             xml_string = file.read()

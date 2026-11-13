@@ -1,7 +1,7 @@
 """
-A case study of robot behavior using state machine
+使用状态机的机器人行为案例
 
-author: Wang Zheng (@Aglargil)
+作者: Wang Zheng (@Aglargil)
 """
 
 from state_machine import StateMachine
@@ -12,10 +12,10 @@ class Robot:
         self.battery = 100
         self.task_progress = 0
 
-        # Initialize state machine
+        # 初始化状态机
         self.machine = StateMachine("robot_sm", self)
 
-        # Add state transition rules
+        # 添加状态转移规则
         self.machine.add_transition(
             src_state="patrolling",
             event="detect_task",
@@ -55,19 +55,19 @@ class Robot:
             action="battery_full",
         )
 
-        # Set initial state
+        # 设置初始状态
         self.machine.set_current_state("patrolling")
 
     def is_battery_low(self):
-        """Battery level check condition"""
+        """电池电量检查条件"""
         return self.battery < 30
 
     def reset_task(self):
-        """Reset task progress"""
+        """重置任务进度"""
         self.task_progress = 0
         print("[Action] Task progress has been reset")
 
-    # Modify state entry callback naming convention (add state_ prefix)
+    # 修改状态进入回调的命名约定（添加 state_ 前缀）
     def on_enter_executing_task(self):
         print("\n------ Start Executing Task ------")
         print(f"Current battery: {self.battery}%")
@@ -96,7 +96,7 @@ class Robot:
         self.machine.process("charge_complete")
 
 
-# Keep the test section structure the same, only modify the trigger method
+# 保持测试部分的结构不变，只修改触发方法
 if __name__ == "__main__":
     robot = Robot()
     print(robot.machine.generate_plantuml())
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     print(f"Initial state: {robot.machine.get_current_state().name}")
     print("------------")
 
-    # Trigger task detection event
+    # 触发任务检测事件
     robot.machine.process("detect_task")
 
     print("\n------------")

@@ -1,5 +1,5 @@
 <Selector name="Robot Main Controller">
-    <!-- Charge battery when power is low -->
+    <!-- 电量低时为电池充电 -->
     <Sequence name="Battery Management">
         <Inverter name="Low Battery Detection">
             <CheckBattery name="Check Battery" threshold="30" />
@@ -7,13 +7,13 @@
         <Echo name="Low Battery Warning" message="Battery level low! Charging needed" />
         <ChargeBattery name="Charge Battery" charge_rate="20" />
     </Sequence>
-    <!-- Main task sequence -->
+    <!-- 主任务顺序 -->
     <Sequence name="Patrol Task">
         <Echo name="Start Task" message="Starting patrol task" />
-        <!-- Move to position A -->
+        <!-- 移动到位置 A -->
         <Sequence name="Move to Position A">
             <MoveToPosition name="Move to A" position="A" move_duration="2" />
-            <!-- Handle obstacles -->
+            <!-- 处理障碍物 -->
             <Selector name="Obstacle Handling A">
                 <Sequence name="Obstacle Present">
                     <DetectObstacle name="Detect Obstacle" obstacle_probability="0.3" />
@@ -23,13 +23,13 @@
             </Selector>
             <PerformTask name="Position A Task" task_name="Check Device Status" task_duration="2" />
         </Sequence>
-        <!-- Move to position B -->
+        <!-- 移动到位置 B -->
         <Sequence name="Move to Position B">
             <Delay name="Short Wait" sec="1">
                 <Echo name="Prepare Movement" message="Preparing to move to next position" />
             </Delay>
             <MoveToPosition name="Move to B" position="B" move_duration="3" />
-            <!-- Handle obstacles with timeout -->
+            <!-- 在超时限制内处理障碍物 -->
             <Timeout name="Limited Time Obstacle Handling" sec="2">
                 <Sequence name="Obstacle Present">
                     <DetectObstacle name="Detect Obstacle" obstacle_probability="0.4" />
@@ -38,7 +38,7 @@
             </Timeout>
             <PerformTask name="Position B Task" task_name="Data Collection" task_duration="2.5" />
         </Sequence>
-        <!-- Move to position C -->
+        <!-- 移动到位置 C -->
         <WhileDoElse name="Conditional Move to C">
             <CheckBattery name="Check Sufficient Battery" threshold="50" />
             <Sequence name="Perform Position C Task">
