@@ -1,68 +1,68 @@
 .. _particle_swarm_optimization:
 
-Particle Swarm Optimization Path Planning
+粒子群优化（PSO）路径规划
 ------------------------------------------
 
-This is a 2D path planning simulation using the Particle Swarm Optimization algorithm.
+这是用粒子群优化（PSO）算法做的二维路径规划仿真。
 
-PSO is a metaheuristic optimization algorithm inspired by the social behavior of bird flocking or fish schooling. In path planning, particles represent potential solutions that explore the search space to find collision-free paths from start to goal.
+PSO 是受鸟群或鱼群社会行为启发的元启发式优化算法。在路径规划中，粒子表示潜在解，它们在搜索空间中寻找从起点到目标点的无碰撞路径。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ParticleSwarmOptimization/animation.gif
 
-Algorithm Overview
+算法概述
 ++++++++++++++++++
 
-The PSO algorithm maintains a swarm of particles that move through the search space according to simple mathematical rules:
+PSO 算法维护一群粒子，它们按照简单的数学规则在搜索空间中运动：
 
-1. **Initialization**: Particles are randomly distributed near the start position
-2. **Evaluation**: Each particle's fitness is calculated based on distance to goal and obstacle penalties
-3. **Update**: Particles adjust their velocities based on:
-   - Personal best position (cognitive component)
-   - Global best position (social component)  
-   - Current velocity (inertia component)
-4. **Movement**: Particles move to new positions and check for collisions
-5. **Convergence**: Process repeats until maximum iterations or goal is reached
+1. **初始化**：粒子在起点附近随机分布
+2. **评估**：根据到目标点的距离和障碍物惩罚计算每个粒子的适应度
+3. **更新**：粒子根据下列量调整速度：
+   - 个体最优位置（认知分量）
+   - 全局最优位置（社会分量）
+   - 当前速度（惯性分量）
+4. **移动**：粒子移动到新位置并检查碰撞
+5. **收敛**：重复该过程，直到达到最大迭代次数或到达目标点
 
-Mathematical Foundation
+数学基础
 +++++++++++++++++++++++
 
-The core PSO velocity update equation is:
+PSO 的核心速度更新方程为：
 
 .. math::
 
    v_{i}(t+1) = w \cdot v_{i}(t) + c_1 \cdot r_1 \cdot (p_{i} - x_{i}(t)) + c_2 \cdot r_2 \cdot (g - x_{i}(t))
 
-Where:
-- :math:`v_{i}(t)` = velocity of particle i at time t
-- :math:`x_{i}(t)` = position of particle i at time t  
-- :math:`w` = inertia weight (controls exploration vs exploitation)
-- :math:`c_1` = cognitive coefficient (attraction to personal best)
-- :math:`c_2` = social coefficient (attraction to global best)
-- :math:`r_1, r_2` = random numbers in [0,1]
-- :math:`p_{i}` = personal best position of particle i
-- :math:`g` = global best position
+其中：
+- :math:`v_{i}(t)` = 粒子 i 在时刻 t 的速度
+- :math:`x_{i}(t)` = 粒子 i 在时刻 t 的位置
+- :math:`w` = 惯性权重（控制探索与利用）
+- :math:`c_1` = 认知系数（对个体最优的吸引）
+- :math:`c_2` = 社会系数（对全局最优的吸引）
+- :math:`r_1, r_2` = [0, 1] 内的随机数
+- :math:`p_{i}` = 粒子 i 的个体最优位置
+- :math:`g` = 全局最优位置
 
-Position update:
+位置更新：
 
 .. math::
 
    x_{i}(t+1) = x_{i}(t) + v_{i}(t+1)
 
-Fitness Function
+适应度函数
 ++++++++++++++++
 
-The fitness function combines distance to target with obstacle penalties:
+适应度函数把到目标的距离与障碍物惩罚结合起来：
 
 .. math::
 
    f(x) = ||x - x_{goal}|| + \sum_{j} P_{obs}(x, O_j)
 
-Where:
-- :math:`||x - x_{goal}||` = Euclidean distance to goal
-- :math:`P_{obs}(x, O_j)` = penalty for obstacle j
-- :math:`O_j` = obstacle j with position and radius
+其中：
+- :math:`||x - x_{goal}||` = 到目标点的欧氏距离
+- :math:`P_{obs}(x, O_j)` = 障碍物 j 的惩罚
+- :math:`O_j` = 具有位置和半径的障碍物 j
 
-The obstacle penalty function is defined as:
+障碍物惩罚函数定义为：
 
 .. math::
 
@@ -72,67 +72,67 @@ The obstacle penalty function is defined as:
    0 & \text{if } ||x - O_j|| \geq r_j + R_{influence} \text{ (safe distance)}
    \end{cases}
 
-Where:
-- :math:`r_j` = radius of obstacle j
-- :math:`R_{influence}` = influence radius (typically 5 units)
+其中：
+- :math:`r_j` = 障碍物 j 的半径
+- :math:`R_{influence}` = 影响半径（通常为 5 个单位）
 
-Collision Detection
+碰撞检测
 +++++++++++++++++++
 
-Line-circle intersection is used to detect collisions between particle paths and circular obstacles:
+用直线与圆的相交来检测粒子路径和圆形障碍物之间的碰撞：
 
 .. math::
 
    ||P_0 + t \cdot \vec{d} - C|| = r
 
-Where:
-- :math:`P_0` = start point of path segment
-- :math:`\vec{d}` = direction vector of path
-- :math:`C` = obstacle center
-- :math:`r` = obstacle radius
-- :math:`t \in [0,1]` = parameter along line segment
+其中：
+- :math:`P_0` = 路径段的起点
+- :math:`\vec{d}` = 路径的方向向量
+- :math:`C` = 障碍物中心
+- :math:`r` = 障碍物半径
+- :math:`t \in [0,1]` = 沿线段的参数
 
-Algorithm Parameters
+算法参数
 ++++++++++++++++++++
 
-Key parameters affecting performance:
+影响性能的关键参数：
 
-- **Number of particles** (n_particles): More particles = better exploration but slower
-- **Maximum iterations** (max_iter): More iterations = better convergence but slower  
-- **Inertia weight** (w): High = exploration, Low = exploitation
-- **Cognitive coefficient** (c1): Attraction to personal best
-- **Social coefficient** (c2): Attraction to global best
+- **粒子数量** (n_particles)：粒子越多，探索越好，但越慢
+- **最大迭代次数** (max_iter)：迭代越多，收敛越好，但越慢
+- **惯性权重** (w)：大表示探索，小表示利用
+- **认知系数** (c1)：对个体最优的吸引
+- **社会系数** (c2)：对全局最优的吸引
 
-Typical values:
-- n_particles: 20-50
-- max_iter: 100-300
-- w: 0.9 → 0.4 (linearly decreasing)
-- c1, c2: 1.5-2.0
+典型取值：
+- n_particles：20–50
+- max_iter：100–300
+- w：0.9 → 0.4（线性递减）
+- c1、c2：1.5–2.0
 
-Advantages
+优点
 ++++++++++
 
-- **Global optimization**: Can escape local minima unlike gradient-based methods
-- **No derivatives needed**: Works with non-differentiable fitness landscapes
-- **Parallel exploration**: Multiple particles search simultaneously
-- **Simple implementation**: Few parameters and straightforward logic
-- **Flexible**: Easily adaptable to different environments and constraints
+- **全局优化**：可以跳出局部极小
+- **不需要导数**：适用于不可微的适应度地形
+- **并行探索**：多个粒子同时搜索
+- **实现简单**：参数少，逻辑直接
+- **灵活**：易于适配不同的环境和约束
 
-Disadvantages
+缺点
 +++++++++++++
 
-- **Stochastic**: Results may vary between runs
-- **Parameter sensitive**: Performance heavily depends on parameter tuning
-- **No optimality guarantee**: Metaheuristic without convergence proof
-- **Computational cost**: Requires many fitness evaluations
-- **Prone to stagnation**: Premature convergence where the entire swarm can get trapped in a local minimum if exploration is insufficient
+- **随机性**：各次运行的结果可能不同
+- **对参数敏感**：性能在很大程度上取决于参数调节
+- **不保证最优**：属于元启发式方法，没有收敛性证明
+- **计算代价**：需要大量适应度评估
+- **容易停滞**：会过早收敛；若探索不足，整个群体可能陷在某个局部极小里
 
-Code Link
+代码链接
 +++++++++
 
 .. autofunction:: PathPlanning.ParticleSwarmOptimization.particle_swarm_optimization.main
 
-Usage Example
+使用示例
 +++++++++++++
 
 .. code-block:: python
@@ -143,7 +143,7 @@ Usage Example
    # Run PSO path planning with visualization
    main()
 
-References
+参考文献
 ++++++++++
 
 - `Particle swarm optimization - Wikipedia <https://en.wikipedia.org/wiki/Particle_swarm_optimization>`__

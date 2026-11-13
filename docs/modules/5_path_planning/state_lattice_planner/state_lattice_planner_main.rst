@@ -1,44 +1,43 @@
-State Lattice Planning
+状态格规划
 ----------------------
 
-This script is a path planning code with state lattice planning.
+这段脚本用状态格规划做路径规划。
 
-This code uses the model predictive trajectory generator to solve
-boundary problem.
+代码使用模型预测轨迹生成器来求解边界值问题。
 
 
-Uniform polar sampling
+均匀极坐标采样
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/UniformPolarSampling.gif
 
-Code Link
+代码链接
 ^^^^^^^^^^^^^
 
 .. autofunction:: PathPlanning.StateLatticePlanner.state_lattice_planner.calc_uniform_polar_states
 
 
-Biased polar sampling
+有偏极坐标采样
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/BiasedPolarSampling.gif
 
-Code Link
+代码链接
 ^^^^^^^^^^^^^
 .. autofunction:: PathPlanning.StateLatticePlanner.state_lattice_planner.calc_biased_polar_states
 
 
-Lane sampling
+车道采样
 ~~~~~~~~~~~~~
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/LaneSampling.gif
 
-Code Link
+代码链接
 ^^^^^^^^^^^^^
 .. autofunction:: PathPlanning.StateLatticePlanner.state_lattice_planner.calc_lane_states
 
 
-Reference
+参考文献
 ~~~~~~~~~~~~~~~
 
 -  `Optimal rough terrain trajectory generation for wheeled mobile
@@ -47,4 +46,3 @@ Reference
 -  `State Space Sampling of Feasible Motions for High-Performance Mobile
    Robot Navigation in Complex
    Environments <https://www.frc.ri.cmu.edu/~alonzo/pubs/papers/JFR_08_SS_Sampling.pdf>`__
-

@@ -1,52 +1,52 @@
-State Machine
+状态机
 -------------
 
-A state machine is a model used to describe the transitions of an object between different states. It clearly shows how an object changes state based on events and may trigger corresponding actions.
+状态机是一种用于描述对象在不同状态之间转移的模型。它清楚地表明对象如何根据事件改变状态，并可能触发相应的动作。
 
-Core Concepts
+核心概念
 ~~~~~~~~~~~~~
 
-- **State**: A distinct mode or condition of the system (e.g. "Idle", "Running"). Managed by State class with optional on_enter/on_exit callbacks
-- **Event**: A trigger signal that may cause state transitions (e.g. "start", "stop")
-- **Transition**: A state change path from source to destination state triggered by an event
-- **Action**: An operation executed during transition (before entering new state)
-- **Guard**: A precondition that must be satisfied to allow transition
+- **状态**：系统的一种明确模式或条件（例如 “Idle”、“Running”）。由 State 类管理，可选 on_enter/on_exit 回调
+- **事件**：可能引起状态转移的触发信号（例如 “start”、“stop”）
+- **转移**：由事件触发的、从源状态到目标状态的状态变化路径
+- **动作**：在转移期间执行的操作（在进入新状态之前）
+- **守卫条件**：允许转移之前必须满足的前提条件
 
-Code Link
+代码链接
 ~~~~~~~~~~~
 
 .. autoclass:: MissionPlanning.StateMachine.state_machine.StateMachine
    :members: add_transition, process, register_state
    :special-members: __init__
 
-PlantUML Support
+PlantUML 支持
 ~~~~~~~~~~~~~~~~
 
-The ``generate_plantuml()`` method creates diagrams showing:
+``generate_plantuml()`` 方法生成的图展示：
 
-- Current state (marked with [*] arrow)
-- All possible transitions
-- Guard conditions in [brackets]
-- Actions prefixed with /
+- 当前状态（用 [*] 箭头标出）
+- 所有可能的转移
+- 方括号 [] 中的守卫条件
+- 以 / 为前缀的动作
 
-Example
+示例
 ~~~~~~~
 
-state machine diagram:
+状态机图：
 +++++++++++++++++++++++
 .. image:: robot_behavior_case.png
 
-state transition table:
+状态转移表：
 +++++++++++++++++++++++
-.. list-table:: State Transitions
+.. list-table:: 状态转移
    :header-rows: 1
    :widths: 20 15 20 20 20
 
-   * - Source State
-     - Event
-     - Target State
-     - Guard
-     - Action
+   * - 源状态
+     - 事件
+     - 目标状态
+     - 守卫条件
+     - 动作
    * - patrolling
      - detect_task
      - executing_task

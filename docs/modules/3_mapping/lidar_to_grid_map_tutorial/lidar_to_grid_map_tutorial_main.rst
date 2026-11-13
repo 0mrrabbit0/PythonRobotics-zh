@@ -1,26 +1,15 @@
-Lidar to grid map
---------------------
+激光雷达到栅格地图
+------------------
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/lidar_to_grid_map/animation.gif
 
-This simple tutorial shows how to read LIDAR (range) measurements from a
-file and convert it to occupancy grid.
+本简要教程说明如何从文件中读取激光雷达（距离）测量，并将其转换为占据栅格。
 
-Occupancy grid maps (*Hans Moravec, A.E. Elfes: High resolution maps
-from wide angle sonar, Proc. IEEE Int. Conf. Robotics Autom. (1985)*)
-are a popular, probabilistic approach to represent the environment. The
-grid is basically discrete representation of the environment, which
-shows if a grid cell is occupied or not. Here the map is represented as
-a ``numpy array``, and numbers close to 1 means the cell is occupied
-(*marked with red on the next image*), numbers close to 0 means they are
-free (*marked with green*). The grid has the ability to represent
-unknown (unobserved) areas, which are close to 0.5.
+占据栅格地图（*Hans Moravec, A.E. Elfes: High resolution maps from wide angle sonar, Proc. IEEE Int. Conf. Robotics Autom. (1985)*）是一种常用的、以概率表示环境的方法。栅格本质上是环境的离散表示，用来表明某个栅格单元是否被占据。这里地图表示为 ``numpy array``，接近 1 的数值表示该单元被占据（*在下一幅图中以红色标出*），接近 0 的数值表示空闲（*以绿色标出*）。栅格能够表示未知（未观测）区域，这些区域的数值接近 0.5。
 
 .. figure:: grid_map_example.png
 
-In order to construct the grid map from the measurement we need to
-discretise the values. But, first we need to ``import`` some
-necessary packages.
+为了由测量构建栅格地图，需要对数值进行离散化。不过，首先需要 ``import`` 一些必要的包。
 
 .. code:: ipython3
 
@@ -29,9 +18,7 @@ necessary packages.
     import matplotlib.pyplot as plt
     from math import cos, sin, radians, pi
 
-The measurement file contains the distances and the corresponding angles
-in a ``csv`` (comma separated values) format. Let’s write the
-``file_read`` method:
+测量文件以 ``csv``（逗号分隔值）格式包含距离以及对应的角度。下面编写 ``file_read`` 方法：
 
 .. code:: ipython3
 
@@ -49,9 +36,7 @@ in a ``csv`` (comma separated values) format. Let’s write the
         distances = np.array(distances)
         return angles, distances
 
-From the distances and the angles it is easy to determine the ``x`` and
-``y`` coordinates with ``sin`` and ``cos``. In order to display it
-``matplotlib.pyplot`` (``plt``) is used.
+由距离和角度，可以用 ``sin`` 和 ``cos`` 求出 ``x`` 和 ``y`` 坐标。为了显示结果，使用 ``matplotlib.pyplot``（``plt``）。
 
 .. code:: ipython3
 
@@ -67,14 +52,10 @@ From the distances and the angles it is easy to determine the ``x`` and
     plt.show()
 
 
-
 .. image:: lidar_to_grid_map_tutorial_5_0.png
 
 
-The ``lidar_to_grid_map.py`` contains handy functions which can used to
-convert a 2D range measurement to a grid map. For example the
-``bresenham`` gives the a straight line between two points in a grid
-map. Let’s see how this works.
+``lidar_to_grid_map.py`` 包含一些便于使用的函数，可以把二维距离测量转换为栅格地图。例如，``bresenham`` 给出栅格地图中两点之间的直线。下面看它如何工作。
 
 .. code:: ipython3
 
@@ -88,9 +69,7 @@ map. Let’s see how this works.
     plt.show()
 
 
-
 .. image:: lidar_to_grid_map_tutorial_7_0.png
-
 
 .. code:: ipython3
 
@@ -105,14 +84,9 @@ map. Let’s see how this works.
     plt.show()
 
 
-
 .. image:: lidar_to_grid_map_tutorial_8_0.png
 
-
-To fill empty areas, a queue-based algorithm can be used that can be
-used on an initialized occupancy map. The center point is given: the
-algorithm checks for neighbour elements in each iteration, and stops
-expansion on obstacles and free boundaries.
+为了填充空白区域，可以使用一种基于队列的算法，它作用于已经初始化的占据地图。给定中心点后，算法在每次迭代中检查相邻单元，并在障碍物和空闲边界处停止扩展。
 
 .. code:: ipython3
 
@@ -150,8 +124,7 @@ expansion on obstacles and free boundaries.
                     pmap[nx, ny + 1] = 0.0
                     fringe.appendleft((nx, ny + 1))
 
-This algotihm will fill the area bounded by the yellow lines starting
-from a center point (e.g. (10, 20)) with zeros:
+该算法将从中心点（例如 (10, 20)）出发，把黄线围成的区域填充为零：
 
 .. code:: ipython3
 
@@ -162,11 +135,9 @@ from a center point (e.g. (10, 20)) with zeros:
     plt.show()
 
 
-
 .. image:: lidar_to_grid_map_tutorial_12_0.png
 
-
-Let’s use this flood fill on real data:
+下面在实际数据上使用这一泛洪填充：
 
 .. code:: ipython3
 
@@ -187,18 +158,14 @@ Let’s use this flood fill on real data:
     plt.colorbar()
     plt.show()
 
-
 .. parsed-literal::
 
     The grid map is  150 x 100 .
 
 
-
 .. image:: lidar_to_grid_map_tutorial_14_1.png
 
-Code Link
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+代码链接
+^^^^^^^^
 
 .. autofunction:: Mapping.lidar_to_grid_map.lidar_to_grid_map.main
-
-

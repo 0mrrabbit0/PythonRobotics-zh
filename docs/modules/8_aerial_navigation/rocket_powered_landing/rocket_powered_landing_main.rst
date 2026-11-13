@@ -1,15 +1,15 @@
-Rocket powered landing
+火箭动力着陆
 -----------------------------
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/rocket_powered_landing/animation.gif
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~~~
 
 .. autofunction:: AerialNavigation.rocket_powered_landing.rocket_powered_landing.main
 
 
-Simulation
+仿真
 ~~~~~~~~~~
 
 .. code-block:: ipython3
@@ -40,9 +40,9 @@ Simulation
 
 
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/rocket_powered_landing/animation.gif
-   :alt: gif
+   :alt: 动画
 
-Equation generation
+方程生成
 ~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: ipython3
@@ -153,14 +153,13 @@ Equation generation
 
 
 
-References
+参考文献
 ~~~~~~~~~~
 
--  Python implementation of ‘Successive Convexification for 6-DoF Mars
-   Rocket Powered Landing with Free-Final-Time’ paper by Michael Szmuk
-   and Behçet Açıkmeşe.
+-  Michael Szmuk 与 Behçet Açıkmeşe 所著论文 ‘Successive Convexification for 6-DoF Mars
+   Rocket Powered Landing with Free-Final-Time’ 的 Python 实现。
 
--  inspired by EmbersArc/SuccessiveConvexificationFreeFinalTime:
-   Implementation of “Successive Convexification for 6-DoF Mars Rocket
+-  受 EmbersArc/SuccessiveConvexificationFreeFinalTime 启发，后者实现了
+   “Successive Convexification for 6-DoF Mars Rocket
    Powered Landing with Free-Final-Time”
    https://github.com/EmbersArc/SuccessiveConvexificationFreeFinalTime

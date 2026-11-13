@@ -1,15 +1,15 @@
 .. _`SLAM`:
 
-SLAM
-====
+同步定位与建图（SLAM）
+======================
 
-Simultaneous Localization and Mapping(SLAM) examples
-Simultaneous Localization and Mapping (SLAM) is an ability to estimate the pose of a robot and the map of the environment at the same time. The SLAM problem is hard to
-solve, because a map is needed for localization and localization is needed for mapping. In this way, SLAM is often said to be similar to a ‘chicken-and-egg’ problem. Popular SLAM solution methods include the extended Kalman filter, particle filter, and Fast SLAM algorithm[31]. Fig.4 shows SLAM simulation results using extended Kalman filter and results using FastSLAM2.0[31].
+同步定位与建图（SLAM）示例。
+
+同步定位与建图（SLAM）是同时估计机器人位姿与环境地图的能力。SLAM 问题难以求解，因为定位需要地图，而建图又需要定位。因此，SLAM 常被比作“先有鸡还是先有蛋”的问题。常用的 SLAM 求解方法包括扩展卡尔曼滤波（EKF）、粒子滤波以及 FastSLAM 算法[31]。图 4 给出使用扩展卡尔曼滤波（EKF）的 SLAM 仿真结果，以及使用 FastSLAM 2.0 的结果[31]。
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
+   :caption: 目录
 
    iterative_closest_point_matching/iterative_closest_point_matching
    ekf_slam/ekf_slam

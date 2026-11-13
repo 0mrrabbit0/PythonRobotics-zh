@@ -1,14 +1,14 @@
-Behavior Tree
+行为树
 -------------
 
-Behavior Tree is a modular, hierarchical decision model that is widely used in robot control, and game development. 
-It presents some similarities to hierarchical state machines with the key difference that the main building block of a behavior is a task rather than a state.
-Behavior Trees have been shown to generalize several other control architectures (https://ieeexplore.ieee.org/document/7790863)
+行为树是一种模块化、分层的决策模型，广泛用于机器人控制和游戏开发。
+它与分层状态机有一些相似之处，关键区别在于行为的主要构建块是任务而不是状态。
+已有研究表明，行为树能够概括若干其他控制架构（https://ieeexplore.ieee.org/document/7790863）
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~
 
-Control Node
+控制节点
 ++++++++++++
 
 .. autoclass:: MissionPlanning.BehaviorTree.behavior_tree.ControlNode
@@ -19,7 +19,7 @@ Control Node
 
 .. autoclass:: MissionPlanning.BehaviorTree.behavior_tree.WhileDoElseNode
 
-Action Node
+动作节点
 ++++++++++++
 
 .. autoclass:: MissionPlanning.BehaviorTree.behavior_tree.ActionNode
@@ -28,7 +28,7 @@ Action Node
 
 .. autoclass:: MissionPlanning.BehaviorTree.behavior_tree.SleepNode
 
-Decorator Node
+装饰节点
 ++++++++++++++
 
 .. autoclass:: MissionPlanning.BehaviorTree.behavior_tree.DecoratorNode
@@ -43,26 +43,26 @@ Decorator Node
 
 .. autoclass:: MissionPlanning.BehaviorTree.behavior_tree.ForceFailureNode
 
-Behavior Tree Factory
+行为树工厂
 +++++++++++++++++++++
 
 .. autoclass:: MissionPlanning.BehaviorTree.behavior_tree.BehaviorTreeFactory
   :members:
 
-Behavior Tree
+行为树
 +++++++++++++
 
 .. autoclass:: MissionPlanning.BehaviorTree.behavior_tree.BehaviorTree
   :members:
 
-Example
+示例
 ~~~~~~~
 
-Visualize the behavior tree by `xml-tree-visual <https://xml-tree-visual.vercel.app/>`_.
+使用 `xml-tree-visual <https://xml-tree-visual.vercel.app/>`_ 可视化行为树。
 
 .. image:: ./robot_behavior_case.svg
 
-Print the behavior tree
+打印行为树
 
 .. code-block:: text
 

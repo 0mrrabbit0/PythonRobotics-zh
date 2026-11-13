@@ -1,115 +1,114 @@
 .. _`Inverted Pendulum`:
 
-Inverted Pendulum
+倒立摆
 ------------------
 
-An inverted pendulum on a cart consists of a mass :math:`m` at the top of a pole of length :math:`l` pivoted on a
-horizontally moving base as shown in the adjacent figure.
+小车倒立摆由质量为 :math:`m` 的质点构成，它位于长度为 :math:`l` 的摆杆顶端，
+摆杆铰接在一个水平运动的底座上，如相邻图所示。
 
-The objective of the control system is to balance the inverted pendulum by applying a force to the cart that the pendulum is attached to.
+控制系统的目标是，通过对摆所连接的小车施加力，使倒立摆保持平衡。
 
-Modeling
+建模
 ~~~~~~~~~~~~
 
 .. image:: inverted-pendulum.png
     :align: center
 
-- :math:`M`: mass of the cart
-- :math:`m`: mass of the load on the top of the rod
-- :math:`l`: length of the rod
-- :math:`u`: force applied to the cart
-- :math:`x`: cart position coordinate
-- :math:`\theta`: pendulum angle from vertical
+- :math:`M`：小车质量
+- :math:`m`：杆顶端载荷的质量
+- :math:`l`：杆长
+- :math:`u`：施加在小车上的力
+- :math:`x`：小车位置坐标
+- :math:`\theta`：摆杆相对竖直方向的角度
 
-Using Lagrange's equations:
+使用拉格朗日方程：
 
 .. math::
     & (M + m)\ddot{x} - ml\ddot{\theta}cos{\theta} + ml\dot{\theta^2}\sin{\theta} = u \\
     & l\ddot{\theta} - g\sin{\theta} = \ddot{x}\cos{\theta}
 
-See this `link <https://en.wikipedia.org/wiki/Inverted_pendulum#From_Lagrange's_equations>`__ for more details.
+更多细节见此 `链接 <https://en.wikipedia.org/wiki/Inverted_pendulum#From_Lagrange's_equations>`__。
 
-So
+因此
 
 .. math::
     & \ddot{x} =  \frac{m(gcos{\theta} - \dot{\theta}^2l)sin{\theta} + u}{M + m - mcos^2{\theta}} \\
     & \ddot{\theta} = \frac{g(M + m)sin{\theta} - \dot{\theta}^2lmsin{\theta}cos{\theta} + ucos{\theta}}{l(M + m - mcos^2{\theta})}
 
 
-Linearized model when :math:`\theta` small, :math:`cos{\theta} \approx 1`, :math:`sin{\theta} \approx \theta`, :math:`\dot{\theta}^2 \approx 0`.
+当 :math:`\theta` 较小时的线性化模型，:math:`cos{\theta} \approx 1`，:math:`sin{\theta} \approx \theta`，:math:`\dot{\theta}^2 \approx 0`。
 
 .. math::
     & \ddot{x} =  \frac{gm}{M}\theta + \frac{1}{M}u\\
     & \ddot{\theta} = \frac{g(M + m)}{Ml}\theta + \frac{1}{Ml}u
 
-State space:
+状态空间：
 
 .. math::
     & \dot{x} = Ax + Bu \\
     & y = Cx + Du
 
-where
+其中
 
 .. math::
     & x = [x, \dot{x}, \theta,\dot{\theta}]\\
     & A = \begin{bmatrix}  0 & 1 & 0 & 0\\0 & 0 & \frac{gm}{M} & 0\\0 & 0 & 0 & 1\\0 & 0 & \frac{g(M + m)}{Ml} & 0 \end{bmatrix}\\
     & B = \begin{bmatrix}  0 \\ \frac{1}{M} \\ 0 \\ \frac{1}{Ml} \end{bmatrix}
 
-If control only \theta
+若只控制 \theta
 
 .. math::
     & C = \begin{bmatrix} 0 & 0 & 1 & 0 \end{bmatrix}\\
     & D = [0]
 
-If control x and \theta
+若同时控制 x 与 \theta
 
 .. math::
     & C = \begin{bmatrix} 1 & 0 & 0 & 0\\0 & 0 & 1 & 0 \end{bmatrix}\\
     & D = \begin{bmatrix} 0 \\ 0 \end{bmatrix}
 
-LQR control
+线性二次调节器（LQR）控制
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The LQR controller minimize this cost function defined as:
+LQR 控制器最小化如下定义的代价函数：
 
 .. math::  J = x^T Q x + u^T R u
 
-the feedback control law that minimizes the value of the cost is:
+使代价值最小的反馈控制律为：
 
 .. math::  u = -K x
 
-where:
+其中：
 
 .. math::  K = (B^T P B + R)^{-1} B^T P A
 
-and :math:`P` is the unique positive definite solution to the discrete time
-`algebraic Riccati equation <https://en.wikipedia.org/wiki/Inverted_pendulum#From_Lagrange's_equations>`__  (DARE):
+并且 :math:`P` 是离散时间
+`代数黎卡提方程 <https://en.wikipedia.org/wiki/Inverted_pendulum#From_Lagrange's_equations>`__ （DARE）的唯一正定解：
 
 .. math::  P = A^T P A - A^T P B ( R + B^T P B )^{-1} B^T P A + Q
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation_lqr.gif
 
-Code Link
+代码链接
 ^^^^^^^^^^^
 
 .. autofunction:: InvertedPendulum.inverted_pendulum_lqr_control.main
 
 
-MPC control
+模型预测控制（MPC）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The MPC controller minimizes this cost function defined as:
+MPC 控制器最小化如下定义的代价函数：
 
 .. math:: J = x^T Q x + u^T R u
 
-subject to:
+约束为：
 
-- Linearized Inverted Pendulum model
-- Initial state
+- 线性化倒立摆模型
+- 初始状态
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation.gif
 
-Code Link
+代码链接
 ^^^^^^^^^^^
 
 .. autofunction:: InvertedPendulum.inverted_pendulum_mpc_control.main
-

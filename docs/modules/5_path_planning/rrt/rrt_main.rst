@@ -1,20 +1,18 @@
 .. _rapidly-exploring-random-trees-(rrt):
 
-Rapidly-Exploring Random Trees (RRT)
+快速扩展随机树（RRT）
 ------------------------------------
 
-Basic RRT
+基本 RRT
 ~~~~~~~~~
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRT/animation.gif
 
-This is a simple path planning code with Rapidly-Exploring Random Trees
-(RRT)
+这是使用快速扩展随机树（RRT）的简单路径规划代码。
 
-Black circles are obstacles, green line is a searched tree, red crosses
-are start and goal positions.
+黑圆是障碍物，绿线是搜索树，红叉是起点和目标点。
 
-Code Link
+代码链接
 ^^^^^^^^^^
 
 .. autoclass:: PathPlanning.RRT.rrt.RRT
@@ -23,14 +21,14 @@ Code Link
 .. include:: rrt_star.rst
 
 
-RRT with dubins path
+带 Dubins 路径的 RRT
 ~~~~~~~~~~~~~~~~~~~~
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTDubins/animation.gif
 
-Path planning for a car robot with RRT and dubins path planner.
+面向汽车机器人的路径规划，使用 RRT 与 Dubins 路径规划器。
 
-Code Link
+代码链接
 ^^^^^^^^^^
 
 .. autoclass:: PathPlanning.RRTDubins.rrt_dubins.RRTDubins
@@ -38,14 +36,14 @@ Code Link
 
 .. _rrt*-with-dubins-path:
 
-RRT\* with dubins path
+带 Dubins 路径的 RRT\*
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTStarDubins/animation.gif
 
-Path planning for a car robot with RRT\* and dubins path planner.
+面向汽车机器人的路径规划，使用 RRT\* 与 Dubins 路径规划器。
 
-Code Link
+代码链接
 ^^^^^^^^^^
 
 .. autoclass:: PathPlanning.RRTStarDubins.rrt_star_dubins.RRTStarDubins
@@ -53,14 +51,14 @@ Code Link
 
 .. _rrt*-with-reeds-sheep-path:
 
-RRT\* with reeds-sheep path
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+结合 Reeds-Shepp 路径的 RRT\*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTStarReedsShepp/animation.gif
 
-Path planning for a car robot with RRT\* and reeds sheep path planner.
+面向汽车机器人的路径规划，使用 RRT\* 与 Reeds-Shepp 路径规划器。
 
-Code Link
+代码链接
 ^^^^^^^^^^
 
 .. autoclass:: PathPlanning.RRTStarReedsShepp.rrt_star_reeds_shepp.RRTStarReedsShepp
@@ -73,17 +71,17 @@ Informed RRT\*
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/InformedRRTStar/animation.gif
 
-This is a path planning code with Informed RRT*.
+这是使用 Informed RRT\* 的路径规划代码。
 
-The cyan ellipse is the heuristic sampling domain of Informed RRT*.
+青色椭圆是 Informed RRT\* 的启发式采样区域。
 
-Code Link
+代码链接
 ^^^^^^^^^^
 
 .. autoclass:: PathPlanning.InformedRRTStar.informed_rrt_star.InformedRRTStar
 
 
-Reference
+参考文献
 ^^^^^^^^^^
 
 -  `Informed RRT\*: Optimal Sampling-based Path Planning Focused via
@@ -97,15 +95,15 @@ Batch Informed RRT\*
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/BatchInformedRRTStar/animation.gif
 
-This is a path planning code with Batch Informed RRT*.
+这是使用 Batch Informed RRT\* 的路径规划代码。
 
-Code Link
+代码链接
 ^^^^^^^^^^
 
 .. autoclass:: PathPlanning.BatchInformedRRTStar.batch_informed_rrt_star.BITStar
 
 
-Reference
+参考文献
 ^^^^^^^^^^^
 
 -  `Batch Informed Trees (BIT*): Sampling-based Optimal Planning via the
@@ -115,24 +113,24 @@ Reference
 
 .. _closed-loop-rrt*:
 
-Closed Loop RRT\*
+闭环 RRT\*
 ~~~~~~~~~~~~~~~~~
 
-A vehicle model based path planning with closed loop RRT*.
+基于车辆模型、使用闭环 RRT\* 的路径规划。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ClosedLoopRRTStar/animation.gif
 
-In this code, pure-pursuit algorithm is used for steering control,
+本代码用纯追踪（pure pursuit）算法做转向控制，
 
-PID is used for speed control.
+用 PID 做速度控制。
 
-Code Link
+代码链接
 ^^^^^^^^^^
 
 .. autoclass:: PathPlanning.ClosedLoopRRTStar.closed_loop_rrt_star_car.ClosedLoopRRTStar
 
 
-Reference
+参考文献
 ^^^^^^^^^^^^
 
 -  `Motion Planning in Complex Environments using Closed-loop
@@ -150,19 +148,19 @@ Reference
 LQR-RRT\*
 ~~~~~~~~~
 
-This is a path planning simulation with LQR-RRT*.
+这是 LQR-RRT\* 路径规划仿真。
 
-A double integrator motion model is used for LQR local planner.
+局部规划器使用双积分器运动模型上的 LQR。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRRRTStar/animation.gif
 
-Code Link
+代码链接
 ^^^^^^^^^^
 
 .. autoclass:: PathPlanning.LQRRRTStar.lqr_rrt_star.LQRRRTStar
 
 
-Reference
+参考文献
 ~~~~~~~~~~~~~
 
 -  `LQR-RRT\*: Optimal Sampling-Based Motion Planning with Automatically

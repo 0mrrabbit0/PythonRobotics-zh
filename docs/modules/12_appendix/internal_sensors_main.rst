@@ -1,61 +1,61 @@
 .. _`Internal Sensors for Robots`:
 
-Internal Sensors for Robots
+机器人的内部传感器
 ============================
 
-This project, `PythonRobotics`, focuses on algorithms, so hardware is not included. However, having basic knowledge of hardware in robotics is also important for understanding algorithms. Therefore, we will provide an overview.
+本项目 `PythonRobotics` 聚焦于算法，因此不包含硬件。不过，具备机器人学中硬件的基本知识，对于理解算法同样重要。因此，这里给出一个概述。
 
-Introduction
+引言
 -------------
 
-In robotic systems, internal sensors play a crucial role in monitoring the robot’s internal state, such as orientation, acceleration, angular velocity, altitude, and temperature. These sensors provide essential feedback that supports control, localization, and safety mechanisms. While external sensors perceive the environment, internal sensors give the robot self-awareness of its own motion and condition. Understanding the principles and characteristics of these sensors is vital to fully utilize their information within algorithms and decision-making systems. This section outlines the main internal sensors used in robotics.
+在机器人系统中，内部传感器在监测机器人内部状态方面起着关键作用，例如朝向、加速度、角速度、高度和温度。这些传感器提供必要的反馈，支撑控制、定位和安全机制。外部传感器感知环境，内部传感器则让机器人对自身的运动和状态具有自我感知。理解这些传感器的原理和特性，对于在算法和决策系统中充分利用它们的信息至关重要。本节概述机器人学中使用的主要内部传感器。
 
-Global Navigation Satellite System (GNSS)
+全球导航卫星系统（GNSS）
 -----------------------------------------
 
-GNSS is a satellite-based navigation system that provides global positioning and time information by analyzing signals from multiple satellites. It is commonly used in outdoor environments for absolute positioning. Although GNSS offers global coverage without infrastructure dependency, its performance is limited indoors or in obstructed areas, and it suffers from low update rates and susceptibility to signal noise. It is widely used in outdoor navigation for drones, vehicles, and delivery robots.
+GNSS 是一种基于卫星的导航系统，通过分析来自多颗卫星的信号，提供全球定位和时间信息。它常用于室外环境中的绝对定位。尽管 GNSS 具有全球覆盖、不依赖地面基础设施的特点，但它在室内或有遮挡的区域性能受限，并且更新率较低、易受信号噪声影响。它广泛用于无人机、车辆和配送机器人的室外导航。
 
-Gyroscope
+陀螺仪
 ----------
 
-A gyroscope measures angular velocity around the robot’s axes, enabling orientation and attitude estimation through detection of the Coriolis effect. Gyroscopes are compact, cost-effective, and provide high update rates, but they are prone to drift and require calibration or sensor fusion for long-term accuracy. These sensors are essential in drones, balancing robots, and IMU-based systems for motion tracking.
+陀螺仪测量绕机器人各轴的角速度，通过检测科里奥利效应来估计朝向和姿态。陀螺仪体积小、成本较低，并能提供高更新率，但容易产生漂移，需要标定或传感器融合才能获得长期精度。这些传感器对于无人机、平衡机器人和基于惯性测量单元（IMU）的运动跟踪系统是必不可少的。
 
-Accelerometer
+加速度计
 ---------------
 
-An accelerometer measures linear acceleration along one or more axes, typically by detecting mass displacement due to motion. It is small, affordable, and useful for detecting movement, tilt, or vibration. However, accelerometers are limited by noisy output and cannot independently determine position without integration and fusion. They are commonly applied in wearable robotics, step counters, and vibration sensing.
+加速度计测量沿一个或多个轴的线加速度，通常通过检测质量因运动而产生的位移来实现。它体积小、价格低，可用于检测运动、倾斜或振动。然而，加速度计的输出噪声较大，如果不经过积分和融合，无法独立确定位置。它们常用于可穿戴机器人、计步器和振动检测。
 
-Magnetometer
+磁力计
 --------------
 
-A magnetometer measures the direction and intensity of magnetic fields, enabling heading estimation based on Earth’s magnetic field. It is lightweight and useful for orientation, especially in GPS-denied environments, though it is sensitive to interference from electronics and requires calibration. Magnetometers are often used in conjunction with IMUs for navigation and directional awareness.
+磁力计测量磁场的方向和强度，从而基于地球磁场估计航向。它重量轻，对确定朝向很有用，尤其是在无法使用 GPS 的环境中，但它对电子设备的干扰敏感，并且需要标定。磁力计常与 IMU 一起用于导航和方向感知。
 
-Inertial Measurement Unit (IMU)
+惯性测量单元（IMU）
 --------------------------------
 
-An IMU integrates a gyroscope, accelerometer, and sometimes a magnetometer to estimate a robot's motion and orientation through sensor fusion techniques such as Kalman filters. IMUs are compact and provide high-frequency data, which is essential for localization and navigation in GPS-denied areas. Nonetheless, they accumulate drift over time and require complex filtering to maintain accuracy. IMUs are found in drones, mobile robots, and motion tracking systems.
+IMU 集成了陀螺仪、加速度计，有时还包括磁力计，通过卡尔曼滤波等传感器融合技术估计机器人的运动和朝向。IMU 结构紧凑，并提供高频数据，这对于在无法使用 GPS 的区域进行定位和导航至关重要。尽管如此，它们会随时间累积漂移，需要复杂的滤波来保持精度。无人机、移动机器人和运动跟踪系统中都能见到 IMU。
 
-Pressure Sensor
+压力传感器
 ----------------
 
-Pressure sensors detect atmospheric or fluid pressure by measuring the force exerted on a diaphragm. They are effective for estimating altitude and monitoring environmental conditions, especially in drones and underwater robots. Although cost-effective and efficient, their accuracy may degrade due to temperature variation and limitations in low-altitude resolution.
+压力传感器通过测量作用在膜片上的力来检测大气压力或流体压力。它们可用于估计高度和监测环境条件，尤其是在无人机和水下机器人中。虽然成本较低且效率较高，但其精度可能因温度变化而下降，并且在低高度上的分辨率有限。
 
-Temperature Sensor
+温度传感器
 --------------------
 
-Temperature sensors monitor environmental or internal component temperatures, using changes in resistance or voltage depending on sensor type (e.g., RTD or thermocouple). They are simple and reliable for safety and thermal regulation, though they may respond slowly and be affected by nearby electronics. Common applications include battery and motor monitoring, safety systems, and ambient sensing.
+温度传感器监测环境温度或内部部件温度，依据传感器类型（例如 RTD 或热电偶）利用电阻或电压的变化。它们简单可靠，用于安全和热管理，但响应可能较慢，并会受到附近电子设备的影响。常见应用包括电池和电机监测、安全系统以及环境感知。
 
-References
+参考文献
 ----------
 
-- *Introduction to Autonomous Mobile Robots*, Roland Siegwart, Illah Nourbakhsh, Davide Scaramuzza
-- *Probabilistic Robotics*, Sebastian Thrun, Wolfram Burgard, Dieter Fox
-- Wikipedia articles:
+- *Introduction to Autonomous Mobile Robots*，Roland Siegwart、Illah Nourbakhsh、Davide Scaramuzza
+- *Probabilistic Robotics*，Sebastian Thrun、Wolfram Burgard、Dieter Fox
+- 维基百科条目：
 
-  - `Inertial Measurement Unit (IMU) <https://en.wikipedia.org/wiki/Inertial_measurement_unit>`_
-  - `Accelerometer <https://en.wikipedia.org/wiki/Accelerometer>`_
-  - `Gyroscope <https://en.wikipedia.org/wiki/Gyroscope>`_
-  - `Magnetometer <https://en.wikipedia.org/wiki/Magnetometer>`_
-  - `Pressure sensor <https://en.wikipedia.org/wiki/Pressure_sensor>`_
-  - `Temperature sensor <https://en.wikipedia.org/wiki/Thermometer>`_
-- `Adafruit Sensor Guides <https://learn.adafruit.com/>`_
+  - `惯性测量单元（IMU） <https://en.wikipedia.org/wiki/Inertial_measurement_unit>`_
+  - `加速度计 <https://en.wikipedia.org/wiki/Accelerometer>`_
+  - `陀螺仪 <https://en.wikipedia.org/wiki/Gyroscope>`_
+  - `磁力计 <https://en.wikipedia.org/wiki/Magnetometer>`_
+  - `压力传感器 <https://en.wikipedia.org/wiki/Pressure_sensor>`_
+  - `温度传感器 <https://en.wikipedia.org/wiki/Thermometer>`_
+- `Adafruit 传感器指南 <https://learn.adafruit.com/>`_

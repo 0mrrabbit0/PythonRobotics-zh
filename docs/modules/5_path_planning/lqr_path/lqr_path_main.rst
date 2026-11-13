@@ -1,11 +1,11 @@
-LQR based path planning
+基于 LQR 的路径规划
 -----------------------
 
-A sample code using LQR based path planning for double integrator model.
+面向双积分器模型、基于 LQR 的路径规划示例代码。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRPlanner/animation.gif?raw=true
 
-Code Link
+代码链接
 +++++++++++++
 
 .. autoclass:: PathPlanning.LQRPlanner.lqr_planner.LQRPlanner

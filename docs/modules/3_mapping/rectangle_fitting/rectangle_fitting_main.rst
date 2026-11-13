@@ -1,69 +1,60 @@
-Object shape recognition using rectangle fitting
-------------------------------------------------
+使用矩形拟合的物体形状识别
+--------------------------
 
-This is an object shape recognition using rectangle fitting.
+这是使用矩形拟合进行的物体形状识别。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/rectangle_fitting/animation.gif
 
-This example code is based on this paper algorithm:
+本示例代码基于这篇论文中的算法：
 
 - `Efficient L\-Shape Fitting for Vehicle Detection Using Laser Scanners \- The Robotics Institute Carnegie Mellon University <https://www.ri.cmu.edu/publications/efficient-l-shape-fitting-for-vehicle-detection-using-laser-scanners/>`_
 
-The algorithm consists of 2 steps as below.
+该算法包含如下 2 个步骤。
 
-Step1: Adaptive range segmentation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 1：自适应距离分割
+~~~~~~~~~~~~~~~~~~~~~~
 
-In the first step, all range data points are segmented into some clusters.
+第一步，把全部距离数据点分割为若干聚类。
 
-We calculate the distance between each range data and the nearest range data, and if this distance is below a certain threshold, it is judged to be in the same cluster. 
-This distance threshold is determined in proportion to the distance from the sensor.
-This is taking advantage of the general model of distance sensors, which tends to have sparser data distribution as the distance from the sensor increases.
+计算每个距离数据与最近的距离数据之间的距离；若该距离低于某一阈值，则判定它们属于同一聚类。该距离阈值按到传感器的距离成比例确定。这利用了距离传感器的一般模型：随着到传感器的距离增加，数据分布往往更稀疏。
 
-The threshold range is calculated by:
+阈值距离按如下公式计算：
 
 .. math:: r_{th} = R_0 + R_d * r_{origin}
 
-where
+其中
 
-- :math:`r_{th}`: Threashold range
-- :math:`R_0, R_d`: Constant parameters
-- :math:`r_{origin}`: Distance from the sensor for a range data.
+- :math:`r_{th}`：阈值距离
+- :math:`R_0, R_d`：常数参数
+- :math:`r_{origin}`：某个距离数据到传感器的距离。
 
-Step2: Rectangle search
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 2：矩形搜索
+~~~~~~~~~~~~~~~~
 
-In the second step, for each cluster calculated in the previous step, rectangular fittings will be applied.
-In this rectangular fitting, each cluster's distance data is rotated at certain angle intervals.
-It is evaluated by one of the three evaluation functions below, then best angle parameter one is selected as the rectangle shape.
+第二步，对上一步算出的每个聚类进行矩形拟合。在该矩形拟合中，每个聚类的距离数据按一定的角度间隔旋转，并用下面三个评价函数之一加以评估，然后选取角度参数最优的一个作为矩形形状。
 
-1. Rectangle Area Minimization criteria
-=========================================
+1. 矩形面积最小化准则
+=====================
 
-This evaluation function calculates the area of the smallest rectangle that includes all the points, derived from the difference between the maximum and minimum values on the x-y axis for all distance data points. 
-This allows for fitting a rectangle in a direction that encompasses as much of the smallest rectangular shape as possible.
+该评价函数计算包含全部点的最小矩形的面积，这个面积由所有距离数据点在 x-y 轴上的最大值与最小值之差得到。这样就可以沿尽可能包住该最小矩形形状的方向拟合矩形。
 
+2. 接近度准则
+=============
 
-2. Closeness criteria
-======================
+该评价函数把矩形右侧上下顶点与距离数据中每个点之间的距离用作评价值。若矩形边上存在点，该评价值会减小。
 
-This evaluation function uses the distances between the top and bottom vertices on the right side of the rectangle and each point in the distance data as evaluation values. 
-If there are points on the rectangle edges, this evaluation value decreases.
+3. 方差准则
+===========
 
-3. Variance criteria
-=======================
+该评价函数使用矩形的边（水平边与垂直边）与每个点之间的平方距离。计算平方误差等同于计算方差。该方差越小，越说明这些点与矩形贴合。
 
-This evaluation function uses the squreed distances between the edges of the rectangle (horizontal and vertical) and each point. 
-Calculating the squared error is the same as calculating the variance.
-The smaller this variance, the more it signifies that the points fit within the rectangle.
-
-Code Link
-~~~~~~~~~~~
+代码链接
+~~~~~~~~
 
 .. autoclass:: Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting
 	:members:
 
-References
-~~~~~~~~~~
+参考文献
+~~~~~~~~
 
 - `Efficient L\-Shape Fitting for Vehicle Detection Using Laser Scanners \- The Robotics Institute Carnegie Mellon University <https://www.ri.cmu.edu/publications/efficient-l-shape-fitting-for-vehicle-detection-using-laser-scanners/>`_

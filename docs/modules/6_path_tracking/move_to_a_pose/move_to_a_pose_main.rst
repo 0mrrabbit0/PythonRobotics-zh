@@ -1,165 +1,165 @@
-Move to a Pose Control
+移动到位姿控制
 ----------------------
 
-In this section, we present the logic of PathFinderController that drives a car from a start pose (x, y, theta) to a goal pose. A simulation of moving to a pose control is presented below.
+本节给出 PathFinderController 的逻辑，它把车辆从起始位姿 (x, y, theta) 驱动到目标位姿。下方给出移动到位姿控制的仿真。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/move_to_pose/animation.gif
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~~~
 
 .. autofunction:: PathTracking.move_to_pose.move_to_pose.move_to_pose
 
 
-Position Control of non-Holonomic Systems
+非完整系统的位置控制
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This section explains the logic of a position controller for systems with constraint (non-Holonomic system).
+本节说明带约束系统（非完整系统）的位置控制器逻辑。
 
-The position control of a 1-DOF (Degree of Freedom) system is quite straightforward. We only need to compute a position error and multiply it with a proportional gain to create a command. The actuator of the system takes this command and drive the system to the target position. This controller can be easily extended to higher dimensions (e.g., using Kp_x and Kp_y gains for a 2D position control). In these systems, the number of control commands is equal to the number of degrees of freedom (Holonomic system). 
+1 自由度（DOF）系统的位置控制相当直接：只需计算位置误差，再乘以比例增益，即可得到控制指令。系统的执行器接收该指令，并把系统驱动到目标位置。该控制器可以很容易地扩展到更高维（例如，二维位置控制使用 Kp_x 与 Kp_y 增益）。在这些系统中，控制指令的数量等于自由度的数量（完整系统）。
 
-To describe the configuration of a car on a 2D plane, we need three DOFs (i.e., x, y, and theta). But to drive a car we only need two control commands (theta_engine and theta_steering_wheel). This difference is because of a constraint between the x and y DOFs. The relationship between the delta_x and delta_y is governed by the theta_steering_wheel.
+要描述二维平面上车辆的位形，需要三个自由度（即 x、y 与 theta）。但驱动车辆只需要两个控制指令（theta_engine 与 theta_steering_wheel）。这一差别来自 x 与 y 这两个自由度之间的约束。delta_x 与 delta_y 之间的关系由 theta_steering_wheel 决定。
 
-Note that a car is normally a non-Holonomic system but if the road is slippery, the car turns into a Holonomic system and thus it needs three independent commands to be controlled.
+注意，车辆通常是非完整系统；若路面打滑，车辆会变成完整系统，从而需要三个独立指令才能控制。
 
-PathFinderController class
+PathFinderController 类
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Constructor
+构造函数
 ^^^^^^^^^^^
 
 .. code-block:: ipython3
 
    PathFinderController(Kp_rho, Kp_alpha, Kp_beta)
 
-Constructs an instance of the PathFinderController for navigating a 3-DOF wheeled robot on a 2D plane.
+构造 PathFinderController 的实例，用于在二维平面上导航三自由度轮式机器人。
 
-Parameters:
+参数：
 
-- | **Kp_rho** : The linear velocity gain to translate the robot along a line towards the goal
-- | **Kp_alpha** : The angular velocity gain to rotate the robot towards the goal
-- | **Kp_beta** : The offset angular velocity gain accounting for smooth merging to the goal angle (i.e., it helps the robot heading to be parallel to the target angle.)
+- | **Kp_rho** ：使机器人沿直线移向目标的线速度增益
+- | **Kp_alpha** ：使机器人朝向目标旋转的角速度增益
+- | **Kp_beta** ：用于平滑并入目标角度的偏置角速度增益（即帮助机器人航向角与目标角度保持平行。）
 
 
-Member function(s)
+成员函数
 ^^^^^^^^^^^^^^^^^^
 
 .. code-block:: ipython3
 
    calc_control_command(x_diff, y_diff, theta, theta_goal)
 
-Returns the control command for the linear and angular velocities as well as the distance to goal
+返回线速度与角速度的控制指令，以及到目标的距离。
 
-Parameters:
+参数：
 
-- | **x_diff** : The position of target with respect to current robot position in x direction
-- | **y_diff** : The position of target with respect to current robot position in y direction
-- | **theta** : The current heading angle of robot with respect to x axis
-- | **theta_goal** : The target angle of robot with respect to x axis
+- | **x_diff** ：目标相对于机器人当前位置在 x 方向上的位置
+- | **y_diff** ：目标相对于机器人当前位置在 y 方向上的位置
+- | **theta** ：机器人相对于 x 轴的当前航向角
+- | **theta_goal** ：机器人相对于 x 轴的目标角度
 
-Returns:
+返回值：
 
-- | **rho** : The distance between the robot and the goal position
-- | **v** : Command linear velocity
-- | **w** : Command angular velocity
+- | **rho** ：机器人与目标位置之间的距离
+- | **v** ：指令线速度
+- | **w** ：指令角速度
 
-How does the Algorithm Work
+算法原理
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The distance between the robot and the goal position, :math:`\rho`, is computed as
+机器人与目标位置之间的距离 :math:`\rho` 按下式计算
 
 .. math::
  \rho = \sqrt{(x_{robot} - x_{target})^2 + (y_{robot} - y_{target})^2}.
 
-The distance :math:`\rho` is used to determine the robot speed. The idea is to slow down the robot as it gets closer to the target.
+距离 :math:`\rho` 用于确定机器人速度。其思路是：机器人越接近目标，速度越低。
 
 .. math::
  v = K_P{_\rho} \times \rho\qquad
  :label: move_to_a_pose_eq1
 
-Note that for your applications, you need to tune the speed gain, :math:`K_P{_\rho}` to a proper value.
+注意，在具体应用中，需要把速度增益 :math:`K_P{_\rho}` 调节到合适的数值。
 
-To turn the robot and align its heading, :math:`\theta`, toward the target position (not orientation),  :math:`\rho \vec{u}`, we need to compute the angle difference :math:`\alpha`. 
+为使机器人转向，并将其航向角 :math:`\theta` 对准目标位置（而不是目标朝向）:math:`\rho \vec{u}`，需要计算角度差 :math:`\alpha`。 
 
 .. math::
  \alpha = (\arctan2(y_{diff}, x_{diff}) - \theta + \pi) mod (2\pi) - \pi
 
-The term :math:`mod(2\pi)` is used to map the angle to :math:`[-\pi, \pi)` range.
+项 :math:`mod(2\pi)` 用于把角度映射到 :math:`[-\pi, \pi)` 区间。
 
-Lastly to correct the orientation of the robot, we need to compute the orientation error, :math:`\beta`, of the robot.
+最后，为校正机器人的朝向，需要计算机器人的朝向误差 :math:`\beta`。
 
 .. math::
  \beta = (\theta_{goal} - \theta - \alpha + \pi) mod (2\pi) - \pi
 
-Note that to cancel out the effect of :math:`\alpha` when the robot is at the vicinity of the target, the term 
+注意，为了在机器人接近目标时抵消 :math:`\alpha` 的影响，式中包含项
 
-:math:`-\alpha` is included.
+:math:`-\alpha`。
 
-The final angular speed command is given by
+最终的角速度指令为
 
 .. math::
  \omega = K_P{_\alpha} \alpha - K_P{_\beta} \beta\qquad
  :label: move_to_a_pose_eq2
  
-The linear and angular speeds (Equations :eq:`move_to_a_pose_eq1` and :eq:`move_to_a_pose_eq2`) are the output of the algorithm.
+线速度与角速度（方程 :eq:`move_to_a_pose_eq1` 与 :eq:`move_to_a_pose_eq2`）是该算法的输出。
 
-Move to a Pose Robot (Class)
+移动到位姿机器人（类）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This program (move_to_pose_robot.py) provides a Robot class to define different robots with different specifications. 
-Using this class, you can simulate different robots simultaneously and compare the effect of your parameter settings.
+本程序（move_to_pose_robot.py）提供 Robot 类，用于定义规格不同的机器人。
+使用该类可以同时仿真不同的机器人，并比较参数设置的效果。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/move_to_pos_robot_class/animation.gif
 
-Note: The robot class is based on PathFinderController class in 'the move_to_pose.py'.
+注意：Robot 类基于 'move_to_pose.py' 中的 PathFinderController 类。
 
-Robot Class
+Robot 类
 ^^^^^^^^^^^^
 
-Constructor
+构造函数
 ^^^^^^^^^^^^
 
 .. code-block:: ipython3
 
     Robot(name, color, max_linear_speed, max_angular_speed, path_finder_controller)
 
-Constructs an instantiate of the 3-DOF wheeled Robot navigating on a 2D plane
+构造在二维平面上导航的三自由度轮式 Robot 实例。
 
-Parameters:
+参数：
 
-- | **name** : (string) The name of the robot
-- | **color** : (string) The color of the robot
-- | **max_linear_speed** : (float) The maximum linear speed that the robot can go
-- | **max_angular_speed** : (float) The maximum angular speed that the robot can rotate about its vertical axis
-- | **path_finder_controller** : (PathFinderController) A configurable controller to finds the path and calculates command linear and angular velocities.
+- | **name** ：（字符串）机器人的名称
+- | **color** ：（字符串）机器人的颜色
+- | **max_linear_speed** ：（浮点数）机器人能够达到的最大线速度
+- | **max_angular_speed** ：（浮点数）机器人绕其竖直轴旋转的最大角速度
+- | **path_finder_controller** ：（PathFinderController）可配置的控制器，用于寻找路径并计算指令线速度与角速度。
 
-Member function(s)
+成员函数
 ^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: ipython3
 
     set_start_target_poses(pose_start, pose_target)
 
-Sets the start and target positions of the robot.
+设置机器人的起始位置与目标位置。
 
-Parameters:
+参数：
 
-- | **pose_start** : (Pose) Start postion of the robot (see the Pose class)
-- | **pose_target** : (Pose) Target postion of the robot (see the Pose class)
+- | **pose_start** ：（Pose）机器人的起始位置（参见 Pose 类）
+- | **pose_target** ：（Pose）机器人的目标位置（参见 Pose 类）
 
 .. code-block:: ipython3
 
     move(dt)
 
-Move the robot for one time step increment
+将机器人移动一个时间步。
 
-Parameters:
+参数：
 
-- | **dt** : <float> time increment
+- | **dt** ：<浮点数> 时间增量
 
 
 
-References
+参考文献
 ~~~~~~~~~~~~
-- PathFinderController class
+- PathFinderController 类
 -  `P. I. Corke, "Robotics, Vision and Control" \| SpringerLink
    p102 <https://link.springer.com/book/10.1007/978-3-642-20144-8>`__

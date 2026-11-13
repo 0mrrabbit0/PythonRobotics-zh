@@ -1,27 +1,27 @@
-Distance Map
-------------
+距离地图
+--------
 
-This is an implementation of the Distance Map algorithm for path planning.
+这是用于路径规划的距离地图算法实现。
 
-The Distance Map algorithm computes the unsigned distance field (UDF) and signed distance field (SDF) from a boolean field representing obstacles. 
+距离地图算法根据表示障碍物的布尔场，计算无符号距离场（UDF）和有符号距离场（SDF）。
 
-The UDF gives the distance from each point to the nearest obstacle. The SDF gives positive distances for points outside obstacles and negative distances for points inside obstacles.
+无符号距离场（UDF）给出每个点到最近障碍物的距离。有符号距离场（SDF）对障碍物外部的点给出正距离，对障碍物内部的点给出负距离。
 
-Example
-~~~~~~~
+示例
+~~~~
 
-The algorithm is demonstrated on a simple 2D grid with obstacles:
+该算法在带有障碍物的简单二维栅格上演示：
 
 .. image:: distance_map.png
 
-Code Link
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+代码链接
+^^^^^^^^
 
 .. autofunction:: Mapping.DistanceMap.distance_map.compute_sdf
 
 .. autofunction:: Mapping.DistanceMap.distance_map.compute_udf
 
-References
-~~~~~~~~~~
+参考文献
+~~~~~~~~
 
-- `Distance Transforms of Sampled Functions <https://cs.brown.edu/people/pfelzens/papers/dt-final.pdf>`_ paper by Pedro F. Felzenszwalb and Daniel P. Huttenlocher. 
+- `Distance Transforms of Sampled Functions <https://cs.brown.edu/people/pfelzens/papers/dt-final.pdf>`_，Pedro F. Felzenszwalb 与 Daniel P. Huttenlocher 的论文。

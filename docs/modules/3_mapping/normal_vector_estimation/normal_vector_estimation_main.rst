@@ -1,74 +1,69 @@
-Normal vector estimation
--------------------------
+法向量估计
+----------
 
 
-Normal vector calculation of a 3D triangle
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+三维三角形的法向量计算
+~~~~~~~~~~~~~~~~~~~~~~
 
-A 3D point is as a vector:
+三维点可以表示为向量：
 
 .. math:: p = [x, y, z]
 
-When there are 3 points in 3D space, :math:`p_1, p_2, p_3`,
+当三维空间中有 3 个点 :math:`p_1, p_2, p_3` 时，
 
-we can calculate a normal vector n of a 3D triangle which is consisted of the points.
+可以计算由这些点构成的三维三角形的法向量 n。
 
 .. math:: n = \frac{v1 \times v2}{|v1 \times v2|}
 
-where
+其中
 
 .. math:: v1 = p2 - p1
 
 .. math:: v2 = p3 - p1
 
-This is an example of normal vector calculation:
+这是法向量计算的一个示例：
 
 .. figure:: normal_vector_calc.png
 
-Code Link
-==========
+代码链接
+========
 
 .. autofunction:: Mapping.normal_vector_estimation.normal_vector_estimation.calc_normal_vector
 
-Normal vector estimation with RANdam SAmpling Consensus(RANSAC)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+基于随机抽样一致性（RANSAC）的法向量估计
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Consider the problem of estimating the normal vector of a plane based on a
-set of N 3D points where a plane can be observed.
+考虑根据一组可以观测到平面的 N 个三维点，估计该平面法向量的问题。
 
-There is a way that uses all point cloud data to estimate a plane and
-a normal vector using the `least-squares method <https://stackoverflow.com/a/44315221/8387766>`_
+有一种方法使用全部点云数据，通过\ `最小二乘法 <https://stackoverflow.com/a/44315221/8387766>`_\ 估计平面和法向量。
 
-However, this method is vulnerable to noise of the point cloud.
+然而，该方法容易受点云噪声的影响。
 
-In this document, we will use a method that uses
-`RANdam SAmpling Consensus(RANSAC) <https://en.wikipedia.org/wiki/Random_sample_consensus>`_
-to estimate a plane and a normal vector.
+本文使用\ `随机抽样一致性（RANSAC） <https://en.wikipedia.org/wiki/Random_sample_consensus>`_\ 来估计平面和法向量。
 
-RANSAC is a robust estimation methods for data set with outliers.
+随机抽样一致性（RANSAC）是针对含离群点数据集的鲁棒估计方法。
 
 
 
-This RANSAC based normal vector estimation method is as follows:
+基于随机抽样一致性（RANSAC）的法向量估计方法如下：
 
-#. Select 3 points randomly from the point cloud.
+#. 从点云中随机选取 3 个点。
 
-#. Calculate a normal vector of a plane which is consists of the sampled 3 points.
+#. 计算由这 3 个采样点所构成平面的法向量。
 
-#. Calculate the distance between the calculated plane and the all point cloud.
+#. 计算该平面与全部点云之间的距离。
 
-#. If the distance is less than a threshold, the point is considered to be an inlier.
+#. 若距离小于阈值，则将该点视为内点。
 
-#. Repeat the above steps until the inlier ratio is greater than a threshold.
+#. 重复上述步骤，直到内点比例大于阈值。
 
 
 
-This is an example of RANSAC based normal vector estimation:
+这是基于随机抽样一致性（RANSAC）的法向量估计示例：
 
 .. figure:: ransac_normal_vector_estimation.png
 
-Code Link
-==========
+代码链接
+========
 
 .. autofunction:: Mapping.normal_vector_estimation.normal_vector_estimation.ransac_normal_vector_estimation
-

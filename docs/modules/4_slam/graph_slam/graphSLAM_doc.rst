@@ -1,6 +1,6 @@
 
-Graph SLAM
-~~~~~~~~~~~~
+基于图的 SLAM
+~~~~~~~~~~~~~
 
 .. code:: ipython3
 
@@ -16,39 +16,19 @@ Graph SLAM
     np.set_printoptions(precision=3, suppress=True)
     np.random.seed(0)
 
-Introduction
+引言
 ^^^^^^^^^^^^
 
-In contrast to the probabilistic approaches for solving SLAM, such as
-EKF, UKF, particle filters, and so on, the graph technique formulates
-the SLAM as an optimization problem. It is mostly used to solve the full
-SLAM problem in an offline fashion, i.e. optimize all the poses of the
-robot after the path has been traversed. However, some variants are
-available that uses graph-based approaches to perform online estimation
-or to solve for a subset of the poses.
+图方法把同步定位与建图（SLAM）表述成一个优化问题。扩展卡尔曼滤波（EKF）、无迹卡尔曼滤波（UKF）、粒子滤波等则属于求解 SLAM 的概率方法。图方法多用来以离线方式求解完全 SLAM 问题，也就是在路径走完之后，优化机器人的全部位姿。也有一些变体用基于图的方法做在线估计，或只求解一部分位姿。
 
-GraphSLAM uses the motion information as well as the observations of the
-environment to create a least squares problem that can be solved using
-standard optimization techniques.
+GraphSLAM 同时利用运动信息和环境观测，构造一个可以用标准优化方法求解的最小二乘问题。
 
-Minimal Example
+最小示例
 ^^^^^^^^^^^^^^^
 
-The following example illustrates the main idea behind graphSLAM. A
-simple case of a 1D robot is considered that can only move in 1
-direction. The robot is commanded to move forward with a control input
-:math:`u_t=1`, however, the motion is not perfect and the measured
-odometry will deviate from the true path. At each time step the robot can
-observe its environment, for this simple case as well, there is only a
-single landmark at coordinates :math:`x=3`. The measured observations
-are the range between the robot and landmark. These measurements are
-also subjected to noise. No bearing information is required since this
-is a 1D problem.
+下面的例子说明 graphSLAM 的主要想法。考虑一个只能沿一个方向运动的一维机器人。机器人被命令以控制输入 :math:`u_t=1` 向前运动，但运动并不理想，测得的里程计会偏离真实路径。每个时间步机器人都可以观测环境；在这个简单情形里，只有一个位于坐标 :math:`x=3` 的路标。测得的观测是机器人与路标之间的距离。这些测量同样带有噪声。因为这是一维问题，不需要方位角信息。
 
-To solve this, graphSLAM creates what is called as the system
-information matrix :math:`\Omega` also referred to as :math:`H` and the
-information vector :math:`\xi` also known as :math:`b`. The entries are
-created based on the information of the motion and the observation.
+为了求解它，graphSLAM 构造所谓的系统信息矩阵 :math:`\Omega`，也称作 :math:`H`，以及信息向量 :math:`\xi`，也称作 :math:`b`。矩阵和向量中的元素根据运动信息与观测信息填写。
 
 .. code:: ipython3
 
@@ -160,65 +140,38 @@ created based on the information of the motion and the observation.
 .. image:: graphSLAM_doc_files/graphSLAM_doc_2_2.png
 
 
-In particular, the tasks are split into 2 parts, graph construction, and
-graph optimization. ### Graph Construction
+具体而言，这些任务分成两部分：图的构建与图的优化。
 
-Firstly the nodes are defined
-:math:`\boldsymbol{x} = \boldsymbol{x}_{1:n}` such that each node is the
-pose of the robot at time :math:`t_i` Secondly, the edges i.e. the
-constraints, are constructed according to the following conditions:
-
--  robot moves from :math:`\boldsymbol{x}_i` to
-   :math:`\boldsymbol{x}_j`. This edge corresponds to the odometry
-   measurement. Relative motion constraints (Not included in the
-   previous minimal example).
--  Measurement constraints, this can be done in two ways:
-
-   -  The information matrix is set in such a way that it includes the
-      landmarks in the map as well. Then the constraints can be entered
-      in a straightforward fashion between a node
-      :math:`\boldsymbol{x}_i` and some landmark :math:`m_k`
-   -  Through creating a virtual measurement among all the node that
-      have observed the same landmark. More concretely, robot observes
-      the same landmark from :math:`\boldsymbol{x}_i` and
-      :math:`\boldsymbol{x}_j`. Relative measurement constraint. The
-      “virtual measurement” :math:`\boldsymbol{z}_{ij}`, which is the
-      estimated pose of :math:`\boldsymbol{x}_j` as seen from the node
-      :math:`\boldsymbol{x}_i`. The virtual measurement can then be
-      entered in the information matrix and vector in a similar fashion
-      to the motion constraints.
-
-An edge is fully characterized by the values of the error (entry to
-information vector) and the local information matrix (entry to the
-system’s information vector). The larger the local information matrix
-(lower :math:`Q` or :math:`R`) the values that this edge will contribute
-with.
-
-Important Notes:
-
--  The addition to the information matrix and vector are added to the
-   earlier values.
--  In the case of 2D robot, the constraints will be non-linear,
-   therefore, a Jacobian of the error w.r.t the states is needed when
-   updated :math:`H` and :math:`b`.
--  The anchoring constraint is needed in order to avoid having a
-   singular information matri.
-
-Graph Optimization
-^^^^^^^^^^^^^^^^^^
-
-The result from this formulation yields an overdetermined system of
-equations. The goal after constructing the graph is to find:
-:math:`x^*=\underset{x}{\mathrm{argmin}}~\underset{ij}\Sigma~f(e_{ij})`,
-where :math:`f` is some error function that depends on the edges between
-to related nodes :math:`i` and :math:`j`. The derivation in the references
-arrive at the solution for :math:`x^* = H^{-1}b`
-
-Planar Example:
+图的构建
 ^^^^^^^^^^^^^^^
 
-Now we will go through an example with a more realistic case of a 2D
-robot with 3DoF, namely, :math:`[x, y, \theta]^T`
+首先定义节点 :math:`\boldsymbol{x} = \boldsymbol{x}_{1:n}`，使每个节点是机器人在时刻 :math:`t_i` 的位姿。其次按下列条件构造边，也就是约束：
+
+-  机器人从 :math:`\boldsymbol{x}_i` 运动到 :math:`\boldsymbol{x}_j`。这条边对应里程计测量，即相对运动约束（前面的最小示例没有包含这一项）。
+-  测量约束可以用两种方式建立：
+
+   -  把信息矩阵设置成同时包含地图中的路标。这样就可以在节点 :math:`\boldsymbol{x}_i` 与某个路标 :math:`m_k` 之间直接写入约束。
+   -  在所有观测过同一路标的节点之间建立虚拟测量。更具体地说，机器人从 :math:`\boldsymbol{x}_i` 与 :math:`\boldsymbol{x}_j` 观测同一路标，从而得到相对测量约束。“虚拟测量” :math:`\boldsymbol{z}_{ij}` 是从节点 :math:`\boldsymbol{x}_i` 看去、对 :math:`\boldsymbol{x}_j` 的估计位姿。随后可以按与运动约束相同的方式，把虚拟测量写入信息矩阵和信息向量。
+
+一条边由误差的取值（写入信息向量的项）和局部信息矩阵（写入系统信息矩阵的项）完全刻画。局部信息矩阵越大（:math:`Q` 或 :math:`R` 越小），这条边所贡献的数值就越大。
+
+要点：
+
+-  加到信息矩阵和信息向量上的量，是累加到已有数值之上的。
+-  对于二维机器人，约束是非线性的，因此在更新 :math:`H` 与 :math:`b` 时，需要误差相对于状态的雅可比矩阵。
+-  需要锚定约束，以免信息矩阵奇异。
+
+图优化
+^^^^^^^^^^^^^^^^^^
+
+这一表述得到一个超定方程组。构建该图之后的目标是求
+:math:`x^*=\underset{x}{\mathrm{argmin}}~\underset{ij}\Sigma~f(e_{ij})`,
+其中 :math:`f` 是某种误差函数，它依赖于相关的两个节点 :math:`i` 与 :math:`j` 之间的边。参考文献中的推导得到解 :math:`x^* = H^{-1}b`。
+
+平面示例
+^^^^^^^^^^^^^^^
+
+下面讨论更接近实际的情形：一个具有三个自由度的二维机器人，即 :math:`[x, y, \theta]^T`。
 
 .. code:: ipython3
 
@@ -301,11 +254,7 @@ robot with 3DoF, namely, :math:`[x, y, \theta]^T`
     number_of_nodes = x_opt.shape[1]
     n = number_of_nodes * STATE_SIZE
 
-After the data has been saved, the graph will be constructed by looking
-at each pair for nodes. The virtual measurement is only created if two
-nodes have observed the same landmark at different points in time. The
-next cells are a walk through for a single iteration of graph
-construction -> optimization -> estimate update.
+数据保存之后，通过考察每一对节点来构建图。只有当两个节点在不同时刻观测到同一路标时，才建立虚拟测量。后面几个单元逐步演示一次迭代：图的构建 → 优化 → 估计更新。
 
 .. code:: ipython3
 
@@ -325,23 +274,16 @@ construction -> optimization -> estimate update.
     Node 1 observed landmark with ID 0.0
 
 
-In the following code snippet the error based on the virtual measurement
-between node 0 and 1 will be created. The equations for the error is as follows:
+下面的代码片段将建立节点 0 与节点 1 之间、基于虚拟测量的误差。误差方程如下：
 :math:`e_{ij}^x = x_j + d_j cos(\psi_j +\theta_j) - x_i - d_i cos(\psi_i + \theta_i)`
 
 :math:`e_{ij}^y = y_j + d_j sin(\psi_j + \theta_j) - y_i - d_i sin(\psi_i + \theta_i)`
 
 :math:`e_{ij}^{\psi} = \psi_j + \theta_j - \psi_i - \theta_i`
 
-Where :math:`[x_i, y_i, \psi_i]` is the pose for node :math:`i` and
-similarly for node :math:`j`, :math:`d` is the measured distance at
-nodes :math:`i` and :math:`j`, and :math:`\theta` is the measured
-bearing to the landmark. The difference is visualized with the figure in
-the next cell.
+其中 :math:`[x_i, y_i, \psi_i]` 是节点 :math:`i` 的位姿，节点 :math:`j` 同样如此；:math:`d` 是节点 :math:`i` 与 :math:`j` 处测得的距离，:math:`\theta` 是测得的到路标的方位角。这个差由下一个单元中的图示说明。
 
-In case of perfect motion and perfect measurement the error shall be
-zero since :math:`x_j + d_j cos(\psi_j + \theta_j)` should equal
-:math:`x_i + d_i cos(\psi_i + \theta_i)`
+若运动和测量都是理想的，误差应为零，因为 :math:`x_j + d_j cos(\psi_j + \theta_j)` 应当等于 :math:`x_i + d_i cos(\psi_i + \theta_i)`。
 
 .. code:: ipython3
 
@@ -409,6 +351,7 @@ zero since :math:`x_j + d_j cos(\psi_j + \theta_j)` should equal
     plt.show()
 
 
+
 .. parsed-literal::
 
     0.0 1.427649841628278 -2.0126109674819155 -3.524048014922737
@@ -423,13 +366,9 @@ zero since :math:`x_j + d_j cos(\psi_j + \theta_j)` should equal
 .. image:: graphSLAM_doc_files/graphSLAM_doc_9_1.png
 
 
-Since the constraints equations derived before are non-linear,
-linearization is needed before we can insert them into the information
-matrix and information vector. Two jacobians
+前面导出的约束方程是非线性的，写入信息矩阵和信息向量之前需要线性化。两个雅可比矩阵如下。
 
-:math:`A = \frac{\partial e_{ij}}{\partial \boldsymbol{x}_i}` as
-:math:`\boldsymbol{x}_i` holds the three variabls x, y, and theta.
-Similarly, :math:`B = \frac{\partial e_{ij}}{\partial \boldsymbol{x}_j}`
+:math:`A = \frac{\partial e_{ij}}{\partial \boldsymbol{x}_i}`，因为 :math:`\boldsymbol{x}_i` 含有 x、y 与 theta 三个变量。类似地，:math:`B = \frac{\partial e_{ij}}{\partial \boldsymbol{x}_j}`。
 
 .. code:: ipython3
 
@@ -486,13 +425,10 @@ Similarly, :math:`B = \frac{\partial e_{ij}}{\partial \boldsymbol{x}_j}`
     plt.imshow(b, extent=[0, 1, 0, n])
     plt.show()
 
-
 .. parsed-literal::
 
     The determinant of H:  0.0
     The determinant of H after origin constraint:  716.1972439134893
-
-
 
 .. image:: graphSLAM_doc_files/graphSLAM_doc_11_1.png
 
@@ -512,7 +448,6 @@ Similarly, :math:`B = \frac{\partial e_{ij}}{\partial \boldsymbol{x}_j}`
     # performance will improve with more iterations, nodes and landmarks.
     print("\ngraphSLAM localization error: ", np.sum((x_opt - hxTrue) ** 2))
     print("Odom localization error: ", np.sum((hxDR - hxTrue) ** 2))
-
 
 .. parsed-literal::
 
@@ -540,7 +475,7 @@ Similarly, :math:`B = \frac{\partial e_{ij}}{\partial \boldsymbol{x}_j}`
     Odom localization error:  0.0004460978857535104
 
 
-The references:
+参考文献
 ^^^^^^^^^^^^^^^
 
 -  `The GraphSLAM Algorithm with Applications to Large-Scale Mapping of Urban Structures <http://robots.stanford.edu/papers/thrun.graphslam.pdf>`_
@@ -549,6 +484,5 @@ The references:
 
 -  `A Tutorial on Graph-Based SLAM <http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf>`_
 
-N.B. An additional step is required that uses the estimated path to
-update the belief regarding the map.
+注：还需要一个额外步骤，用估计得到的路径更新关于地图的信念。
 

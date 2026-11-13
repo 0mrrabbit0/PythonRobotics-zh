@@ -1,23 +1,23 @@
 .. _`How to run sample codes`:
 
-How to run sample codes
+如何运行示例代码
 -------------------------
 
-In this chapter, we will explain the setup process for running each sample code
-in PythonRobotics and describe the contents of each directory.
+本章将说明运行 PythonRobotics 中各个示例代码的环境配置过程，
+并介绍每个目录的内容。
 
-Steps to setup and run sample codes
+配置并运行示例代码的步骤
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Install `Python 3.12.x`_
+1. 安装 `Python 3.12.x`_
 
-Note that older versions of Python3 might work, but we recommend using
-the specified version, because the sample codes are only tested with it.
+请注意，更早的 Python3 版本也许可以运行，但我们建议使用
+指定版本，因为示例代码只在该版本上测试过。
 
-2. If you prefer to use conda for package management, install
-Anaconda or Miniconda to use `conda`_ command.
+2. 如果希望使用 conda 管理软件包，请安装
+Anaconda 或 Miniconda，以便使用 `conda`_ 命令。
 
-3. Clone this repo and go into dir.
+3. 克隆本仓库并进入目录。
 
 .. code-block::
 
@@ -26,28 +26,28 @@ Anaconda or Miniconda to use `conda`_ command.
     >$ cd PythonRobotics
 
 
-4. Install the required libraries.
+4. 安装所需的库。
 
-We have prepared requirements management files for `conda`_ and `pip`_ under
-the requirements directory. Using these files makes it easy to install the necessary libraries.
+我们在 requirements 目录下准备了用于 `conda`_ 和 `pip`_ 的
+依赖管理文件。使用这些文件可以方便地安装所需的库。
 
-using conda :
+使用 conda：
 
 .. code-block::
 
     >$ conda env create -f requirements/environment.yml
 
-using pip :
+使用 pip：
 
 .. code-block::
 
     >$ pip install -r requirements/requirements.txt
 
 
-5. Execute python script in each directory.
+5. 在每个目录中执行 Python 脚本。
 
-For example, to run the sample code of `Extended Kalman Filter` in the
-`localization` directory, execute the following command:
+例如，要运行 `localization` 目录中扩展卡尔曼滤波（EKF）的示例代码，
+执行以下命令：
 
 .. code-block::
 
@@ -55,13 +55,13 @@ For example, to run the sample code of `Extended Kalman Filter` in the
 
 	>$ python extended_kalman_filter.py
 
-Then, you can see this animation of the EKF algorithm based localization:
+然后可以看到基于扩展卡尔曼滤波（EKF）算法的定位动画：
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif
 
-Please refer to the `Directory structure`_ section for more details on the contents of each directory.
+各目录内容的更多细节请参阅 `目录结构 <Directory structure_>`_ 一节。
 
-6. Add star to this repo if you like it 😃.
+6. 如果喜欢本仓库，请为它加一颗 star 😃。
 
 .. _`Python 3.12.x`: https://www.python.org/
 .. _`conda`: https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html
@@ -70,35 +70,34 @@ Please refer to the `Directory structure`_ section for more details on the conte
 
 .. _`Directory structure`:
 
-Directory structure
+目录结构
 ~~~~~~~~~~~~~~~~~~~~
 
-The top-level directory structure of PythonRobotics is as follows:
+PythonRobotics 的顶层目录结构如下：
 
-Sample codes directories:
+示例代码目录：
 
-- `AerialNavigation`_ : the sample codes of aerial navigation algorithms for drones and rocket landing.
-- `ArmNavigation`_ : the sample codes of arm navigation algorithms for robotic arms.
-- `Localization`_ : the sample codes of localization algorithms.
-- `Bipedal`_ : the sample codes of bipedal walking algorithms for legged robots.
-- `Control`_ : the sample codes of control algorithms for robotic systems.
-- `Mapping`_ : the sample codes of mapping or obstacle shape recognition algorithms.
-- `PathPlanning`_ : the sample codes of path planning algorithms.
-- `PathTracking`_ : the sample codes of path tracking algorithms for car like robots.
-- `SLAM`_ : the sample codes of SLAM algorithms.
+- `AerialNavigation`_：无人机与火箭着陆的空中导航算法示例代码。
+- `ArmNavigation`_：机械臂导航算法的示例代码。
+- `Localization`_：定位算法的示例代码。
+- `Bipedal`_：足式机器人双足行走算法的示例代码。
+- `Control`_：机器人系统控制算法的示例代码。
+- `Mapping`_：建图或障碍物形状识别算法的示例代码。
+- `PathPlanning`_：路径规划算法的示例代码。
+- `PathTracking`_：类车机器人路径跟踪算法的示例代码。
+- `SLAM`_：同步定位与建图（SLAM）算法的示例代码。
 
-Other directories:
+其他目录：
 
-- `docs`_ : This directory contains the documentation of PythonRobotics.
-- `requirements`_ : This directory contains the requirements management files.
-- `tests`_ : This directory contains the unit test files.
-- `utils`_ : This directory contains utility functions used in some sample codes in common.
-- `.github`_ : This directory contains the GitHub Actions configuration files.
-- `.circleci`_ : This directory contains the CircleCI configuration files.
+- `docs`_：本目录包含 PythonRobotics 的文档。
+- `requirements`_：本目录包含依赖管理文件。
+- `tests`_：本目录包含单元测试文件。
+- `utils`_：本目录包含若干示例代码共用的工具函数。
+- `.github`_：本目录包含 GitHub Actions 配置文件。
+- `.circleci`_：本目录包含 CircleCI 配置文件。
 
-The structure of this document is the same as that of the sample code
-directories mentioned above.
-For more details, please refer to the :ref:`How to read this textbook` section.
+本文档的结构与上述示例代码目录的结构相同。
+更多细节请参阅 :ref:`如何阅读本教材 <How to read this textbook>` 一节。
 
 
 .. _`AerialNavigation`: https://github.com/AtsushiSakai/PythonRobotics/tree/master/AerialNavigation

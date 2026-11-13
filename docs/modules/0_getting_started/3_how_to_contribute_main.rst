@@ -1,205 +1,153 @@
-How to contribute
+如何贡献
 =================
 
-This document describes how to contribute this project.
-There are several ways to contribute to this project as below:
+本文档说明如何为本项目做贡献。
+可以通过以下几种方式为本项目做贡献：
 
-#. `Adding a new algorithm example`_
-#. `Reporting and fixing a defect`_
-#. `Adding missed documentations for existing examples`_
-#. `Supporting this project`_
+#. `添加新的算法示例 <Adding a new algorithm example_>`_
+#. `报告并修复缺陷 <Reporting and fixing a defect_>`_
+#. `为已有示例补充缺失的文档 <Adding missed documentations for existing examples_>`_
+#. `支持本项目 <Supporting this project_>`_
 
-Before contributing
+贡献之前
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Please check following items before contributing:
+贡献之前请检查以下事项：
 
-Understanding this project
+理解本项目
 ---------------------------
 
-Please check this :ref:`What is PythonRobotics?` section and this paper
-`PythonRobotics: a Python code collection of robotics algorithms`_
-to understand the philosophies of this project.
+请阅读 :ref:`What is PythonRobotics?` 一节以及这篇论文
+`PythonRobotics: a Python code collection of robotics algorithms`_，
+以理解本项目的理念。
 
 .. _`PythonRobotics: a Python code collection of robotics algorithms`: https://arxiv.org/abs/1808.10703
 
-Check your Python version.
+.. _`Check your Python version.`:
+
+检查你的 Python 版本
 ---------------------------
 
-We only accept a PR for Python 3.13.x or higher.
+我们只接受面向 Python 3.13.x 或更高版本的 PR。
 
-We will not accept a PR for Python 2.x.
+我们不接受面向 Python 2.x 的 PR。
 
-Before opening a pull request
+.. _`Before opening a pull request`:
+
+打开拉取请求之前
 --------------------------------
 
-Check the items that apply to your change before opening a PR. The steps below
-explain these points in more detail.
+打开 PR 之前，请检查适用于你这次更改的事项。下面的步骤会更详细地说明这些要点。
 
-- **Scope:** Focus on one algorithm, bug, or documentation topic. Split large
-  changes into smaller PRs, and propose substantial changes in an issue first.
-- **Diff:** Use a separate branch and review the diff against ``master``. Remove
-  unrelated formatting, parameter, dependency, and CI configuration changes.
-- **Readability:** Use descriptive names and small, clear functions. Keep the
-  code easy to relate to the algorithm's equations, even when optimizing it.
-- **Compatibility:** Follow `Check your Python version.`_ and the current CI
-  configuration. Use only the existing :ref:`Requirements` libraries.
-- **Existing behavior:** Preserve default parameters and working examples unless
-  the change is intentional and explained. Do not weaken tests to hide failures.
-- **Tests:** For code changes, add or extend tests under ``tests`` that check the
-  expected result and relevant boundary cases. Run examples without animation
-  and run ``bash runtests.sh`` locally, including its code style checks.
-- **Documentation:** Update the existing official RST page, or add one for a new
-  example. Explain the algorithm and mathematics there; explain code, inputs,
-  outputs, and units in headers and docstrings. Write these explanations in English.
-- **Navigation and rendering:** Add new pages to the appropriate parent
-  ``toctree``. Build the docs and inspect the generated HTML, including equations,
-  lists, links, and images.
-- **Animation:** For new examples or changed visual behavior, check that the
-  animation makes the result, colors, and lines understandable. Submit new GIFs
-  to `PythonRoboticsGifs`_ and link them from the documentation.
-- **PR description:** Prepare the issue link, reason for the change, and test
-  results. Include before-and-after results where useful, and comparable timings
-  with the test configuration for performance improvements.
+- **范围：** 聚焦于一个算法、一个缺陷或一个文档主题。把大的更改拆成较小的 PR，并先在 Issue 中提议重大更改。
+- **差异：** 使用单独的分支，并对照 ``master`` 检查 diff。去掉无关的格式、参数、依赖和 CI 配置更改。
+- **可读性：** 使用描述性的名称和简短清晰的函数。即使在做优化时，也要让代码容易与算法的方程对应起来。
+- **兼容性：** 遵循 `检查你的 Python 版本 <Check your Python version._>`_ 以及当前的 CI 配置。只使用已有的 :ref:`Requirements` 库。
+- **既有行为：** 除非更改是有意的并已加以说明，否则保留默认参数和可运行的示例。不要为了掩盖失败而削弱测试。
+- **测试：** 对于代码更改，在 ``tests`` 下添加或扩展测试，检查期望结果和相关边界情况。以无动画方式运行示例，并在本地运行 ``bash runtests.sh``，包括其中的代码风格检查。
+- **文档：** 更新已有的官方 RST 页面，或者为新示例添加一页。在那里解释算法和数学；在文件头和文档字符串中解释代码、输入、输出和单位。这些说明用英文撰写。
+- **导航与渲染：** 把新页面加入相应父页面的 ``toctree``。构建文档并检查生成的 HTML，包括方程、列表、链接和图像。
+- **动画：** 对于新示例或改变了视觉行为的更改，确认动画能让人看懂结果、颜色和线条。把新的 GIF 提交到 `PythonRoboticsGifs`_，并在文档中链接它们。
+- **PR 描述：** 准备 Issue 链接、更改原因和测试结果。在有帮助时附上更改前后的结果；对于性能改进，附上测试配置以及可比较的计时。
 
 .. _`Adding a new algorithm example`:
 
-1. Adding a new algorithm example
+1. 添加新的算法示例
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This is a step by step manual to add a new algorithm example.
+这是添加新算法示例的分步说明。
 
-Step 1: Choose an algorithm to implement
+步骤 1：选择要实现的算法
 -----------------------------------------
 
-Before choosing an algorithm, please check the :ref:`getting started` doc to
-understand this project's philosophy and setup your development environment.
+在选择算法之前，请阅读 :ref:`getting started` 文档，
+以理解本项目的理念并配置你的开发环境。
 
-If an algorithm is widely used and successful, let's create an issue to
-propose it for our community.
+如果某个算法被广泛使用并且是成功的，请创建 Issue，向我们的社区提议它。
 
-If some people agree by thumbs up or posting positive comments, let go to next step.
+如果有人通过点赞或发表正面评论表示同意，就进入下一步。
 
-It is OK to just create an issue to propose adding an algorithm, someone might implement it.
+只创建 Issue 来提议添加某种算法也是可以的，也许会有人去实现它。
 
-In that case, please share any papers or documentations to implement it.
+在这种情况下，请分享任何可用于实现的论文或文档。
 
 
-Step 2: Implement the algorithm with matplotlib based animation
+步骤 2：用基于 matplotlib 的动画实现算法
 ----------------------------------------------------------------
 
-When you implement an algorithm, please keep the following items in mind.
+实现算法时，请牢记以下几点。
 
-1. Use only Python. Other language code is not acceptable.
+1. 只使用 Python。不接受其他语言的代码。
 
-2. Use the Python version described in `Check your Python version.`_ and run the
-   example with the versions used by the current CI configuration.
+2. 使用 `检查你的 Python 版本 <Check your Python version._>`_ 中说明的 Python 版本，并用当前 CI 配置所使用的版本运行示例。
 
-3. Use matplotlib based animation to show how the algorithm works. Make the
-   start, goal, obstacles, and result clear where applicable, and explain the
-   meaning of colors and lines. The animation should help readers understand
-   the algorithm's behavior, such as how a path changes after detecting an obstacle.
+3. 使用基于 matplotlib 的动画展示算法如何工作。在适用时把起点、目标、障碍物和结果标清楚，并解释颜色和线条的含义。动画应帮助读者理解算法的行为，例如检测到障碍物之后路径如何变化。
 
-4. Only use current :ref:`Requirements` libraries, not adding new dependencies.
+4. 只使用当前的 :ref:`Requirements` 库，不要添加新的依赖。
 
-5. Keep the code simple and easy to follow. The main goal is to help beginners
-   understand the algorithm. Favor readability over performance or additional
-   abstractions, and keep the implementation recognizable from the algorithm's
-   equations. Avoid shortcuts that only work for the default simulation.
+5. 保持代码简单、易于跟随。主要目标是帮助初学者理解算法。优先考虑可读性，而不是性能或额外的抽象，并让实现能够从算法的方程中辨认出来。避免只对默认仿真有效的捷径。
 
-6. Use descriptive names instead of unexplained abbreviations or single-letter
-   names. For example, prefer ``parent_index`` to ``pind``. If mathematical symbols
-   help relate the code to an equation, explain their meaning. Split long
-   functions and complex conditions into clearly named functions or intermediate
-   variables, and follow the style of nearby examples.
+6. 使用描述性名称，而不是未加解释的缩写或单字母名称。例如，用 ``parent_index`` 而不是 ``pind``。如果数学符号有助于把代码和方程对应起来，请解释它们的含义。把过长的函数和复杂条件拆成命名清晰的函数或中间变量，并遵循邻近示例的风格。
 
-7. Add a short file header describing the example, its author, and relevant
-   references. Use docstrings to explain functions, classes, inputs, outputs,
-   and configuration parameters, including units where applicable. Keep useful
-   existing explanations when refactoring.
+7. 添加简短的文件头，说明该示例、其作者和相关参考文献。使用文档字符串解释函数、类、输入、输出和配置参数，在适用时包括单位。重构时保留已有的有用说明。
 
-8. Use named configuration parameters instead of unexplained numeric constants.
-   Preserve existing defaults unless changing them is part of the intended fix;
-   set parameters for a particular test inside that test.
+8. 使用具名配置参数，而不是未加解释的数值常量。除非改变默认值是预期修复的一部分，否则保留已有默认值；针对某一次测试的参数应设置在该测试内部。
 
-9. Put the runnable example in a ``main()`` function and guard plotting with
-   ``show_animation`` so that the example also runs without animation. Prefer
-   existing Python, NumPy, SciPy, and project functions when they make the
-   algorithm easier to read, rather than duplicating the same implementation.
+9. 把可运行的示例放在 ``main()`` 函数中，并用 ``show_animation`` 保护绘图，使示例在没有动画时也能运行。当已有的 Python、NumPy、SciPy 和项目函数能让算法更易读时，优先使用它们，而不是重复同一套实现。
 
 
-Step 3: Add a unittest
+步骤 3：添加单元测试
 ----------------------
-If you add a new algorithm sample code, please add a unit test file under `tests dir`_.
+如果你添加了新的算法示例代码，请在 `tests 目录 <tests dir_>`_ 下添加单元测试文件。
 
-This sample test code might help you : `test_a_star.py`_.
+这段示例测试代码也许对你有帮助：`test_a_star.py`_。
 
-At the least, try to run the example code without animation in the unit test.
+至少要在单元测试中尝试以无动画方式运行示例代码。
 
-When extending an existing example, add test cases to its existing test file
-where possible. Give tests descriptive names that explain the scenario, such as
-``test_no_obstacle`` or ``test_too_big_step_size``. Cover the added algorithm
-variants and relevant boundary cases.
+扩展已有示例时，尽可能把测试用例加到它已有的测试文件中。给测试起能说明场景的描述性名称，例如 ``test_no_obstacle`` 或 ``test_too_big_step_size``。覆盖新增的算法变体和相关边界情况。
 
-For a bug fix, reproduce the reported problem and assert the expected result,
-not just that the code runs without an exception. Keep existing tests and default
-examples working. Do not weaken an assertion merely to make a changed algorithm
-pass; explain and test any intentional change in behavior.
+对于缺陷修复，要复现所报告的问题，并断言期望结果，而不仅仅是代码运行时不抛出异常。保持已有测试和默认示例可以工作。不要只是为了让改过的算法通过而削弱断言；对任何有意的行为变化都要加以说明并测试。
 
-Run the test suite locally from the repository root:
+从仓库根目录在本地运行测试套件：
 
 .. code-block:: bash
 
    bash runtests.sh
 
-The `test_codestyle.py`_ check code style for your PR's codes.
+`test_codestyle.py`_ 会检查你的 PR 代码的代码风格。
 
 
 .. _`how to write doc`:
 
-Step 4: Write a document about the algorithm
+步骤 4：撰写关于该算法的文档
 ----------------------------------------------
-Please describe the algorithm's basic steps, mathematical background, and
-relevant references, with graphs and an animation GIF. Explain how it differs
-from related algorithms and where it is useful when this helps readers
-understand the example.
+请描述算法的基本步骤、数学背景和相关参考文献，并配上图和动画 GIF。在有助于读者理解示例时，说明它与相关算法的区别以及它在何处有用。
 
-This project is using `Sphinx`_ as a document builder, all documentations are written by `reStructuredText`_.
+本项目使用 `Sphinx`_ 作为文档构建工具，所有文档都用 `reStructuredText`_ 编写。
 
-For an existing example, update its official document instead of creating a
-separate README or a duplicate explanation. For a new example, add a
-``*_main.rst`` page under the appropriate category in `doc modules dir`_ and
-include it in the parent page's ``toctree``. Follow the naming and toctree entries
-of nearby pages so that the new page appears in the documentation navigation.
+对于已有示例，更新其官方文档，而不是另写一份 README 或重复的说明。对于新示例，在 `文档模块目录 <doc modules dir_>`_ 中相应类别下添加 ``*_main.rst`` 页面，并把它列入父页面的 ``toctree``。遵循邻近页面的命名和 toctree 条目，使新页面出现在文档导航中。
 
-Please check other documents for details.
+请查看其他文档了解细节。
 
-You can build the doc locally based on `doc README`_.
+你可以依据 `文档 README <doc README_>`_ 在本地构建文档。
 
-After building, open the generated HTML or the PR's documentation artifact and
-check the changed pages. Confirm that equations, lists, links, images, and
-animations render correctly, and that the page is reachable from its parent.
-A successful build alone does not guarantee that the page looks correct.
+构建之后，打开生成的 HTML 或该 PR 的文档产物，并检查改过的页面。确认方程、列表、链接、图像和动画都能正确渲染，并且可以从其父页面到达该页。仅构建成功并不能保证页面看起来正确。
 
-For creating a gif animation, you can use this tool: `matplotrecorder`_.
+要创建 GIF 动画，可以使用这个工具：`matplotrecorder`_。
 
-The created gif file should be stored in the `PythonRoboticsGifs`_ repository,
-so please create a PR to add it and refer to it in the doc.
+创建的 GIF 文件应存放在 `PythonRoboticsGifs`_ 仓库中，因此请创建 PR 来添加它，并在文档中引用它。
 
-Note that the `reStructuredText`_ based doc should only focus on the
-mathematics and the algorithm of the example.
+请注意，基于 `reStructuredText`_ 的文档应只聚焦于该示例的数学和算法。
 
-Documentations related codes should be in the python script as the header
-comments of the script or docstrings of each function.
+与代码相关的说明应放在 Python 脚本中，作为脚本的头部注释或各函数的文档字符串。
 
-Also, each document should have a link to the code in Github.
-You can easily add the link by using the `.. autoclass::`, `.. autofunction::`, and `.. automodule` by Sphinx's `autodoc`_ module.
+此外，每份文档都应有指向 GitHub 上代码的链接。你可以使用 Sphinx 的 `autodoc`_ 模块，通过 `.. autoclass::`、`.. autofunction::` 和 `.. automodule` 轻松添加该链接。
 
-Using this `autodoc`_ module, the generated documentations have the link to the code in Github like:
+使用这个 `autodoc`_ 模块后，生成的文档会带有指向 GitHub 上代码的链接，如下所示：
 
 .. image:: /_static/img/source_link_1.png
 
-When you click the link, you will jump to the source code in Github like:
+点击该链接后，会跳转到 GitHub 上的源代码，如下所示：
 
 .. image:: /_static/img/source_link_2.png
 
@@ -207,99 +155,87 @@ When you click the link, you will jump to the source code in Github like:
 
 .. _`submit a pull request`:
 
-Step 5: Submit a pull request and fix codes based on review
+步骤 5：提交拉取请求，并根据评审修改代码
 ------------------------------------------------------------
 
-Use the `Before opening a pull request`_ checklist, then submit your PR when the
-code, tests, and documentation are ready.
+先使用 `打开拉取请求之前 <Before opening a pull request_>`_ 清单，然后在代码、测试和文档都准备好时提交你的 PR。
 
-In the PR description, link the relevant issue and explain the problem, why the
-change solves it, and how you tested it. For changes to a simulation, include
-before-and-after results or animations where useful. For a performance
-improvement, explain the technique and provide comparable timings and the
-configuration used to obtain them.
+在 PR 描述中，链接相关 Issue，并说明问题是什么、为什么这项更改能解决它，以及你如何测试。对于仿真的更改，在有帮助时附上更改前后的结果或动画。对于性能改进，说明所用技术，并提供可比较的计时以及获得这些计时所用的配置。
 
-At first, please fix all CI errors before code review.
+首先，请在代码评审之前修复所有 CI 错误。
 
-Check the test, code style, and documentation build results. If a failure appears
-unrelated to your changes, report the failing check and relevant log rather than
-changing CI settings or removing tests to hide the failure.
+检查测试、代码风格和文档构建的结果。如果某个失败看起来与你的更改无关，请报告失败的检查和相关日志，而不是修改 CI 设置或删掉测试来掩盖失败。
 
-You can check your PR doc from the CI panel.
+你可以从 CI 面板查看你的 PR 文档。
 
-After the "ci/circleci: build_doc" CI is succeeded,
-you can access your PR doc with clicking the [Details] of the "ci/circleci: build_doc artifact" CI.
+在 “ci/circleci: build_doc” CI 成功之后，
+你可以点击 “ci/circleci: build_doc artifact” CI 的 [Details] 来访问你的 PR 文档。
 
 .. image:: /_static/img/doc_ci.png
 
-After that, I will start the review.
+此后，我将开始评审。
 
-Note that this is my hobby project; I appreciate your patience during the review process.
+请注意，这是我的业余项目；感谢你在评审过程中的耐心。
 
 　
 
 .. _`Reporting and fixing a defect`:
 
-2. Reporting and fixing a defect
+2. 报告并修复缺陷
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Reporting and fixing a defect is also great contribution.
+报告并修复缺陷同样是很好的贡献。
 
-When you report an issue, please provide these information:
+报告 Issue 时，请提供以下信息：
 
-- A clear and concise description of what the bug is.
-- A clear and concise description of what you expected to happen.
-- Screenshots to help explain your problem if applicable.
-- OS version
-- Python version
-- Each library versions
+- 清晰简洁地描述缺陷是什么。
+- 清晰简洁地描述你预期会发生什么。
+- 如适用，附上有助于说明问题的屏幕截图。
+- 操作系统版本
+- Python 版本
+- 各个库的版本
 
-If you want to fix any bug, you can find reported issues in `bug labeled issues`_.
+如果你想修复某个缺陷，可以在 `带有 bug 标签的 Issue <bug labeled issues_>`_ 中查找已报告的问题。
 
-If you fix a bug of existing codes, please add a test function
-in the test code to show the issue was solved.
-Use the failing inputs as a regression case and assert the corrected behavior,
-including relevant boundary conditions. Keep unrelated changes in separate PRs.
+如果你修复了已有代码中的缺陷，请在测试代码中添加测试函数，以表明该问题已经解决。
+把会失败的输入用作回归用例，并断言修正后的行为，包括相关边界条件。把无关的更改放在单独的 PR 中。
 
-This doc `submit a pull request`_ can be helpful to submit a pull request.
+这份 `提交拉取请求 <submit a pull request_>`_ 的文档对提交拉取请求会有帮助。
 
 
 .. _`Adding missed documentations for existing examples`:
 
-3. Adding missed documentations for existing examples
+3. 为已有示例补充缺失的文档
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Adding the missed documentations for existing examples is also great contribution.
+为已有示例补充缺失的文档同样是很好的贡献。
 
-If you check the `Python Robotics Docs`_, you can notice that some of the examples
-only have a simulation gif or short overview descriptions or just TBD.,
-but no detailed algorithm or mathematical description.
-These documents need to be improved.
+如果你查看 `Python Robotics 文档 <Python Robotics Docs_>`_，会注意到有些示例只有仿真 GIF、简短的概述，或者只写着 TBD.，而没有详细的算法或数学描述。这些文档需要改进。
 
-This doc `how to write doc`_ can be helpful to write documents.
+这份 `如何撰写文档 <how to write doc_>`_ 的说明对撰写文档会有帮助。
 
 .. _`Supporting this project`:
 
-4. Supporting this project
+4. 支持本项目
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Supporting this project financially is also a great contribution!!.
+在资金上支持本项目同样是很好的贡献！！
 
-If you or your company would like to support this project, please consider:
+如果你或你的公司希望支持本项目，请考虑：
 
-- `Sponsor @AtsushiSakai on GitHub Sponsors`_
+- `在 GitHub Sponsors 上赞助 @AtsushiSakai <Sponsor @AtsushiSakai on GitHub Sponsors_>`_
 
-- `Become a backer or sponsor on Patreon`_
+- `在 Patreon 上成为支持者或赞助者 <Become a backer or sponsor on Patreon_>`_
 
-- `One-time donation via PayPal`_
+- `通过 PayPal 一次性捐赠 <One-time donation via PayPal_>`_
 
-If you would like to support us in some other way, please contact with creating an issue.
+如果你希望以其他方式支持我们，请创建 Issue 与我们联系。
 
-Current Major Sponsors:
+当前主要赞助者：
 
-#. `GitHub`_ : They are providing a GitHub Copilot Pro license for this OSS development.
-#. `JetBrains`_ : They are providing a free license of their IDEs for this OSS development.
-#. `1Password`_ : They are providing a free license of their 1Password team license for this OSS project.
+#. `GitHub`_：他们为本开源软件的开发提供 GitHub Copilot Pro 许可。
+#. `JetBrains`_：他们为本开源软件的开发提供其 IDE 的免费许可。
+#. `1Password`_：他们为本开源项目提供 1Password 团队许可的免费授权。
 
 
 

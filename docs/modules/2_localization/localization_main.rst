@@ -1,12 +1,12 @@
 .. _`Localization`:
 
-Localization
-============
-Localization is the ability of a robot to know its position and orientation with sensors such as Global Navigation Satellite System:GNSS etc. In localization, Bayesian filters such as Kalman filters, histogram filter, and particle filter are widely used[31]. Fig.2 shows localization simulations using histogram filter and particle filter.
+定位
+======
+定位是机器人借助全球导航卫星系统（GNSS）等传感器获知其位置与朝向的能力。在定位中，卡尔曼滤波、直方图滤波和粒子滤波等贝叶斯滤波被广泛使用[31]。图2展示了使用直方图滤波和粒子滤波的定位仿真。
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
+   :caption: 目录
 
    extended_kalman_filter_localization_files/extended_kalman_filter_localization
    gps_imu_fusion/gps_imu_fusion
@@ -14,5 +14,3 @@ Localization is the ability of a robot to know its position and orientation with
    unscented_kalman_filter_localization/unscented_kalman_filter_localization
    histogram_filter_localization/histogram_filter_localization
    particle_filter_localization/particle_filter_localization
-
-

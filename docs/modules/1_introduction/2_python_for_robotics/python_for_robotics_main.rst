@@ -1,135 +1,131 @@
-Python for Robotics
+用于机器人学的 Python
 ----------------------
 
-A programming language, Python is used for this `PythonRobotics` project
-to achieve the purposes of this project described in the :ref:`What is PythonRobotics?`.
+本 `PythonRobotics` 项目使用编程语言 Python，
+以实现 :ref:`什么是 PythonRobotics？ <What is PythonRobotics?>` 中描述的项目目标。
 
-This section explains the Python itself and features for science computing and robotics.
+本节说明 Python 本身，以及它在科学计算和机器人学方面的特性。
 
-Python for general-purpose programming
+用于通用编程的 Python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`Python <https://www.python.org/>`_ is an general-purpose programming language developed by
-`Guido van Rossum <https://en.wikipedia.org/wiki/Guido_van_Rossum>`_ from the late 1980s.
+`Python <https://www.python.org/>`_ 是由
+`Guido van Rossum <https://en.wikipedia.org/wiki/Guido_van_Rossum>`_ 从 20 世纪 80 年代末开始开发的通用编程语言。
 
-It features as follows:
+它具有如下特点：
 
-#. High-level
-#. Interpreted
-#. Dynamic type system (also type annotation is supported)
-#. Emphasizes code readability
-#. Rapid prototyping
-#. Batteries included
-#. Interoperability for C and Fortran
+#. 高级
+#. 解释型
+#. 动态类型系统（同时也支持类型注解）
+#. 强调代码可读性
+#. 快速原型开发
+#. 标准库完备（Batteries included）
+#. 与 C 和 Fortran 的互操作性
 
-Due to these features, Python is one of the most popular programming language
-for educational purposes for programming beginners.
+由于这些特点，Python 是面向编程初学者的教育用途中最流行的编程语言之一。
 
-Python for Scientific Computing
+用于科学计算的 Python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Python itself was not designed for scientific computing.
-However, scientists quickly recognized its strengths.
-For example,
+Python 本身并非为科学计算而设计。
+然而，科学家很快认识到了它的优势。
+例如：
 
-#. High-level and interpreted features enable scientists to focus on their problems without dealing with low-level programming tasks like memory management.
-#. Code readability, rapid prototyping, and batteries included features enables scientists who are not professional programmers, to solve their problems easily.
-#. The interoperability to wrap C and Fortran libraries enables scientists to access already existed powerful and optimized scientific computing libraries.
+#. 高级和解释型的特点使科学家能够专注于自己的问题，而不必处理内存管理之类的底层编程任务。
+#. 代码可读性、快速原型以及标准库完备这些特点，使并非专业程序员的科学家也能轻松解决问题。
+#. 包装 C 和 Fortran 库的互操作性，使科学家能够使用已经存在的强大且经过优化的科学计算库。
 
-To address the more needs of scientific computing, many fundamental scientific computation libraries have been developed based on the upper features.
+为满足科学计算的更多需求，人们基于上述特点开发了许多基础科学计算库。
 
-- `NumPy <https://numpy.org/>`_ is the fundamental package for scientific computing with Python.
-- `SciPy <https://www.scipy.org/>`_ is a library that builds on NumPy and provides a large number of functions that operate on NumPy arrays and are useful for different types of scientific and engineering applications.
-- `Matplotlib <https://matplotlib.org/>`_ is a plotting library for the Python programming language and its numerical mathematics extension NumPy.
-- `Pandas <https://pandas.pydata.org/>`_ is a fast, powerful, flexible, and easy-to-use open-source data analysis and data manipulation library built on top of NumPy.
-- `SymPy <https://www.sympy.org/>`_ is a Python library for symbolic mathematics.
-- `CVXPy <https://www.cvxpy.org/>`_ is a Python-embedded modeling language for convex optimization problems.
+- `NumPy <https://numpy.org/>`_ 是用 Python 进行科学计算的基础包。
+- `SciPy <https://www.scipy.org/>`_ 是建立在 NumPy 之上的库，提供大量作用于 NumPy 数组、适用于不同类型科学与工程应用的函数。
+- `Matplotlib <https://matplotlib.org/>`_ 是 Python 编程语言及其数值数学扩展 NumPy 的绘图库。
+- `Pandas <https://pandas.pydata.org/>`_ 是基于 NumPy 构建的快速、强大、灵活且易用的开源数据分析与数据处理库。
+- `SymPy <https://www.sympy.org/>`_ 是用于符号数学的 Python 库。
+- `CVXPy <https://www.cvxpy.org/>`_ 是嵌入 Python 的凸优化问题建模语言。
 
-Also, more domain-specific libraries have been developed based on these fundamental libraries:
+此外，还基于这些基础库开发了更多面向特定领域的库：
 
-- `Scikit-learn <https://scikit-learn.org/stable/>`_ is a free software machine learning library for the Python programming language.
-- `Scikit-image <https://scikit-image.org/>`_ is a collection of algorithms for image processing.
-- `Networkx <https://networkx.org/>`_ is a package for the creation, manipulation for complex networks.
-- `SunPy <https://sunpy.org/>`_ is a community-developed free and open-source software package for solar physics.
-- `Astropy <https://www.astropy.org/>`_ is a community-developed free and open-source software package for astronomy.
+- `Scikit-learn <https://scikit-learn.org/stable/>`_ 是 Python 编程语言的自由软件机器学习库。
+- `Scikit-image <https://scikit-image.org/>`_ 是图像处理算法的集合。
+- `Networkx <https://networkx.org/>`_ 是用于创建和操作复杂网络的包。
+- `SunPy <https://sunpy.org/>`_ 是社区开发的、用于太阳物理学的自由开源软件包。
+- `Astropy <https://www.astropy.org/>`_ 是社区开发的、用于天文学的自由开源软件包。
 
-Currently, Python is one of the most popular programming languages for scientific computing.
+目前，Python 是科学计算中最流行的编程语言之一。
 
-Python for Robotics
-^^^^^^^^^^^^^^^^^^^^
+用于机器人学的 Python
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Python has become an increasingly popular language in robotics.
+Python 在机器人学中已成为越来越流行的语言。
 
-These are advantages of Python for Robotics:
+以下是 Python 用于机器人学的优势：
 
-Simplicity and Readability
+简洁与可读性
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Python's syntax is clear and concise, making it easier to learn and write code.
-This is crucial in robotics where complex algorithms and control logic are involved.
+Python 的语法清晰简洁，使学习和编写代码更加容易。
+这在涉及复杂算法和控制逻辑的机器人学中至关重要。
 
 
-Extensive libraries for scientific computation.
+丰富的科学计算库
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Scientific computation routine are fundamental for robotics.
-For example:
+科学计算例程是机器人学的基础。
+例如：
 
-- Matrix operation is needed for rigid body transformation, state estimation, and model based control.
-- Optimization is needed for optimization based SLAM, optimal path planning, and optimal control.
-- Visualization is needed for robot teleoperation, debugging, and simulation.
+- 刚体变换、状态估计和基于模型的控制需要矩阵运算。
+- 基于优化的同步定位与建图（SLAM）、最优路径规划和最优控制需要优化。
+- 机器人遥操作、调试和仿真需要可视化。
 
-ROS supports Python
+ROS 对 Python 的支持
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`ROS`_ (Robot Operating System) is an open-source and widely used framework for robotics development.
-It is designed to help developping complicated robotic applications.
-ROS provides essential tools, libraries, and drivers to simplify robot programming and integration.
+`ROS`_\ （Robot Operating System，机器人操作系统）是一个开源且广泛使用的机器人开发框架。
+它旨在帮助开发复杂的机器人应用。
+ROS 提供必要的工具、库和驱动程序，以简化机器人编程与集成。
 
-Key Features of ROS:
+ROS 的关键特性：
 
-- Modular Architecture – Uses a node-based system where different components (nodes) communicate via messages.
-- Hardware Abstraction – Supports various robots, sensors, and actuators, making development more flexible.
-- Powerful Communication System – Uses topics, services, and actions for efficient data exchange between components.
-- Rich Ecosystem – Offers many pre-built packages for navigation, perception, and manipulation.
-- Multi-language Support – Primarily uses Python and C++, but also supports other languages.
-- Simulation & Visualization – Tools like Gazebo (for simulation) and RViz (for visualization) aid in development and testing.
-- Scalability & Community Support – Widely used in academia and industry, with a large open-source community.
+- 模块化架构——使用基于节点的系统，不同组件（节点）通过消息通信。
+- 硬件抽象——支持各种机器人、传感器和执行器，使开发更加灵活。
+- 强大的通信系统——使用话题（topic）、服务（service）和动作（action）在组件之间高效交换数据。
+- 丰富的生态系统——提供许多用于导航、感知和操作的预构建包。
+- 多语言支持——主要使用 Python 和 C++，也支持其他语言。
+- 仿真与可视化——Gazebo（用于仿真）和 RViz（用于可视化）等工具有助于开发与测试。
+- 可扩展性与社区支持——在学术界和工业界广泛使用，并拥有大型开源社区。
 
-ROS has strong Python support (`rospy`_ for ROS1 and `rclpy`_ for ROS2).
-This allows developers to easily create nodes, manage communication between
-different parts of a robot system, and utilize various ROS tools.
+ROS 对 Python 有强大支持（ROS1 的 `rospy`_ 与 ROS2 的 `rclpy`_\）。
+这使开发者能够轻松创建节点、管理机器人系统不同部分之间的通信，并使用各种 ROS 工具。
 
 .. _`ROS`: https://www.ros.org/
 .. _`rospy`: http://wiki.ros.org/rospy
 .. _`rclpy`: https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html
 
-Cross-Platform Compatibility
+跨平台兼容性
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Python code can run on various operating systems (Windows, macOS, Linux), providing flexibility in choosing hardware platforms for robotics projects.
+Python 代码可以在多种操作系统（Windows、macOS、Linux）上运行，为机器人项目选择硬件平台提供了灵活性。
 
-Large Community and Support
+庞大的社区与支持
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Python has a vast and active community, offering ample resources, tutorials, and support for developers. This is invaluable when tackling challenges in robotics development.
+Python 拥有庞大而活跃的社区，为开发者提供丰富的资源、教程和支持。这在应对机器人开发中的挑战时非常宝贵。
 
-Situations which Python is NOT suitable for Robotics
+Python 不适合用于机器人学的情形
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We explained the advantages of Python for robotics.
-However, Python is not always the best choice for robotics development.
+我们说明了 Python 用于机器人学的优势。
+然而，Python 并不总是机器人开发的最佳选择。
 
-These are situations where Python is NOT suitable for robotics:
+以下是 Python 不适合用于机器人学的情形：
 
-High-speed real-time control
+高速实时控制
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Python is an interpreted language, which means it is slower than compiled languages like C++.
-This can be a disadvantage when real-time control is required,
-such as in high-speed motion control or safety-critical systems.
+Python 是解释型语言，这意味着它比 C++ 等编译型语言更慢。
+当需要实时控制时，这可能成为缺点，
+例如高速运动控制或安全关键系统。
 
-So, for these applications, we recommend to understand the each algorithm you
-needed using this project and implement it in other suitable languages like C++.
+因此，对于这些应用，我们建议先用本项目理解你所需要的每种算法，
+再用 C++ 等其他合适的语言实现它。
 
-Resource-constrained systems
+资源受限的系统
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Python is a high-level language that requires more memory and processing power
-compared to low-level languages.
-So, it is difficult to run Python on resource-constrained systems like
-microcontrollers or embedded devices.
-In such cases, C or C++ is more suitable for these applications.
+Python 是高级语言，与低级语言相比需要更多内存和计算能力。
+因此，很难在微控制器或嵌入式设备等资源受限的系统上运行 Python。
+在这类情况下，C 或 C++ 更适合这些应用。

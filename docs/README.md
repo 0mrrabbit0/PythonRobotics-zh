@@ -1,29 +1,29 @@
-## Python Robotics Documentation
+## Python Robotics 文档
 
-This folder contains documentation for the Python Robotics project.
+本目录包含 Python Robotics 项目的文档。
 
 
-### Build the Documentation
+### 构建文档
 
-#### Install Sphinx and Theme
+#### 安装 Sphinx 与主题
 
 ```
 pip install sphinx sphinx-autobuild sphinx-rtd-theme sphinx_rtd_dark_mode sphinx_copybutton sphinx_rtd_dark_mode
 ```
 
-#### Building the Docs
+#### 构建文档
 
-In the `docs/` folder:
+在 `docs/` 目录中：
 ```
 make html
 ```
 
-if you want to building each time a file is changed:
+如果希望在文件每次更改时重新构建：
 
 ```
 sphinx-autobuild . _build/html
 ```
 
-#### Check the generated doc
+#### 查看生成的文档
 
-Open the index.html file under docs/_build/
+打开 docs/_build/ 下的 index.html 文件

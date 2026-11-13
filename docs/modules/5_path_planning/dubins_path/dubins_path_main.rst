@@ -1,30 +1,30 @@
-Dubins path planning
+Dubins 路径规划
 --------------------
 
-A sample code for Dubins path planning.
+Dubins 路径规划的示例代码。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DubinsPath/animation.gif?raw=True
 
-Dubins path
+Dubins 路径
 ~~~~~~~~~~~~
-Dubins path is a analytical path planning algorithm for a simple car model.
+Dubins 路径是针对简单车辆模型的解析路径规划算法。
 
-It can generates a shortest path between two 2D poses (x, y, yaw) with maximum curvature constraint and tangent(yaw angle) constraint.
+它可以在最大曲率约束和切向（航向角）约束下，生成两个二维位姿 (x, y, yaw) 之间的最短路径。
 
-Generated paths consist of 3 segments of maximum curvature curves or a straight line segment.
+生成的路径由 3 段组成，每一段是最大曲率曲线或直线段。
 
-Each segment type can be categorized by 3 types: 'Right turn (R)' , 'Left turn (L)', and 'Straight (S).' 
+每一段可分为三类：‘右转（R）’、‘左转（L）’和‘直线（S）’。
 
-Possible path will be at least one of these six types: RSR, RSL, LSR, LSL, RLR, LRL.
+可能的路径至少是这六种类型之一：RSR、RSL、LSR、LSL、RLR、LRL。
 
-Dubins path planner can output each segment type and distance of each course segment.
+Dubins 路径规划器可以输出每一段的类型以及各段路程。
 
-For example, a RSR Dubins path is:
+例如，一条 RSR 型 Dubins 路径为：
 
 .. image:: RSR.jpg
    :width: 400px
 
-Each segment distance can be calculated by:
+各段长度可由下列公式计算：
 
 :math:`\alpha = mod(-\theta)`
 
@@ -40,14 +40,14 @@ Each segment distance can be calculated by:
 
 :math:`d_3 = mod(\beta - t)`
 
-where :math:`\theta` is tangent and d is distance from :math:`x_s` to :math:`x_e`
+其中 :math:`\theta` 为切向，d 为从 :math:`x_s` 到 :math:`x_e` 的距离。
 
-A RLR Dubins path is:
+一条 RLR 型 Dubins 路径为：
 
 .. image:: RLR.jpg
    :width: 200px
 
-Each segment distance can be calculated by:
+各段长度可由下列公式计算：
 
 :math:`t = (6.0 - d^2 + 2\cos(\alpha-\beta) + 2d(\sin\alpha - \sin\beta)) / 8.0`
 
@@ -57,18 +57,17 @@ Each segment distance can be calculated by:
 
 :math:`d_3 = mod(\alpha - \beta - d_1 + d_2)`
 
-You can generate a path from these information and the maximum curvature information.
+可以根据这些信息以及最大曲率信息生成路径。
 
-A path type which has minimum course length among 6 types is selected,
-and then a path is constructed based on the selected type and its distances.
+在六种类型中选择路程最短的类型，再按所选类型及其各段长度构造路径。
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: PathPlanning.DubinsPath.dubins_path_planner.plan_dubins_path
 
 
-Reference
+参考文献
 ~~~~~~~~~~~~~~~~~~~~
 -  `On Curves of Minimal Length with a Constraint on Average Curvature, and with Prescribed Initial and Terminal Positions and Tangents <https://www.jstor.org/stable/2372560?origin=crossref>`__
 -  `Dubins path - Wikipedia <https://en.wikipedia.org/wiki/Dubins_path>`__

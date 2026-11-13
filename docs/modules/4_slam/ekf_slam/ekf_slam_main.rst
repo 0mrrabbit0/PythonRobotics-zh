@@ -1,66 +1,50 @@
-EKF SLAM
---------
+基于扩展卡尔曼滤波的 SLAM
+---------------------------
 
-This is an Extended Kalman Filter based SLAM example.
+这是基于扩展卡尔曼滤波（EKF）的同步定位与建图（SLAM）示例。
 
-The blue line is ground truth, the black line is dead reckoning, the red
-line is the estimated trajectory with EKF SLAM.
+蓝线是真值，黑线是航位推算，红线是 EKF SLAM 估计轨迹。
 
-The green crosses are estimated landmarks.
+绿色叉号是估计得到的路标。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/EKFSLAM/animation.gif
 
-Simulation
+仿真
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is a simulation of EKF SLAM.
+这是 EKF SLAM 的仿真。
 
--  Black stars: landmarks
--  Green crosses: estimates of landmark positions
--  Black line: dead reckoning
--  Blue line: ground truth
--  Red line: EKF SLAM position estimation
+-  黑色星号：路标
+-  绿色叉号：路标位置的估计
+-  黑线：航位推算
+-  蓝线：真值
+-  红线：EKF SLAM 的位置估计
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: SLAM.EKFSLAM.ekf_slam.ekf_slam
 
 
-Introduction
+引言
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-EKF SLAM models the SLAM problem in a single EKF where the modeled state
-is both the pose :math:`(x, y, \theta)` and an array of landmarks
-:math:`[(x_1, y_1), (x_2, y_2), ... , (x_n, y_n)]` for :math:`n`
-landmarks. The covariance between each of the positions and landmarks
-are also tracked.
+EKF SLAM 在单个 EKF 中为 SLAM 问题建模。所建模的状态同时包含位姿 :math:`(x, y, \theta)`，以及 :math:`n` 个路标组成的数组 :math:`[(x_1, y_1), (x_2, y_2), ... , (x_n, y_n)]`。各个位置与各路标之间的协方差也一并跟踪。
 
 :math:`\begin{equation} X = \begin{bmatrix} x \\ y \\ \theta \\ x_1 \\ y_1 \\ x_2 \\ y_2 \\ \dots \\ x_n \\ y_n \end{bmatrix} \end{equation}`
 
 :math:`\begin{equation} P = \begin{bmatrix} \sigma_{xx} & \sigma_{xy} & \sigma_{x\theta} & \sigma_{xx_1} & \sigma_{xy_1} & \sigma_{xx_2} & \sigma_{xy_2} & \dots & \sigma_{xx_n} & \sigma_{xy_n} \\ \sigma_{yx} & \sigma_{yy} & \sigma_{y\theta} & \sigma_{yx_1} & \sigma_{yy_1} & \sigma_{yx_2} & \sigma_{yy_2} & \dots & \sigma_{yx_n} & \sigma_{yy_n} \\  & & & & \vdots & & & & & \\ \sigma_{x_nx} & \sigma_{x_ny} & \sigma_{x_n\theta} & \sigma_{x_nx_1} & \sigma_{x_ny_1} & \sigma_{x_nx_2} & \sigma_{x_ny_2} & \dots & \sigma_{x_nx_n} & \sigma_{x_ny_n} \end{bmatrix} \end{equation}`
 
-A single estimate of the pose is tracked over time, while the confidence
-in the pose is tracked by the covariance matrix :math:`P`. :math:`P` is
-a symmetric square matrix which each element in the matrix corresponding
-to the covariance between two parts of the system. For example,
-:math:`\sigma_{xy}` represents the covariance between the belief of
-:math:`x` and :math:`y` and is equal to :math:`\sigma_{yx}`.
+滤波器随时间跟踪单一的位姿估计，位姿的置信度由协方差矩阵 :math:`P` 跟踪。:math:`P` 是对称方阵，其中每个元素对应系统两部分之间的协方差。例如，:math:`\sigma_{xy}` 表示对 :math:`x` 与 :math:`y` 的信念之间的协方差，并且等于 :math:`\sigma_{yx}`。
 
-The state can be represented more concisely as follows.
+状态可以更紧凑地表示如下。
 
 :math:`\begin{equation} X = \begin{bmatrix} x \\ m \end{bmatrix} \end{equation}`
 :math:`\begin{equation} P = \begin{bmatrix} \Sigma_{xx} & \Sigma_{xm}\\ \Sigma_{mx} & \Sigma_{mm}\\ \end{bmatrix} \end{equation}`
 
-Here the state simplifies to a combination of pose (:math:`x`) and map
-(:math:`m`). The covariance matrix becomes easier to understand and
-simply reads as the uncertainty of the robots pose
-(:math:`\Sigma_{xx}`), the uncertainty of the map (:math:`\Sigma_{mm}`),
-and the uncertainty of the robots pose with respect to the map and vice
-versa (:math:`\Sigma_{xm}`, :math:`\Sigma_{mx}`).
+这里状态简化为位姿（:math:`x`）与地图（:math:`m`）的组合。协方差矩阵因此更容易理解，可以直接读成：机器人位姿的不确定性（:math:`\Sigma_{xx}`）、地图的不确定性（:math:`\Sigma_{mm}`），以及机器人位姿相对于地图的不确定性，反之亦然（:math:`\Sigma_{xm}`、:math:`\Sigma_{mx}`）。
 
-Take care to note the difference between :math:`X` (state) and :math:`x`
-(pose).
+请注意区分 :math:`X` （状态）与 :math:`x` （位姿）。
 
 .. code:: ipython3
 
@@ -92,12 +76,10 @@ Take care to note the difference between :math:`X` (state) and :math:`x`
 
     show_animation = True
 
-Algorithm Walk through
+算法流程
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-At each time step, the following is done. - predict the new state using
-the control functions - update the belief in landmark positions based on
-the estimated state and measurements
+每个时间步做下面两件事：用控制函数预测新的状态；根据估计状态与测量，更新对路标位置的信念。
 
 .. code:: ipython3
 
@@ -122,12 +104,10 @@ the estimated state and measurements
         return xEst, PEst
 
 
-1- Predict
+1- 预测
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Predict State update:** The following equations describe the predicted
-motion model of the robot in case we provide only the control
-:math:`(v,w)`, which are the linear and angular velocity respectively.
+**预测状态更新：** 下列方程描述只给出控制量 :math:`(v,w)` 时机器人的预测运动模型，二者分别是线速度与角速度。
 
 :math:`\begin{equation*} F= \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} \end{equation*}`
 
@@ -139,16 +119,9 @@ motion model of the robot in case we provide only the control
 
 :math:`\begin{equation*} \begin{bmatrix} x_{t+1} \\ y_{t+1} \\ \theta_{t+1} \end{bmatrix}= \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}\begin{bmatrix} x_{t} \\ y_{t} \\ \theta_{t} \end{bmatrix}+ \begin{bmatrix} \Delta t cos(\theta) & 0\\ \Delta t sin(\theta) & 0\\ 0 & \Delta t \end{bmatrix} \begin{bmatrix} v_{t} + \sigma_v\\ w_{t} + \sigma_w\\ \end{bmatrix} \end{equation*}`
 
-Notice that while :math:`U` is only defined by :math:`v_t` and
-:math:`w_t`, in the actual calculations, a :math:`+\sigma_v` and
-:math:`+\sigma_w` appear. These values represent the error between the
-given control inputs and the actual control inputs.
+请注意，虽然 :math:`U` 只由 :math:`v_t` 与 :math:`w_t` 定义，实际计算中却会出现 :math:`+\sigma_v` 与 :math:`+\sigma_w`。这些量表示给定控制输入与实际控制输入之间的误差。
 
-As a result, the simulation is set up as the following. :math:`R`
-represents the process noise which is added to the control inputs to
-simulate noise experienced in the real world. A set of truth values are
-computed from the raw control values while the values dead reckoning
-values incorporate the error into the estimation.
+因此仿真按下面的方式设置。:math:`R` 表示加到控制输入上的过程噪声，用来模拟真实世界中的噪声。一组真值由原始控制量算出，航位推算则把该误差计入估计。
 
 :math:`\begin{equation*} R= \begin{bmatrix} \sigma_v\\ \sigma_w\\ \end{bmatrix} \end{equation*}`
 
@@ -156,19 +129,13 @@ values incorporate the error into the estimation.
 
 :math:`\begin{equation*} X_{DR} = FX + B(U + R) \end{equation*}`
 
-The implementation of the motion model prediction code is shown in
-``motion_model``. The ``observation`` function shows how the simulation
-uses (or doesn’t use) the process noise ``Rsim`` to the find the ground
-truth and dead reckoning estimates of the pose.
+运动模型预测的实现见 ``motion_model``。``observation`` 函数展示仿真如何使用（或不使用）过程噪声 ``Rsim``，以求出位姿的真值与航位推算估计。
 
-**Predict covariance:** Add the state covariance to the the current
-uncertainty of the EKF. At each time step, the uncertainty in the system
-grows by the covariance of the pose, :math:`Cx`.
+**预测协方差：** 把状态协方差加到 EKF 当前的不确定性上。每个时间步，系统的不确定性按位姿的协方差 :math:`Cx` 增长。
 
 :math:`P = G^TPG + Cx`
 
-Notice this uncertainty is only growing with respect to the pose, not
-the landmarks.
+请注意，这里增长的不确定性只相对于位姿，路标对应的部分并不增长。
 
 .. code:: ipython3
 
@@ -209,57 +176,33 @@ the landmarks.
         x = (F @ x) + (B @ u)
         return x
 
-2 - Update
+2 - 更新
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In the update phase, the observations of nearby landmarks are used to
-correct the location estimate.
+在更新阶段，用附近路标的观测来修正位置估计。
 
-For every landmark observed, it is associated to a particular landmark
-in the known map. If no landmark exists in the position surrounding the
-landmark, it is taken as a NEW landmark. The distance threshold for how
-far a landmark must be from the next known landmark before its
-considered to be a new landmark is set by ``M_DIST_TH``.
+对每一个观测到的路标，把它与已知地图中的某个路标做数据关联。如果该位置附近不存在路标，就把它当作新路标。一个路标必须离最近的已知路标多远才被看成新路标，这个距离阈值由 ``M_DIST_TH`` 设定。
 
-With an observation associated to the appropriate landmark, the
-**innovation** can be calculated. Innovation (:math:`y`) is the
-difference between the observation and the observation that *should*
-have been made if the observation were made from the pose predicted in
-the predict stage.
+观测已经关联到相应路标之后，就可以计算**新息**。新息（:math:`y`）是实际观测，与“假如从预测阶段得到的位姿进行观测、所应当得到的观测”之差。
 
 :math:`y = z_t - h(X)`
 
-With the innovation calculated, the question becomes which to trust more
-- the observations or the predictions? To determine this, we calculate
-the Kalman Gain - a percent of how much of the innovation to add to the
-prediction based on the uncertainty in the predict step and the update
-step.
+算出新息之后，需要决定更信任观测还是更信任预测。为此计算卡尔曼增益：根据预测步与更新步的不确定性，它给出应当把多大比例的新息加到预测上。
 
 :math:`K = \bar{P_t}H_t^T(H_t\bar{P_t}H_t^T + Q_t)^{-1}`
-In these equations, :math:`H` is the jacobian of the
-measurement function. The multiplications by :math:`H^T` and :math:`H`
-represent the application of the delta to the measurement covariance.
-Intuitively, this equation is applying the following from the single
-variate Kalman equation but in the multivariate form, i.e. finding the
-ratio of the uncertainty of the process compared the measurement.
+在这些方程中，:math:`H` 是测量函数的雅可比矩阵。乘以 :math:`H^T` 与 :math:`H`，表示把该增量作用到测量协方差上。直观地看，这个方程是把下面的单变量卡尔曼公式写成多变量形式，也就是求过程不确定性相对于测量不确定性的比值。
 
 K = :math:`\frac{\bar{P_t}}{\bar{P_t} + Q_t}`
 
-If :math:`Q_t << \bar{P_t}`, (i.e. the measurement covariance is low
-relative to the current estimate), then the Kalman gain will be
-:math:`~1`. This results in adding all of the innovation to the estimate
-– and therefore completely believing the measurement.
+若 :math:`Q_t << \bar{P_t}` （即测量协方差相对于当前估计较低），卡尔曼增益将为 :math:`~1`。这时会把全部新息加到估计上，从而完全采信该测量。
 
-However, if :math:`Q_t >> \bar{P_t}` then the Kalman gain will go to 0,
-signaling a high trust in the process and little trust in the
-measurement.
+若 :math:`Q_t >> \bar{P_t}`，卡尔曼增益趋于 0，表示对过程模型高度信任，对测量则很少信任。
 
-The update is captured in the following.
+更新由下式给出。
 
 :math:`xUpdate = xEst + (K * y)`
 
-Of course, the covariance must also be updated as well to account for
-the changing uncertainty.
+协方差也必须一并更新，以反映变化后的不确定性。
 
 :math:`P_{t} = (I-K_tH_t)\bar{P_t}`
 
@@ -353,17 +296,12 @@ the changing uncertainty.
 
         return H
 
-Observation Step
+观测步骤
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The observation step described here is outside the main EKF SLAM process
-and is primarily used as a method of driving the simulation. The
-observations function is in charge of calculating how the poses of the
-robots change and accumulate error over time, and the theoretical
-measurements that are expected as a result of each measurement.
+这里描述的观测步骤在 EKF SLAM 主过程之外，主要用来驱动仿真。观测函数负责计算机器人位姿如何随时间变化并累积误差，以及每次测量所对应的理论测量。
 
-Observations are based on the TRUE position of the robot. Error in dead
-reckoning and control functions are passed along here as well.
+观测基于机器人的真实位置。航位推算与控制函数中的误差也在这里一并传入。
 
 .. code:: ipython3
 
@@ -584,7 +522,7 @@ reckoning and control functions are passed along here as well.
 
 .. image:: ekf_slam_1_0.png
 
-Reference
+参考文献
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - `PROBABILISTIC ROBOTICS <http://www.probabilistic-robotics.org/>`_

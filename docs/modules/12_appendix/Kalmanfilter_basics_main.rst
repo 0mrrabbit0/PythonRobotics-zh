@@ -1,29 +1,23 @@
 
-KF Basics - Part I
-------------------
+卡尔曼滤波基础（第一部分）
+------------------------------
 
-Introduction
-~~~~~~~~~~~~
+引言
+~~~~
 
-What is the need to describe belief in terms of PDF’s?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+为什么需要用概率密度函数（PDF）来描述信念？
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This is because robot environments are stochastic. A robot environment
-may have cows with Tesla by side. That is a robot and it’s environment
-cannot be deterministically modelled(e.g as a function of something like
-time t). In the real world sensors are also error prone, and hence
-there’ll be a set of values with a mean and variance that it can take.
-Hence, we always have to model around some mean and variances
-associated.
+这是因为机器人所处的环境是随机的。环境里可能一边是奶牛、一边是特斯拉。也就是说，机器人及其环境无法被确定性建模（例如写成时间 t 之类变量的函数）。现实世界中的传感器也容易出错，因此读数会落在一组具有均值和方差的取值上。所以，我们始终要围绕相应的均值和方差来建模。
 
-What is Expectation of a Random Variables?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+什么是随机变量的期望？
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Expectation is nothing but an average of the probabilites
+期望就是按概率对取值做加权平均。
 
 .. math:: \mathbb E[X] = \sum_{i=1}^n p_ix_i
 
-In the continous form,
+连续形式为，
 
 .. math:: \mathbb E[X] = \int_{-\infty}^\infty x\, f(x) \,dx
 
@@ -42,22 +36,18 @@ In the continous form,
     1.4000000000000001
 
 
-What is the advantage of representing the belief as a unimodal as opposed to multimodal?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+把信念表示为单峰而不是多峰有什么好处？
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Obviously, it makes sense because we can’t multiple probabilities to a
-car moving for two locations. This would be too confusing and the
-information will not be useful.
+这显然是合理的，因为我们不能让一辆正在行驶的汽车同时对应两个位置上的概率。那样会过于混乱，这些信息也没有用处。
 
-Variance, Covariance and Correlation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+方差、协方差与相关性
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-Variance
-^^^^^^^^
+方差
+^^^^
 
-Variance is the spread of the data. The mean doesn’t tell much **about**
-the data. Therefore the variance tells us about the **story** about the
-data meaning the spread of the data.
+方差是数据的散布程度。均值并不能充分\ **说明**\ 数据。因此，方差告诉我们数据的\ **故事**，也就是数据的散布。
 
 .. math:: \mathit{VAR}(X) = \frac{1}{n}\sum_{i=1}^n (x_i - \mu)^2
 
@@ -75,34 +65,25 @@ data meaning the spread of the data.
 
 
 
-Covariance
+协方差
 ^^^^^^^^^^
 
-This is for a multivariate distribution. For example, a robot in 2-D
-space can take values in both x and y. To describe them, a normal
-distribution with mean in both x and y is needed.
+这针对多元分布。例如，二维空间中的机器人在 x 和 y 上都可以取值。要描述它们，需要一个在 x 和 y 上都有均值的正态分布。
 
-For a multivariate distribution, mean :math:`\mu` can be represented as
-a matrix,
+对于多元分布，均值 :math:`\mu` 可以表示为一个矩阵，
 
 .. math::
 
 
    \mu = \begin{bmatrix}\mu_1\\\mu_2\\ \vdots \\\mu_n\end{bmatrix}
 
-Similarly, variance can also be represented.
+同样，方差也可以这样表示。
 
-But an important concept is that in the same way as every variable or
-dimension has a variation in its values, it is also possible that there
-will be values on how they **together vary**. This is also a measure of
-how two datasets are related to each other or **correlation**.
+但还有一个重要概念：正如每个变量或维度自身的取值会变化，它们\ **共同变化**\ 的程度也可以用数值来刻画。这也是衡量两个数据集如何相互关联，即\ **相关性**\ 的度量。
 
-For example, as height increases weight also generally increases. These
-variables are correlated. They are positively correlated because as one
-variable gets larger so does the other.
+例如，身高增加时，体重通常也会增加。这些变量是相关的。它们呈正相关，因为一个变量变大时，另一个也会变大。
 
-We use a **covariance matrix** to denote covariances of a multivariate
-normal distribution:
+我们用\ **协方差矩阵**\ 表示多元正态分布的协方差：
 
 .. math::
 
@@ -114,9 +95,9 @@ normal distribution:
      \sigma_{n1} & \sigma_{n2} & \cdots & \sigma_n^2
     \end{bmatrix}
 
-**Diagonal** - Variance of each variable associated.
+**对角线**——每个相应变量的方差。
 
-**Off-Diagonal** - covariance between ith and jth variables.
+**非对角线**——第 i 个变量与第 j 个变量之间的协方差。
 
 .. math::
 
@@ -139,7 +120,7 @@ normal distribution:
 
 
 
-Covariance taking the data as **sample** with :math:`\frac{1}{N-1}`
+把数据当作\ **样本**、使用 :math:`\frac{1}{N-1}` 时的协方差
 
 .. code-block:: ipython3
 
@@ -157,7 +138,7 @@ Covariance taking the data as **sample** with :math:`\frac{1}{N-1}`
 
 
 
-Covariance taking the data as **population** with :math:`\frac{1}{N}`
+把数据当作\ **总体**、使用 :math:`\frac{1}{N}` 时的协方差
 
 .. code-block:: ipython3
 
@@ -173,15 +154,13 @@ Covariance taking the data as **population** with :math:`\frac{1}{N}`
 
 
 
-Gaussians
-~~~~~~~~~
+高斯分布
+~~~~~~~~~~~~
 
-Central Limit Theorem
-^^^^^^^^^^^^^^^^^^^^^
+中心极限定理
+^^^^^^^^^^^^^^^^
 
-According to this theorem, the average of n samples of random and
-independent variables tends to follow a normal distribution as we
-increase the sample size.(Generally, for n>=30)
+根据该定理，随机且相互独立的变量的 n 个样本的平均值，会随着样本量增大而趋于正态分布。（一般而言，n ≥ 30）
 
 .. code-block:: ipython3
 
@@ -210,24 +189,19 @@ increase the sample size.(Generally, for n>=30)
 .. image:: Kalmanfilter_basics_files/Kalmanfilter_basics_14_1.png
 
 
-Gaussian Distribution
-^^^^^^^^^^^^^^^^^^^^^
+高斯分布的定义
+^^^^^^^^^^^^^^
 
-A Gaussian is a *continuous probability distribution* that is completely
-described with two parameters, the mean (:math:`\mu`) and the variance
-(:math:`\sigma^2`). It is defined as:
+高斯分布是一种\ *连续概率分布*，由两个参数完全描述：均值（:math:`\mu`）和方差（:math:`\sigma^2`）。其定义为：
 
 .. math::
 
     
    f(x, \mu, \sigma) = \frac{1}{\sigma\sqrt{2\pi}} \exp\big [{-\frac{(x-\mu)^2}{2\sigma^2} }\big ]
 
+取值范围为 :math:`[-\inf,\inf]`
 
-Range is :math:`[-\inf,\inf]`
-
-This is just a function of mean(\ :math:`\mu`) and standard deviation
-(:math:`\sigma`) and what gives the normal distribution the
-charecteristic **bell curve**.
+它只是均值（:math:`\mu`）和标准差（:math:`\sigma`）的函数，并由此给出正态分布特有的\ **钟形曲线**。
 
 .. code-block:: ipython3
 
@@ -248,38 +222,30 @@ charecteristic **bell curve**.
 .. image:: Kalmanfilter_basics_files/Kalmanfilter_basics_16_0.png
 
 
-Why do we need Gaussian distributions?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+为什么需要高斯分布？
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-Since it becomes really difficult in the real world to deal with
-multimodal distribution as we cannot put the belief in two seperate
-location of the robots. This becomes really confusing and in practice
-impossible to comprehend. Gaussian probability distribution allows us to
-drive the robots using only one mode with peak at the mean with some
-variance.
+因为在现实世界中，处理多峰分布会变得非常困难：我们无法把信念放在机器人两个分开的位置上。这会让人十分困惑，实践中也难以把握。高斯概率分布使我们只需使用单峰来驾驶机器人，峰值在均值处，并带有一定方差。
 
-Gaussian Properties
-~~~~~~~~~~~~~~~~~~~
+高斯分布的性质
+~~~~~~~~~~~~~~~~~~
 
-**Multiplication**
+**乘法**
 
-For the measurement update in a Bayes Filter, the algorithm tells us to
-multiply the Prior P(X_t) and measurement P(Z_t|X_t) to calculate the
-posterior:
+在贝叶斯滤波的测量更新中，算法要求把先验 P(X_t) 与测量 P(Z_t|X_t) 相乘，以计算后验：
 
 .. math:: P(X \mid Z) = \frac{P(Z \mid X)P(X)}{P(Z)}
 
-Here for the numerator, :math:`P(Z \mid X),P(X)` both are gaussian.
+这里，分子中的 :math:`P(Z \mid X),P(X)` 都是高斯分布。
 
-:math:`N(\bar\mu, \bar\sigma^1)` and :math:`N(\bar\mu, \bar\sigma^2)`
-are their mean and variances.
+:math:`N(\bar\mu, \bar\sigma^1)` 与 :math:`N(\bar\mu, \bar\sigma^2)`
+是它们的均值和方差。
 
-New mean is
+新的均值为
 
 .. math:: \mu_\mathtt{new} = \frac{\sigma_z^2\bar\mu + \bar\sigma^2z}{\bar\sigma^2+\sigma_z^2}
 
-
-New variance is
+新的方差为
 
 .. math::
 
@@ -326,12 +292,9 @@ New variance is
 .. image:: Kalmanfilter_basics_files/Kalmanfilter_basics_19_1.png
 
 
-**Addition**
+**加法**
 
-The motion step involves a case of adding up probability (Since it has
-to abide the Law of Total Probability). This means their beliefs are to
-be added and hence two gaussians. They are simply arithmetic additions
-of the two.
+运动步骤涉及把概率加起来的情形（因为它必须遵守全概率定律）。这意味着要把它们的信念相加，因而涉及两个高斯分布。二者只是做算术相加。
 
 .. math::
 
@@ -443,12 +406,9 @@ of the two.
 .. image:: Kalmanfilter_basics_files/Kalmanfilter_basics_22_0.png
 
 
-This is a 3D projection of the gaussians involved with the lower surface
-showing the 2D projection of the 3D projection above. The innermost
-ellipse represents the highest peak, that is the maximum probability for
-a given (X,Y) value.
+这是所涉及高斯分布的三维投影，下方曲面显示的是上方三维图形的二维投影。最内层椭圆表示最高峰，也就是给定 (X, Y) 取值处的最大概率。
 
-\*\* numpy einsum examples \*\*
+\*\* numpy einsum 示例 \*\*
 
 .. code-block:: ipython3
 
@@ -552,16 +512,13 @@ a given (X,Y) value.
 .. image:: Kalmanfilter_basics_files/Kalmanfilter_basics_28_1.png
 
 
-Reference
-~~~~~~~~~~~
+参考文献
+~~~~~~~~~~~~
 
-1. Roger Labbe’s
-   `repo <https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python>`__
-   on Kalman Filters. (Majority of the examples in the notes are from
-   this)
+1. Roger Labbe 关于卡尔曼滤波的
+   `仓库 <https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python>`__。（笔记中的大部分示例来自该仓库）
 
-2. Probabilistic Robotics by Sebastian Thrun, Wolfram Burgard and Dieter
-   Fox, MIT Press.
+2. Sebastian Thrun、Wolfram Burgard 与 Dieter Fox 所著 *Probabilistic Robotics*，MIT Press。
 
-3. Scipy
-   `Documentation <https://scipython.com/blog/visualizing-the-bivariate-gaussian-distribution/>`__
+3. SciPy
+   `文档 <https://scipython.com/blog/visualizing-the-bivariate-gaussian-distribution/>`__

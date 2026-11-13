@@ -1,19 +1,19 @@
-Graph based SLAM
+基于图的 SLAM
 ----------------
 
-This is a graph based SLAM example.
+这是一个基于图的同步定位与建图（SLAM）示例。
 
-The blue line is ground truth.
+蓝线是真值。
 
-The black line is dead reckoning.
+黑线是航位推算。
 
-The red line is the estimated trajectory with Graph based SLAM.
+红线是基于图的 SLAM 估计的轨迹。
 
-The black stars are landmarks for graph edge generation.
+黑色星号是用来生成图边的路标。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/GraphBasedSLAM/animation.gif
 
-Code Link
+代码链接
 ~~~~~~~~~~~~
 
 .. autofunction:: SLAM.GraphBasedSLAM.graph_based_slam.graph_based_slam
@@ -23,8 +23,7 @@ Code Link
 .. include:: graphSLAM_formulation.rst
 .. include:: graphSLAM_SE2_example.rst
 
-Reference
+参考文献
 ~~~~~~~~~~~
 
 - `A Tutorial on Graph-Based SLAM <http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf>`_
-

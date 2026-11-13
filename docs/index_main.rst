@@ -1,23 +1,22 @@
-.. PythonRobotics documentation master file, created by
-   sphinx-quickstart on Sat Sep 15 13:15:55 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. PythonRobotics 文档主文件，由
+   sphinx-quickstart 于 2018 年 9 月 15 日周六 13:15:55 创建。
+   你可以按自己的喜好完全改写本文件，但至少应
+   包含根 `toctree` 指令。
 
-Welcome to PythonRobotics's documentation!
+欢迎阅读 PythonRobotics 文档！
 ==========================================
 
-"PythonRobotics" is a Python code collections and textbook
-(This document) for robotics algorithm, which is developed on `GitHub`_.
+“PythonRobotics” 是一套机器人算法的 Python 代码合集与教材
+（即本文档），开发于 `GitHub`_。
 
-See this section (:ref:`What is PythonRobotics?`) for more details of this project.
+更多项目细节见本节（:ref:`What is PythonRobotics?`）。
 
-This project  is `the one of the most popular open-source software (OSS) in
-the field of robotics on GitHub`_.
-This is `user comments about this project`_, and
-this graph shows GitHub star history of this project:
+本项目是 `GitHub 上机器人领域最受欢迎的开源软件（OSS）之一 <the one of the most popular open-source software (OSS) in the field of robotics on GitHub_>`_。
+这里是 `关于本项目的用户评论 <user comments about this project_>`_，
+下图展示本项目的 GitHub 星标历史：
 
 .. image:: https://api.star-history.com/svg?repos=AtsushiSakai/PythonRobotics&type=Date
-   :alt: Star History
+   :alt: 星标历史
    :width: 80%
    :align: center
 
@@ -31,7 +30,7 @@ this graph shows GitHub star history of this project:
 
 .. toctree::
    :maxdepth: 2
-   :caption: Table of Contents
+   :caption: 目录
 
    modules/0_getting_started/0_getting_started
    modules/1_introduction/introduction
@@ -49,7 +48,7 @@ this graph shows GitHub star history of this project:
    modules/12_appendix/appendix
 
 
-Indices and tables
+索引与表格
 ==================
 
 * :ref:`genindex`

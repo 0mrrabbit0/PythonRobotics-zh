@@ -1,94 +1,86 @@
-Catmull-Rom Spline Planning
+Catmull-Rom 样条路径规划
 ----------------------------
 
 .. image:: catmull_rom_path_planning.png
 
-This is a Catmull-Rom spline path planning routine.
+这是 Catmull-Rom 样条路径规划程序。
 
-If you provide waypoints, the Catmull-Rom spline generates a smooth path that always passes through the control points, 
-exhibits local control, and maintains 𝐶1 continuity.
+给定路点后，Catmull-Rom 样条会生成一条始终经过控制点的平滑路径，具有局部控制性，并保持 𝐶1 连续性。
 
 
-Catmull-Rom Spline Fundamentals
+Catmull-Rom 样条基础
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Catmull-Rom splines are a type of cubic spline that passes through a given set of points, known as control points. 
+Catmull-Rom 样条是一类经过给定点集（称为控制点）的三次样条。
 
-They are defined by the following equation for calculating a point on the spline:
+样条上的一点由下列方程计算：
 
 :math:`P(t) = 0.5 \times \left( 2P_1 + (-P_0 + P_2)t + (2P_0 - 5P_1 + 4P_2 - P_3)t^2 + (-P_0 + 3P_1 - 3P_2 + P_3)t^3 \right)`
 
-Where:
+其中：
 
-* :math:`P(t)` is the point on the spline at parameter :math:`t`.
-* :math:`P_0, P_1, P_2, P_3` are the control points surrounding the parameter :math:`t`.
+* :math:`P(t)` 是参数 :math:`t` 处样条上的点。
+* :math:`P_0, P_1, P_2, P_3` 是参数 :math:`t` 周围的控制点。
 
-Types of Catmull-Rom Splines
+Catmull-Rom 样条的类型
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are different types of Catmull-Rom splines based on the choice of the **tau** parameter, which influences how the curve 
-behaves in relation to the control points:
+按照参数 **tau** 的取法，Catmull-Rom 样条有不同类型。该参数影响曲线相对控制点的形态：
 
-1. **Uniform Catmull-Rom Spline**: 
-   The standard implementation where the parameterization is uniform. Each segment of the spline is treated equally, 
-   regardless of the distances between control points.
+1. **均匀 Catmull-Rom 样条**：
+   标准实现，参数化是均匀的。样条的每一段被同等对待，与控制点之间的距离无关。
 
 
-2. **Chordal Catmull-Rom Spline**: 
-   This spline type takes into account the distance between control points. The parameterization is based on the actual distance 
-   along the spline, ensuring smoother transitions. The equation can be modified to include the chord length :math:`L_i` between 
-   points :math:`P_i` and :math:`P_{i+1}`:
+2. **弦长 Catmull-Rom 样条**：
+   这类样条考虑控制点之间的距离。参数化基于沿样条的实际距离，从而使过渡更平滑。方程可以改写，以包含点 :math:`P_i` 与 :math:`P_{i+1}` 之间的弦长 :math:`L_i`：
    
    .. math::
        \tau_i = \sqrt{(x_{i+1} - x_i)^2 + (y_{i+1} - y_i)^2}
 
-3. **Centripetal Catmull-Rom Spline**: 
-   This variation improves upon the chordal spline by using the square root of the distance to determine the parameterization, 
-   which avoids oscillations and creates a more natural curve. The parameter :math:`t_i` is adjusted using the following relation:
+3. **向心 Catmull-Rom 样条**：
+   这一变体在弦长样条的基础上，用距离的平方根来确定参数化，从而避免振荡并得到更自然的曲线。参数 :math:`t_i` 按下列关系调整：
    
    .. math::
        t_i = \sqrt{(x_{i+1} - x_i)^2 + (y_{i+1} - y_i)^2}
 
 
-Blending Functions
+混合函数
 ~~~~~~~~~~~~~~~~~~~~~
 
-In Catmull-Rom spline interpolation, blending functions are used to calculate the influence of each control point on the spline at a 
-given parameter :math:`t`. The blending functions ensure that the spline is smooth and passes through the control points while 
-maintaining continuity. The four blending functions used in Catmull-Rom splines are defined as follows:
+在 Catmull-Rom 样条插值中，混合函数用来计算给定参数 :math:`t` 下各控制点对样条的影响。混合函数保证样条平滑、经过控制点，并保持连续性。Catmull-Rom 样条使用的四个混合函数定义如下：
 
-1. **Blending Function 1**:
+1. **混合函数 1**：
    
    .. math::
        b_1(t) = -t + 2t^2 - t^3
 
-2. **Blending Function 2**:
+2. **混合函数 2**：
    
    .. math::
        b_2(t) = 2 - 5t^2 + 3t^3
 
-3. **Blending Function 3**:
+3. **混合函数 3**：
    
    .. math::
        b_3(t) = t + 4t^2 - 3t^3
 
-4. **Blending Function 4**:
+4. **混合函数 4**：
    
    .. math::
        b_4(t) = -t^2 + t^3
 
-The blending functions are combined in the spline equation to create a smooth curve that reflects the influence of each control point.
+这些混合函数在样条方程中组合起来，形成反映各控制点影响的平滑曲线。
 
-The following figure illustrates the blending functions over the interval :math:`[0, 1]`:
+下图给出区间 :math:`[0, 1]` 上的混合函数：
 
 .. image:: blending_functions.png
 
-Catmull-Rom Spline API
+Catmull-Rom 样条 API
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This section provides an overview of the functions used for Catmull-Rom spline path planning.
+本节概述用于 Catmull-Rom 样条路径规划的函数。
 
-Code Link
+代码链接
 ++++++++++
 
 .. autofunction:: PathPlanning.Catmull_RomSplinePath.catmull_rom_spline_path.catmull_rom_point
@@ -96,7 +88,7 @@ Code Link
 .. autofunction:: PathPlanning.Catmull_RomSplinePath.catmull_rom_spline_path.catmull_rom_spline
 
 
-References
+参考文献
 ~~~~~~~~~~~~~~
 
 -  `Catmull-Rom Spline - Wikipedia <https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline>`__

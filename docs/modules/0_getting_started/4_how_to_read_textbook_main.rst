@@ -1,14 +1,14 @@
 .. _`How to read this textbook`:
 
-How to read this textbook
+如何阅读本教材
 --------------------------
 
-This document is structured to help you learn the fundamental concepts
-behind each sample code in PythonRobotics.
+本文档的结构旨在帮助你学习 PythonRobotics 中
+每个示例代码背后的基本概念。
 
-If you already have some knowledge of robotics technologies, you can start
-by reading any document that interests you.
+如果你已经具备一些机器人技术知识，可以从
+自己感兴趣的任意文档开始阅读。
 
-However, if you have no prior knowledge of robotics technologies, it is
-recommended that you first read the :ref:`Introduction` section and then proceed
-to the documents related to the technical fields that interest you.
+如果你此前没有机器人技术方面的知识，建议
+先阅读 :ref:`引言 <Introduction>` 一节，然后再阅读
+与你感兴趣的技术领域相关的文档。

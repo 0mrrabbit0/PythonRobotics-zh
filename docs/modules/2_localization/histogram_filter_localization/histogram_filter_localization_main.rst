@@ -1,119 +1,114 @@
-Histogram filter localization
------------------------------
+直方图滤波定位
+--------------
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/histogram_filter/animation.gif
 
-This is a 2D localization example with Histogram filter.
+这是使用直方图滤波的二维定位示例。
 
-The red cross is true position, black points are RFID positions.
+红色十字是真实位置，黑点是 RFID 位置。
 
-The blue grid shows a position probability of histogram filter.
+蓝色栅格表示直方图滤波的位置概率。
 
-In this simulation, we assume the robot's yaw orientation and RFID's positions are known,
-but x,y positions are unknown.
+在本仿真中，假设机器人的航向角以及 RFID 的位置已知，但 x、y 位置未知。
 
-The filter uses speed input and range observations from RFID for localization.
+滤波器使用速度输入以及来自 RFID 的距离观测进行定位。
 
-Initial position information is not needed.
+不需要初始位置信息。
 
-Code Link
-~~~~~~~~~~~~~
+代码链接
+~~~~~~~~
 
 .. autofunction:: Localization.histogram_filter.histogram_filter.histogram_filter_localization
 
-Filtering algorithm
-~~~~~~~~~~~~~~~~~~~~
+滤波算法
+~~~~~~~~
 
-Histogram filter is a discrete Bayes filter in continuous space.
+直方图滤波是连续空间中的离散贝叶斯滤波。
 
-It uses regular girds to manage probability of the robot existence.
+它使用规则栅格来管理机器人存在的概率。
 
-If a grid has higher probability, it means that the robot is likely to be there.
+若某个栅格的概率较高，则表示机器人很可能位于该处。
 
-In the simulation, we want to estimate x-y position, so we use 2D grid data.
+在仿真中要估计 x-y 位置，因此使用二维栅格数据。
 
-There are 4 steps for the histogram filter to estimate the probability distribution.
+直方图滤波估计概率分布分为 4 个步骤。
 
-Step1: Filter initialization
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+步骤 1：滤波器初始化
+^^^^^^^^^^^^^^^^^^^^
 
-Histogram filter does not need initial position information.
+直方图滤波不需要初始位置信息。
 
-In that case, we can initialize each grid probability as a same value.
+此时，可以将每个栅格的概率初始化为相同的值。
 
-If we can use initial position information, we can set initial probabilities based on it.
+若可以使用初始位置信息，则可以据此设置初始概率。
 
-:ref:`gaussian_grid_map` might be useful when the initial position information is provided as gaussian distribution.
+当初始位置信息以高斯分布给出时，:ref:`gaussian_grid_map` 可能会有用。
 
-Step2: Predict probability by motion
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+步骤 2：由运动预测概率
+^^^^^^^^^^^^^^^^^^^^^^
 
-In histogram filter, when a robot move to a next grid,
-all probability information of each grid are shifted towards the movement direction.
+在直方图滤波中，当机器人移动到下一栅格时，每个栅格的全部概率信息都沿运动方向平移。
 
-This process represents the change in the probability distribution as the robot moves.
+该过程表示机器人运动时概率分布的变化。
 
-After the robot has moved, the probability distribution needs reflect
-the estimation error due to the movement.
+机器人移动之后，概率分布需要反映由运动引起的估计误差。
 
-For example, the position probability is peaky with observations:
+例如，有观测时位置概率呈尖峰：
 
 .. image:: 1.png
    :width: 400px
 
-But, the probability is getting uncertain without observations:
+但在没有观测时，概率会变得更加不确定：
 
 .. image:: 2.png
    :width: 400px
 
 
-The `gaussian filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.gaussian_filter.html>`_
-is used in the simulation for adding noise.
+仿真中使用\ `高斯滤波 <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.gaussian_filter.html>`_\ 来添加噪声。
 
-Step3: Update probability by observation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-In this step, all probabilities are updated by observations,
-this is the update step of bayesian filter.
+步骤 3：由观测更新概率
+^^^^^^^^^^^^^^^^^^^^^^
+在此步骤中，所有概率都由观测更新，这是贝叶斯滤波的更新步骤。
 
-The probability update formula is different by the used sensor model.
+概率更新公式因所使用的传感器模型而不同。
 
-This simulation uses range observation model.
+本仿真使用距离观测模型。
 
-The probability of each grid is updated by this formula:
+每个栅格的概率按下列公式更新：
 
 .. math:: p_t=p_{t-1}*h(z)
 
 .. math:: h(z)=\frac{\exp \left(-(d - z)^{2} / 2\right)}{\sqrt{2 \pi}}
 
-- :math:`p_t` is the probability at the time `t`.
+- :math:`p_t` 是时刻 `t` 的概率。
 
-- :math:`h(z)` is the observation probability with the observation `z`.
+- :math:`h(z)` 是观测 `z` 对应的观测概率。
 
-- :math:`d` is the known distance from the RD-ID to the grid center.
+- :math:`d` 是从 RFID 到栅格中心的已知距离。
 
-When the `d` is 3.0, the `h(z)` distribution is:
+当 `d` 为 3.0 时，`h(z)` 的分布为：
 
 .. image:: 4.png
    :width: 400px
 
-The observation probability distribution looks a circle when a RF-ID is observed:
+观测到 RFID 时，观测概率分布呈圆形：
 
 .. image:: 3.png
    :width: 400px
 
-Step4: Estimate position from probability
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-In each time step, we can calculate the final robot position from the current probability distribution.
-There are two ways to calculate the final positions:
+步骤 4：由概率估计位置
+^^^^^^^^^^^^^^^^^^^^^^
+在每个时间步，可以根据当前概率分布计算最终的机器人位置。
+计算最终位置有两种方法：
 
-1. Using the maximum probability grid position.
+1. 使用概率最大的栅格位置。
 
-2. Using the average of probability weighted grind position.
+2. 使用按概率加权的栅格位置的平均值。
 
 
 
-Reference
-~~~~~~~~~~~
+参考文献
+~~~~~~~~
 
 - `_PROBABILISTIC ROBOTICS: <http://www.probabilistic-robotics.org>`_
 - `Robust Vehicle Localization in Urban Environments Using Probabilistic Maps <http://driving.stanford.edu/papers/ICRA2010.pdf>`_

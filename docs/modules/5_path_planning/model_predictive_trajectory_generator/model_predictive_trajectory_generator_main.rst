@@ -1,28 +1,27 @@
-Model Predictive Trajectory Generator
+模型预测轨迹生成器
 -------------------------------------
 
-This is a path optimization sample on model predictive trajectory
-generator.
+这是模型预测轨迹生成器上的路径优化示例。
 
-This algorithm is used for state lattice planner.
+该算法用于状态格规划器。
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~
 
 .. autofunction:: PathPlanning.ModelPredictiveTrajectoryGenerator.trajectory_generator.optimize_trajectory
 
 
-Path optimization sample
+路径优化示例
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ModelPredictiveTrajectoryGenerator/kn05animation.gif
 
-Lookup table generation sample
+查找表示例
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: lookup_table.png
 
-Reference
+参考文献
 ~~~~~~~~~~~~
 
 -  `Optimal rough terrain trajectory generation for wheeled mobile

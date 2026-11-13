@@ -1,11 +1,11 @@
 .. _`Arm Navigation`:
 
-Arm Navigation
-==============
+机械臂导航
+==========
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
+   :caption: 目录
 
    planar_two_link_ik
    n_joint_arm_to_point_control

@@ -1,12 +1,12 @@
 .. _`utils`:
 
-Utilities
+工具
 ==========
 
-Common utilities for PythonRobotics.
+PythonRobotics 的通用工具。
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
+   :caption: 目录
 
    plot/plot

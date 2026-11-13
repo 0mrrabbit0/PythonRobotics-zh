@@ -1,18 +1,17 @@
-Stanley control
+Stanley 控制
 ---------------
 
-Path tracking simulation with Stanley steering control and PID speed
-control.
+使用 Stanley 转向控制与 PID 速度控制的路径跟踪仿真。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/stanley_controller/animation.gif
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~~~
 
 .. autofunction:: PathTracking.stanley_control.stanley_control.stanley_control
 
 
-Reference
+参考文献
 ~~~~~~~~~~~
 
 -  `Stanley: The robot that won the DARPA grand

@@ -1,53 +1,52 @@
 .. _ndt_map:
 
-Normal Distance Transform (NDT) map
-------------------------------------
+正态分布变换（NDT）地图
+------------------------
 
-This is a NDT mapping example.
+这是一个正态分布变换（NDT）建图示例。
 
-Normal Distribution Transform (NDT) is a map representation that uses normal distribution for observation point modeling.
+正态分布变换（NDT）是一种地图表示，它使用正态分布对观测点建模。
 
-Normal Distribution
-~~~~~~~~~~~~~~~~~~~~~
+正态分布
+~~~~~~~~
 
-Normal distribution consists of two parameters: mean :math:`\mu` and covariance :math:`\Sigma`.
+正态分布由两个参数组成：均值 :math:`\mu` 和协方差 :math:`\Sigma`。
 
 :math:`\mathbf{X} \sim \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma})`
 
-In the 2D case, :math:`\boldsymbol{\mu}` is a 2D vector and :math:`\boldsymbol{\Sigma}` is a 2x2 matrix.
+在二维情形下，:math:`\boldsymbol{\mu}` 是二维向量，:math:`\boldsymbol{\Sigma}` 是 2×2 矩阵。
 
-In the matrix form, the probability density function of thr normal distribution is:
+正态分布概率密度函数的矩阵形式为：
 
 :math:`X=\frac{1}{\sqrt{(2 \pi)^2|\Sigma|}} \exp \left\{-\frac{1}{2}^t(x-\mu) \sum^{-1}(x-\mu)\right\}`
 
-Normal Distance Transform mapping steps
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~　
+正态分布变换建图步骤
+~~~~~~~~~~~~~~~~~~~~
 
-NDT mapping consists of two steps:
+正态分布变换（NDT）建图包含两个步骤：
 
-When we have a new observation like this:
+当得到如下新观测时：
 
 .. figure:: raw_observations.png
 
-First, we need to cluster the observation points.
-This is done by using a grid based clustering algorithm.
+首先需要对观测点进行聚类。
+这通过基于栅格的聚类算法完成。
 
-The result is:
+结果为：
 
 .. figure:: grid_clustering.png
 
-Then, we need to fit a normal distribution to each grid cluster.
+然后，需要对每个栅格聚类拟合一个正态分布。
 
-Black ellipse shows each NDT grid like this:
+黑色椭圆如下表示每个正态分布变换（NDT）栅格：
 
 .. figure:: ndt_map1.png
 
 .. figure:: ndt_map2.png
 
-API
+接口
 ~~~~~
 
 .. autoclass:: Mapping.ndt_map.ndt_map.NDTMap
     :members:
     :class-doc-from: class
-

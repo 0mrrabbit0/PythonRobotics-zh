@@ -1,124 +1,114 @@
-Cubic spline planning
+三次样条路径规划
 ---------------------
 
-Spline curve continuity
+样条曲线的连续性
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Spline curve smoothness is depending on the which kind of spline model is used.
+样条曲线的平滑程度取决于所用的样条模型。
 
-The smoothness of the spline curve is expressed as :math:`C_0, C_1`, and so on.
+样条曲线的平滑程度用 :math:`C_0, C_1` 等记号表示。
 
-This representation represents continuity of the curve.
-For example, for a spline curve in two-dimensional space:
+这种记号表示曲线的连续性。
+例如，对于二维空间中的样条曲线：
 
-- :math:`C_0` is position continuous
-- :math:`C_1` is tangent vector continuous
-- :math:`C_2` is curvature vector continuous
+- :math:`C_0` 表示位置连续
+- :math:`C_1` 表示切向量连续
+- :math:`C_2` 表示曲率向量连续
 
-as shown in the following figure:
+如下图所示：
 
 .. image:: spline_continuity.png
 
-Cubic spline can generate a curve with :math:`C_0, C_1, C_2`.
+三次样条可以生成具有 :math:`C_0, C_1, C_2` 连续性的曲线。
 
-1D cubic spline
+一维三次样条
 ~~~~~~~~~~~~~~~~~~~
 
-Cubic spline interpolation is a method of smoothly
-interpolating between multiple data points when given
-multiple data points, as shown in the figure below.
+三次样条插值是在给定多个数据点时，于这些数据点之间做平滑插值的方法，如下图所示。
 
 .. image:: spline.png
 
-It separates between each interval between data points.
+它把数据点之间的各个区间分开处理。
 
-The each interval part is approximated by each cubic polynomial.
+每个区间用各自的三次多项式逼近。
 
-The cubic spline uses the cubic polynomial equation for interpolation:
+三次样条使用三次多项式方程进行插值：
 
 :math:`S_j(x)=a_j+b_j(x-x_j)+c_j(x-x_j)^2+d_j(x-x_j)^3`
 
-where :math:`x_j < x < x_{j+1}`, :math:`x_j` is the j-th node of the spline,
-:math:`a_j`, :math:`b_j`, :math:`c_j`, :math:`d_j` are the coefficients
-of the spline.
+其中 :math:`x_j < x < x_{j+1}`，:math:`x_j` 是样条的第 j 个节点，
+:math:`a_j`、:math:`b_j`、:math:`c_j`、:math:`d_j` 是样条系数。
 
-As the above equation, there are 4 unknown parameters :math:`(a,b,c,d)` for
-one interval, so if the number of data points is :math:`N`, the
-interpolation has :math:`4N` unknown parameters.
+由上式，一个区间有 4 个未知参数 :math:`(a,b,c,d)`。
+若数据点个数为 :math:`N`，则插值共有 :math:`4N` 个未知参数。
 
-The following five conditions are used to determine the :math:`4N`
-unknown parameters:
+用下面五个条件来确定这 :math:`4N` 个未知参数：
 
-Constraint 1: Terminal constraints
+约束 1：端点约束
 ===================================
 
 :math:`S_j(x_j)=y_j`
 
-This constraint is the terminal constraint of each interval.
+该约束是每个区间的端点约束。
 
-The polynomial of each interval will pass through the x,y coordinates of
-the data points.
+每个区间的多项式都会经过数据点的 x、y 坐标。
 
-Constraint 2: Point continuous constraints
+约束 2：点连续约束
 ============================================
 
 :math:`S_j(x_{j+1})=S_{j+1}(x_{j+1})=y_{j+1}`
 
-This constraint is a continuity condition for the boundary of each interval.
+该约束是各区间边界上的连续性条件。
 
-This constraint ensures that the boundary of each interval is continuous.
+该约束保证各区间的边界连续。
 
-Constraint 3: Tangent vector continuous constraints
+约束 3：切向量连续约束
 ====================================================
 
 :math:`S'_j(x_{j+1})=S'_{j+1}(x_{j+1})`
 
-This constraint is a continuity condition for the first derivative of
-the boundary of each interval.
+该约束是各区间边界上一阶导数的连续性条件。
 
-This constraint makes the vectors of the boundaries of each
-interval continuous.
+该约束使各区间边界上的切向量连续。
 
 
-Constraint 4: Curvature continuous constraints
+约束 4：曲率连续约束
 ==============================================
 
 :math:`S''_j(x_{j+1})=S''_{j+1}(x_{j+1})`
 
-This constraint is the continuity condition for the second derivative of
-the boundary of each interval.
+该约束是各区间边界上二阶导数的连续性条件。
 
-This constraint makes the curvature of the boundaries of each
-interval continuous.
+该约束使各区间边界上的曲率连续。
 
 
-Constraint 5: Terminal curvature constraints
+约束 5：端点曲率约束
 ========================================================
 
 :math:`S''_0(0)=S''_{n+1}(x_{n})=0`.
 
-The constraint is a boundary condition for the second derivative of the starting and ending points.
+该约束是起点和终点二阶导数的边界条件。
 
-Our sample code assumes these terminal curvatures are 0, which is well known as Natural Cubic Spline.
+示例代码假定这些端点曲率为 0，即通常所说的自然三次样条（Natural Cubic Spline）。
 
-How to calculate the unknown parameters :math:`a_j, b_j, c_j, d_j`
+如何计算未知参数 :math:`a_j, b_j, c_j, d_j`
 ===================================================================
 
-Step1: calculate :math:`a_j`
+步骤 1：计算 :math:`a_j`
 +++++++++++++++++++++++++++++
 
-Spline coefficients :math:`a_j` can be calculated by y positions of the data points:
+样条系数 :math:`a_j` 可由数据点的 y 坐标计算：
 
 :math:`a_j = y_i`.
 
-Step2: calculate :math:`c_j`
+步骤 2：计算 :math:`c_j`
 +++++++++++++++++++++++++++++
 
-Spline coefficients :math:`c_j` can be calculated by solving the linear equation:
+样条系数 :math:`c_j` 可通过求解线性方程得到：
 
 :math:`Ac_j = B`.
 
-The matrix :math:`A` and :math:`B` are defined as follows:
+矩阵 :math:`A` 和 :math:`B` 定义如下：
 
 .. math::
 	A=\left[\begin{array}{cccccc}
@@ -140,72 +130,71 @@ The matrix :math:`A` and :math:`B` are defined as follows:
 	0
 	\end{array}\right]
 
-where :math:`h_{i}` is the x position distance between the i-th and (i+1)-th data points.
+其中 :math:`h_{i}` 是第 i 个与第 (i+1) 个数据点之间的 x 方向距离。
 
-Step3: calculate :math:`d_j`
+步骤 3：计算 :math:`d_j`
 +++++++++++++++++++++++++++++
 
-Spline coefficients :math:`d_j` can be calculated by the following equation:
+样条系数 :math:`d_j` 可由下列方程计算：
 
 :math:`d_{j}=\frac{c_{j+1}-c_{j}}{3 h_{j}}`
 
-Step4: calculate :math:`b_j`
+步骤 4：计算 :math:`b_j`
 +++++++++++++++++++++++++++++
 
-Spline coefficients :math:`b_j` can be calculated by the following equation:
+样条系数 :math:`b_j` 可由下列方程计算：
 
 :math:`b_{i}=\frac{1}{h_i}(a_{i+1}-a_{i})-\frac{h_i}{3}(2c_{i}+c_{i+1})`
 
-How to calculate the first and second derivatives of the spline curve
+如何计算样条曲线的一阶导数和二阶导数
 ======================================================================
 
-After we can get the coefficients of the spline curve, we can calculate
+得到样条曲线的系数之后，可以计算
 
-the first derivative by:
+一阶导数：
 
 :math:`y^{\prime}(x)=b+2cx+3dx^2`
 
-the second derivative by:
+二阶导数：
 
 :math:`y^{\prime \prime}(x)=2c+6dx`
 
-These equations can be calculated by differentiating the cubic polynomial.
+这些方程可由三次多项式求导得到。
 
-Code Link
+代码链接
 ==========
 
-This is the 1D cubic spline class API:
+这是一维三次样条类的 API：
 
 .. autoclass:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D
 	:members:
 
-2D cubic spline
+二维三次样条
 ~~~~~~~~~~~~~~~~~~~
 
-Data x positions needs to be mono-increasing for 1D cubic spline.
+一维三次样条要求数据的 x 坐标单调递增。
 
-So, it cannot be used for 2D path planning.
+因此不能直接用于二维路径规划。
 
-2D cubic spline uses two 1D cubic splines based on path distance from
-the start point for each dimension x and y.
+二维三次样条对 x 和 y 两个方向分别使用一条一维三次样条，自变量是从起点起算的路径距离。
 
-This can generate a curvature continuous path based on x-y waypoints.
+这样可以基于 x-y 路点生成曲率连续的路径。
 
-Heading angle of each point can be calculated analytically by:
+各点的航向角可以解析地计算：
 
 :math:`\theta=\tan ^{-1} \frac{y’}{x’}`
 
-Curvature of each point can be also calculated analytically by:
+各点的曲率也可以解析地计算：
 
 :math:`\kappa=\frac{y^{\prime \prime} x^{\prime}-x^{\prime \prime} y^{\prime}}{\left(x^{\prime2}+y^{\prime2}\right)^{\frac{2}{3}}}`
 
-Code Link
+代码链接
 ==========
 
 .. autoclass:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D
 	:members:
 
-References
+参考文献
 ~~~~~~~~~~
 -  `Cubic Splines James Keesling <https://people.clas.ufl.edu/kees/files/CubicSplines.pdf>`__
 -  `Curves and Splines <http://www.cs.cmu.edu/afs/cs/academic/class/15462-s10/www/lec-slides/lec06.pdf>`__

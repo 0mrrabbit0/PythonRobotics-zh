@@ -1,97 +1,94 @@
 
-Steering Motion Model
+转向运动模型
 -----------------------
 
-Turning radius calculation by steering motion model
+基于转向运动模型计算转弯半径
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The turning Radius represents the radius of the circle when the robot turns, as shown in the diagram below.
+转弯半径表示机器人转弯时所走圆的半径，如下图所示。
 
 .. image:: steering_motion_model/steering_model.png
 
-When the steering angle is tilted by :math:`\delta`,
-the turning radius :math:`R` can be calculated using the following equation,
-based on the geometric relationship between the wheelbase (WB),
-which is the distance between the rear wheel center and the front wheel center,
-and the assumption that the turning radius circle passes through the center of
-the rear wheels in the diagram above.
+当转向角偏转 :math:`\delta` 时，
+可以基于轴距（WB，即后轮中心与前轮中心之间的距离）
+与上图中转弯半径圆经过后轮中心这一假设之间的几何关系，
+用下面的方程计算转弯半径 :math:`R`。
 
 :math:`R = \frac{WB}{tan\delta}`
 
-The curvature :math:`\kappa` is the reciprocal of the turning radius:
+曲率 :math:`\kappa` 是转弯半径的倒数：
 
 :math:`\kappa = \frac{tan\delta}{WB}`
 
-In the diagram above, the angular difference :math:`\Delta \theta` in the vehicle’s heading between two points on the turning radius :math:`R`
-is the same as the angle of the vector connecting the two points from the center of the turn.
+在上图中，转弯半径 :math:`R` 上两点之间车辆航向角的角度差 :math:`\Delta \theta`，
+与从转弯中心连接这两点的向量的夹角相同。
 
-From the formula for the length of an arc and the radius,
+由弧长与半径的公式，
 
 :math:`\Delta \theta = \frac{s}{R}`
 
-Here, :math:`s` is the distance between two points on the turning radius.
+这里，:math:`s` 是转弯半径上两点之间的距离。
 
-So, yaw rate :math:`\omega` can be calculated as follows.
+因此，航向角速度 :math:`\omega` 可以如下计算。
 
 :math:`\omega = \frac{v}{R}`
 
-and
+以及
 
 :math:`\omega = v\kappa`
 
-here, :math:`v` is the velocity of the vehicle.
+这里，:math:`v` 是车辆的速度。
 
 
-Turning radius calculation by 2 consecutive positions of the robot trajectory
+由机器人轨迹上连续两个位姿计算转弯半径
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In this section, we will derive the formula for the turning radius from 2 consecutive positions of the robot trajectory.
+本节将由机器人轨迹上连续两个位姿推导转弯半径的公式。
 
 .. image:: steering_motion_model/turning_radius_calc1.png
 
-As shown in the upper diagram above, the robot moves from a point at time :math:`t` to a point at time :math:`t+1`.
-Each point is represented by a 2D position :math:`(x_t, y_t)` and an orientation :math:`\theta_t`.
+如上图上方所示，机器人从时刻 :math:`t` 的点运动到时刻 :math:`t+1` 的点。
+每个点由二维位置 :math:`(x_t, y_t)` 和航向角 :math:`\theta_t` 表示。
 
-The distance between the two points is :math:`d = \sqrt{(x_{t+1} - x_t)^2 + (y_{t+1} - y_t)^2}`.
+两点之间的距离为 :math:`d = \sqrt{(x_{t+1} - x_t)^2 + (y_{t+1} - y_t)^2}`。
 
-The angle between the two vectors from the turning center to the two points is :math:`\theta = \theta_{t+1} - \theta_t`.
-Here, by drawing a perpendicular line from the center of the turning radius
-to a straight line of length :math:`d` connecting two points,
-the following equation can be derived from the resulting right triangle.
+从转弯中心指向这两点的两个向量之间的夹角为 :math:`\theta = \theta_{t+1} - \theta_t`。
+这里，从转弯半径的中心向连接两点、长度为 :math:`d` 的直线作垂线，
+可以由所得的直角三角形推导出下面的方程。
 
 :math:`sin\frac{\theta}{2} = \frac{d}{2R}`
 
-So, the turning radius :math:`R` can be calculated as follows.
+因此，转弯半径 :math:`R` 可以如下计算。
 
 :math:`R = \frac{d}{2sin\frac{\theta}{2}}`
 
-The curvature :math:`\kappa` is the reciprocal of the turning radius.
-So, the curvature can be calculated as follows.
+曲率 :math:`\kappa` 是转弯半径的倒数。
+因此，曲率可以如下计算。
 
 :math:`\kappa = \frac{2sin\frac{\theta}{2}}{d}`
 
-Target speed by maximum steering speed
+由最大转向速度确定目标速度
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the maximum steering speed is given as :math:`\dot{\delta}_{max}`,
-the maximum curvature change rate :math:`\dot{\kappa}_{max}` can be calculated as follows:
+如果最大转向速度给定为 :math:`\dot{\delta}_{max}`，
+最大曲率变化率 :math:`\dot{\kappa}_{max}` 可以如下计算：
 
 :math:`\dot{\kappa}_{max} = \frac{tan\dot{\delta}_{max}}{WB}`
 
-From the curvature calculation by 2 consecutive positions of the robot trajectory,
+根据由机器人轨迹上连续两个位姿计算曲率的方法，
 
-the maximum curvature change rate :math:`\dot{\kappa}_{max}` can be calculated as follows:
+最大曲率变化率 :math:`\dot{\kappa}_{max}` 可以如下计算：
 
 :math:`\dot{\kappa}_{max} = \frac{\kappa_{t+1}-\kappa_{t}}{\Delta t}`
 
-If we can assume that the vehicle will not exceed the maximum curvature change rate,
+如果可以假设车辆不会超过最大曲率变化率，
 
-the target minimum velocity :math:`v_{min}` can be calculated as follows:
+目标最小速度 :math:`v_{min}` 可以如下计算：
 
 :math:`v_{min} = \frac{d_{t+1}+d_{t}}{\Delta t} = \frac{d_{t+1}+d_{t}}{(\kappa_{t+1}-\kappa_{t})}\frac{tan\dot{\delta}_{max}}{WB}`
 
 
-Reference
+参考文献
 ~~~~~~~~~~~
 
 - `Vehicle Dynamics and Control <https://link.springer.com/book/10.1007/978-1-4614-1433-9>`_

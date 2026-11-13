@@ -1,25 +1,25 @@
 .. _probabilistic-road-map-(prm)-planning:
 
-Probabilistic Road-Map (PRM) planning
+概率路线图（PRM）规划
 -------------------------------------
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ProbabilisticRoadMap/animation.gif
 
-This PRM planner uses Dijkstra method for graph search.
+该 PRM 规划器使用 Dijkstra 方法做图搜索。
 
-In the animation, blue points are sampled points,
+动画中，蓝点是采样点，
 
-Cyan crosses means searched points with Dijkstra method,
+青色叉号是用 Dijkstra 方法搜索过的点，
 
-The red line is the final path of PRM.
+红线是 PRM 的最终路径。
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~~~
 
 .. autofunction:: PathPlanning.ProbabilisticRoadMap.probabilistic_road_map.prm_planning
 
 
-Reference
+参考文献
 ~~~~~~~~~~~
 
 -  `Probabilistic roadmap -

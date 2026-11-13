@@ -1,38 +1,31 @@
 
-Two joint arm to point control
+两关节机械臂到点控制
 ------------------------------
 
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/two_joint_arm_to_point_control/animation.gif
-   :alt: TwoJointArmToPointControl
+   :alt: 两关节机械臂到点控制
 
-This is two joint arm to a point control simulation.
+这是两关节机械臂到点控制仿真。
 
-This is an interactive simulation.
+这是交互式仿真。
 
-You can set the goal position of the end effector with left-click on the plotting area.
+可在绘图区域单击鼠标左键，设置末端执行器的目标位置。
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~~~
 
 .. autofunction:: ArmNavigation.two_joint_arm_to_point_control.two_joint_arm_to_point_control.main
 
 
-Inverse Kinematics for a Planar Two-Link Robotic Arm
+平面两连杆机械臂的逆运动学
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A classic problem with robotic arms is getting the end-effector, the
-mechanism at the end of the arm responsible for manipulating the
-environment, to where you need it to be. Maybe the end-effector is a
-gripper and maybe you want to pick up an object and maybe you know where
-that object is relative to the robot - but you cannot tell the
-end-effector where to go directly. Instead, you have to determine the
-joint angles that get the end-effector to where you want it to be. This
-problem is known as inverse kinematics.
+机械臂的一个经典问题，是使末端执行器——位于臂末端、负责操作环境的机构——到达所需位置。末端执行器也许是夹爪，你也许想抓取某个物体，并且也许知道该物体相对于机器人的位置，但不能直接指定末端执行器前往何处。你必须求出能使末端执行器到达目标位置的关节角。该问题称为逆运动学。
 
-Credit for this solution goes to:
+该解法来源于：
 https://robotacademy.net.au/lesson/inverse-kinematics-for-a-2-joint-robot-arm-using-geometry/
 
-First, let’s define a class to make plotting our arm easier.
+首先定义一个类，以便更容易地绘制机械臂。
 
 .. code-block:: ipython3
 
@@ -70,8 +63,7 @@ First, let’s define a class to make plotting our arm easier.
             plt.plot(self.elbow[0], self.elbow[1], 'ko')
             plt.plot(self.wrist[0], self.wrist[1], 'ko')
 
-Let’s also define a function to make it easier to draw an angle on our
-diagram.
+再定义一个函数，以便在图上画出角度。
 
 .. code-block:: ipython3
 
@@ -100,11 +92,7 @@ diagram.
             coords = transform_points(coords, offset, origin)
             plt.plot(coords[0], coords[1], 'k-')
 
-Okay, we now have a TwoLinkArm class to help us draw the arm, which
-we’ll do several times during our derivation. Notice there is a method
-called forward_kinematics - forward kinematics specifies the
-end-effector position given the joint angles and link lengths. Forward
-kinematics is easier than inverse kinematics.
+现在有 TwoLinkArm 类帮助绘制机械臂，推导过程中会多次使用。注意其中有一个名为 forward_kinematics 的方法：正运动学根据关节角与连杆长度确定末端执行器的位置。正运动学比逆运动学更容易。
 
 .. code-block:: ipython3
 
@@ -149,11 +137,7 @@ kinematics is easier than inverse kinematics.
 .. image:: Planar_Two_Link_IK_files/Planar_Two_Link_IK_5_0.png
 
 
-It’s common to name arm joints anatomically, hence the names shoulder,
-elbow, and wrist. In this example, the wrist is not itself a joint, but
-we can consider it to be our end-effector. If we constrain the shoulder
-to the origin, we can write the forward kinematics for the elbow and the
-wrist.
+机械臂关节常按解剖学术语命名，因此有肩（Shoulder）、肘（Elbow）与腕（Wrist）。在本例中，腕本身并不是关节，但可以把它视为末端执行器。若将肩约束在原点，就可以写出肘与腕的正运动学。
 
 | :math:`elbow_x = l_0\cos(\theta_0)`
 | :math:`elbow_y = l_0\sin(\theta_0)`
@@ -161,19 +145,14 @@ wrist.
 | :math:`wrist_x = elbow_x + l_1\cos(\theta_0+\theta_1) = l_0\cos(\theta_0) + l_1\cos(\theta_0+\theta_1)`
 | :math:`wrist_y = elbow_y + l_1\sin(\theta_0+\theta_1) = l_0\sin(\theta_0) + l_1\sin(\theta_0+\theta_1)`
 
-Since the wrist is our end-effector, let’s just call its coordinates
-\ :math:`x`\  and \ :math:`y`\ . The forward kinematics for our
-end-effector is then
+由于腕是末端执行器，这里把它的坐标记为
+\ :math:`x`\  与 \ :math:`y`\ 。于是末端执行器的正运动学为
 
 | :math:`x = l_0\cos(\theta_0) + l_1\cos(\theta_0+\theta_1)`
 | :math:`y = l_0\sin(\theta_0) + l_1\sin(\theta_0+\theta_1)`
 
-A first attempt to find the joint angles :math:`\theta_0` and
-:math:`\theta_1` that would get our end-effector to the desired
-coordinates :math:`x` and :math:`y` might be to try solving the forward
-kinematics for :math:`\theta_0` and :math:`\theta_1`, but that would be
-the wrong move. An easier path involves going back to the geometry of
-the arm.
+要寻找能使末端执行器到达期望坐标 :math:`x` 与 :math:`y` 的关节角 :math:`\theta_0` 与
+:math:`\theta_1`，第一次尝试也许是从正运动学中反解 :math:`\theta_0` 与 :math:`\theta_1`，但那是错误的做法。更简便的做法是回到机械臂的几何关系。
 
 .. code-block:: ipython3
 
@@ -209,19 +188,17 @@ the arm.
 .. image:: Planar_Two_Link_IK_files/Planar_Two_Link_IK_7_0.png
 
 
-The distance from the end-effector to the robot base (shoulder joint) is
-:math:`r` and can be written in terms of the end-effector position using
-the Pythagorean Theorem.
+末端执行器到机器人基座（肩关节）的距离为
+:math:`r`，可用勾股定理根据末端执行器位置写成
 
 :math:`r^2` = :math:`x^2 + y^2`
 
-Then, by the law of cosines, :math:`r`\ 2 can also be written as:
+然后，由余弦定理，:math:`r`\ 2 也可写成：
 
 :math:`r^2` = :math:`l_0^2 + l_1^2 - 2l_0l_1\cos(\alpha)`
 
-Because :math:`\alpha` can be written as :math:`\pi - \theta_1`, we can
-relate the desired end-effector position to one of our joint angles,
-:math:`\theta_1`.
+因为 :math:`\alpha` 可以写成 :math:`\pi - \theta_1`，可以把期望的末端执行器位置与其中一个关节角
+:math:`\theta_1` 联系起来。
 
 :math:`x^2 + y^2` = :math:`l_0^2 + l_1^2 - 2l_0l_1\cos(\alpha)`
 
@@ -232,21 +209,15 @@ relate the desired end-effector position to one of our joint angles,
 | :math:`\cos(\pi-\theta_1) = \frac{l_0^2 + l_1^2 - x^2 - y^2}{2l_0l_1}`
 | :math:`~`
 | :math:`~`
-| :math:`\cos(\pi-\theta_1) = -cos(\theta_1)` is a trigonometric
-  identity, so we can also write
+| :math:`\cos(\pi-\theta_1) = -cos(\theta_1)` 是三角恒等式，因此也可以写成
 
 :math:`\cos(\theta_1) = \frac{x^2 + y^2 - l_0^2 - l_1^2}{2l_0l_1}`
 
-which leads us to an equation for :math:`\theta_1` in terms of the link
-lengths and the desired end-effector position!
+由此得到用连杆长度与期望末端执行器位置表示 :math:`\theta_1` 的方程。
 
 :math:`\theta_1 = \cos^{-1}(\frac{x^2 + y^2 - l_0^2 - l_1^2}{2l_0l_1})`
 
-This is actually one of two possible solutions for :math:`\theta_1`, but
-we’ll ignore the other possibility for now. This solution will lead us
-to the “arm-down” configuration of the arm, which is what’s shown in the
-diagram. Now we’ll derive an equation for :math:`\theta_0` that depends
-on this value of :math:`\theta_1`.
+这实际上是 :math:`\theta_1` 的两个可能解之一，此处暂时忽略另一个解。该解对应于图中所示的“臂向下”构型。接下来推导依赖于这一 :math:`\theta_1` 取值的 :math:`\theta_0` 方程。
 
 .. code-block:: ipython3
 
@@ -284,18 +255,13 @@ on this value of :math:`\theta_1`.
 .. image:: Planar_Two_Link_IK_files/Planar_Two_Link_IK_9_0.png
 
 
-Consider the angle between the displacement vector :math:`r` and the
-first link :math:`l_0`; let’s call it :math:`\beta`. If we extend the
-first link to include the component of the second link in the same
-direction as the first, we form a right triangle with components
-:math:`l_0+l_1cos(\theta_1)` and :math:`l_1sin(\theta_1)`, allowing us
-to express :math:`\beta` as
+考虑位移向量 :math:`r` 与第一根连杆 :math:`l_0` 之间的夹角，记为 :math:`\beta`。若延长第一根连杆，使其包含第二根连杆沿第一根连杆方向的分量，就得到一个直角三角形，两条直角边分别为
+:math:`l_0+l_1cos(\theta_1)` 与 :math:`l_1sin(\theta_1)`，从而可将 :math:`\beta` 表示为
 
 :math:`\beta = \tan^{-1}(\frac{l_1\sin(\theta_1)}{l_0+l_1\cos(\theta_1)})`
 
-We now have an expression for this angle :math:`\beta` in terms of one
-of our arm’s joint angles. Now, can we relate :math:`\beta` to
-:math:`\theta_0`? Yes!
+现在已有用机械臂某一关节角表示该角度 :math:`\beta` 的表达式。那么，能否将 :math:`\beta` 与
+:math:`\theta_0` 联系起来？可以。
 
 .. code-block:: ipython3
 
@@ -329,27 +295,21 @@ of our arm’s joint angles. Now, can we relate :math:`\beta` to
 .. image:: Planar_Two_Link_IK_files/Planar_Two_Link_IK_12_0.png
 
 
-Our first joint angle :math:`\theta_0` added to :math:`\beta` gives us
-the angle between the positive :math:`x`-axis and the displacement
-vector :math:`r`; let’s call this angle :math:`\gamma`.
+第一个关节角 :math:`\theta_0` 与 :math:`\beta` 相加，得到正 :math:`x` 轴与位移向量
+:math:`r` 之间的夹角，将该角记为 :math:`\gamma`。
 
 :math:`\gamma = \theta_0+\beta`
 
-:math:`\theta_0`, our remaining joint angle, can then be expressed as
+于是，剩下的关节角 :math:`\theta_0` 可以表示为
 
 :math:`\theta_0 = \gamma-\beta`
 
-We already know :math:`\beta`. :math:`\gamma` is simply the inverse
-tangent of :math:`\frac{y}{x}`, so we have an equation of
-:math:`\theta_0`!
+已经知道 :math:`\beta`。:math:`\gamma` 就是 :math:`\frac{y}{x}` 的反正切，因此得到
+:math:`\theta_0` 的方程。
 
 :math:`\theta_0 = \tan^{-1}(\frac{y}{x})-\tan^{-1}(\frac{l_1\sin(\theta_1)}{l_0+l_1\cos(\theta_1)})`
 
-We now have the inverse kinematics for a planar two-link robotic arm. If
-you’re planning on implementing this in a programming language, it’s
-best to use the atan2 function, which is included in most math libraries
-and correctly accounts for the signs of :math:`y` and :math:`x`. Notice
-that :math:`\theta_1` must be calculated before :math:`\theta_0`.
+至此得到平面两连杆机械臂的逆运动学。若要用编程语言实现，最好使用 atan2 函数；大多数数学库都包含该函数，并能正确处理 :math:`y` 与 :math:`x` 的符号。注意必须先计算 :math:`\theta_1`，再计算 :math:`\theta_0`。
 
 | :math:`\theta_1 = \cos^{-1}(\frac{x^2 + y^2 - l_0^2 - l_1^2}{2l_0l_1})`
 | :math:`\theta_0 = atan2(y, x)-atan2(l_1\sin(\theta_1), l_0+l_1\cos(\theta_1))`

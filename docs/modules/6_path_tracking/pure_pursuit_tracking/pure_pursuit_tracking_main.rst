@@ -1,21 +1,19 @@
-Pure pursuit tracking
----------------------
+纯追踪路径跟踪
+--------------
 
-Path tracking simulation with pure pursuit steering control and PID
-speed control.
+使用纯追踪转向控制与 PID 速度控制的路径跟踪仿真。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/pure_pursuit/animation.gif
 
-The red line is a target course, the green cross means the target point
-for pure pursuit control, the blue line is the tracking.
+红线为目标路径，绿色十字表示纯追踪控制的目标点，蓝线为跟踪轨迹。
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~~~
 
 .. autofunction:: PathTracking.pure_pursuit.pure_pursuit.pure_pursuit_steer_control
 
 
-Reference
+参考文献
 ~~~~~~~~~~~
 
 -  `A Survey of Motion Planning and Control Techniques for Self-driving

@@ -1,68 +1,65 @@
-Technologies for Robotics
+机器人技术
 -------------------------
 
-The field of robotics needs wide areas of technologies such as mechanical engineering,
-electrical engineering, computer science, and artificial intelligence (AI).
-This project, `PythonRobotics`, only focuses on computer science and artificial intelligence.
+机器人学领域需要广泛的技术，例如机械工程、
+电气工程、计算机科学和人工智能（AI）。
+本项目 `PythonRobotics` 只聚焦于计算机科学和人工智能。
 
-The technologies for robotics are categorized as following 3 categories:
+机器人技术分为以下 3 类：
 
-#. `Autonomous Navigation`_
-#. `Manipulation`_
-#. `Robot type specific technologies`_
+#. `自主导航 <Autonomous Navigation_>`_
+#. `操作 <Manipulation_>`_
+#. `特定机器人类型的技术 <Robot type specific technologies_>`_
 
 .. _`Autonomous Navigation`:
 
-Autonomous Navigation
+自主导航
 ^^^^^^^^^^^^^^^^^^^^^^^^
-Autonomous navigation is a capability that can move to a goal over long
-periods of time without any external control by an operator.
+自主导航是一种能力：机器人能够在没有操作员外部控制的情况下，长时间运动到目标。
 
-To achieve autonomous navigation, the robot needs to have the following technologies:
-- It needs to know where it is (localization)
-- Where it is safe (mapping)
-- Where is is safe and where the robot is in the map (Simultaneous Localization and Mapping (SLAM))
-- Where and how to move (path planning)
-- How to control its motion (path following).
+要实现自主导航，机器人需要具备以下技术：
+- 它需要知道自己在哪里（定位）
+- 哪里是安全的（建图）
+- 哪里是安全的，以及机器人在地图中的位置（同步定位与建图（SLAM））
+- 往哪里走以及如何走（路径规划）
+- 如何控制其运动（路径跟踪）。
 
-The autonomous system would not work correctly if any of these technologies is missing.
+如果缺少其中任何一项技术，自主系统就无法正确工作。
 
-In recent years, autonomous navigation technologies have received huge
-attention in many fields.
-For example, self-driving cars, drones, and autonomous mobile robots in indoor and outdoor environments.
+近年来，自主导航技术在许多领域受到巨大关注。
+例如，自动驾驶汽车、无人机，以及室内外环境中的自主移动机器人。
 
-In this project, we provide many algorithms, sample codes,
-and documentations for autonomous navigation.
+在本项目中，我们为自主导航提供许多算法、示例代码
+和文档。
 
-#. :ref:`Localization`
-#. :ref:`Mapping`
-#. :ref:`SLAM`
-#. :ref:`Path planning`
-#. :ref:`Path tracking`
+#. :ref:`定位 <Localization>`
+#. :ref:`建图 <Mapping>`
+#. :ref:`同步定位与建图（SLAM） <SLAM>`
+#. :ref:`路径规划 <Path planning>`
+#. :ref:`路径跟踪 <Path tracking>`
 
 
 
 .. _`Manipulation`:
 
-Manipulation
+操作
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-#. :ref:`Arm Navigation`
+#. :ref:`机械臂导航 <Arm Navigation>`
 
 .. _`Robot type specific technologies`:
 
-Robot type specific technologies
+特定机器人类型的技术
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-#. :ref:`Aerial Navigation`
-#. :ref:`Bipedal`
-#. :ref:`Inverted Pendulum`
+#. :ref:`空中导航 <Aerial Navigation>`
+#. :ref:`双足 <Bipedal>`
+#. :ref:`倒立摆 <Inverted Pendulum>`
 
 
-Additional Information
+补充信息
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-#. :ref:`utils`
-#. :ref:`Appendix`
-
+#. :ref:`工具 <utils>`
+#. :ref:`附录 <Appendix>`
 

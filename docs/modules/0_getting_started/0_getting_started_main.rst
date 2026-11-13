@@ -1,11 +1,11 @@
 .. _`getting started`:
 
-Getting Started
+入门
 ===============
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
+   :caption: 目录
 
    1_what_is_python_robotics
    2_how_to_run_sample_codes

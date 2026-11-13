@@ -1,53 +1,53 @@
-Elastic Bands
+弹性带
 -------------
 
-This is a path planning with Elastic Bands.
+这是使用弹性带的路径规划。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ElasticBands/animation.gif
 
-Code Link
+代码链接
 +++++++++++++
 
 .. autoclass:: PathPlanning.ElasticBands.elastic_bands.ElasticBands
 
 
-Core Concept
+核心概念
 ~~~~~~~~~~~~
-- **Elastic Band**: A dynamically deformable collision-free path initialized by a global planner.
-- **Objective**:
+- **弹性带**：由全局规划器初始化、可动态变形的无碰撞路径。
+- **目标**：
 
-  * Shorten and smooth the path.
-  * Maximize obstacle clearance.
-  * Maintain global path connectivity.
+  * 缩短并平滑路径。
+  * 尽量增大与障碍物的间隙。
+  * 保持全局路径的连通性。
 
-Bubble Representation
+气泡表示
 ~~~~~~~~~~~~~~~~~~~~~~~~
-- **Definition**: A local free-space region around configuration :math:`b`:
+- **定义**：构型 :math:`b` 周围的局部自由空间区域：
 
   .. math::
      B(b) = \{ q: \|q - b\| < \rho(b) \},
   
-  where :math:`\rho(b)` is the radius of the bubble.
+  其中 :math:`\rho(b)` 是气泡半径。
 
 
-Force-Based Deformation
+基于力的变形
 ~~~~~~~~~~~~~~~~~~~~~~~
-The elastic band deforms under artificial forces:
+弹性带在人工力作用下变形：
 
-Internal Contraction Force
+内部收缩力
 ++++++++++++++++++++++++++
-- **Purpose**: Reduces path slack and length.
-- **Formula**: For node :math:`b_i`:
+- **作用**：减小路径的松弛和长度。
+- **公式**：对于节点 :math:`b_i`：
 
   .. math::
      f_c(b_i) = k_c \left( \frac{b_{i-1} - b_i}{\|b_{i-1} - b_i\|} + \frac{b_{i+1} - b_i}{\|b_{i+1} - b_i\|} \right)
 
-  where :math:`k_c` is the contraction gain.
+  其中 :math:`k_c` 是收缩增益。
 
-External Repulsion Force
+外部排斥力
 +++++++++++++++++++++++++
-- **Purpose**: Pushes the path away from obstacles.
-- **Formula**: For node :math:`b_i`:
+- **作用**：把路径推离障碍物。
+- **公式**：对于节点 :math:`b_i`：
 
   .. math::
      f_r(b_i) = \begin{cases} 
@@ -55,25 +55,25 @@ External Repulsion Force
      0 & \text{otherwise}.
      \end{cases}
 
-  where :math:`k_r` is the repulsion gain, :math:`\rho_0` is the maximum distance for applying repulsion force, and :math:`\nabla \rho(b_i)` is approximated via finite differences:
+  其中 :math:`k_r` 是排斥增益，:math:`\rho_0` 是施加排斥力的最大距离，:math:`\nabla \rho(b_i)` 用有限差分近似：
 
   .. math::
      \frac{\partial \rho}{\partial x} \approx \frac{\rho(b_i + h) - \rho(b_i - h)}{2h}.
 
-Dynamic Path Maintenance
+动态路径维护
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-1. **Node Update**:
+1. **节点更新**：
    
    .. math::
       b_i^{\text{new}} = b_i^{\text{old}} + \alpha (f_c + f_r),
 
-   where :math:`\alpha` is a step-size parameter, which is often proportional to :math:`\rho(b_i^{\text{old}})`
+   其中 :math:`\alpha` 是步长参数，通常与 :math:`\rho(b_i^{\text{old}})` 成正比。
 
-2. **Overlap Enforcement**:
-- Insert new nodes if adjacent nodes are too far apart
-- Remove redundant nodes if adjacent nodes are too close
+2. **重叠约束**：
+- 若相邻节点相距过远，则插入新节点
+- 若相邻节点相距过近，则删除冗余节点
 
-References
+参考文献
 +++++++++++++
 
 -  `Elastic Bands: Connecting Path Planning and Control <http://www8.cs.umu.se/research/ifor/dl/Control/elastic%20bands.pdf>`__

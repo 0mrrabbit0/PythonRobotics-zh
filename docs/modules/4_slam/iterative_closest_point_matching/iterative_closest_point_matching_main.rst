@@ -1,22 +1,21 @@
 .. _iterative-closest-point-(icp)-matching:
 
-Iterative Closest Point (ICP) Matching
+迭代最近点（ICP）匹配
 --------------------------------------
 
-This is a 2D ICP matching example with singular value decomposition.
+这是一个使用奇异值分解的二维迭代最近点（ICP）匹配示例。
 
-It can calculate a rotation matrix and a translation vector between
-points to points.
+它可以计算点集与点集之间的旋转矩阵和平移向量。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/iterative_closest_point/animation.gif
 
-Code Link
+代码链接
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autofunction:: SLAM.ICPMatching.icp_matching.icp_matching
 
 
-References
+参考文献
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - `Introduction to Mobile Robotics: Iterative Closest Point Algorithm <https://cs.gmu.edu/~kosecka/cs685/cs685-icp.pdf>`_

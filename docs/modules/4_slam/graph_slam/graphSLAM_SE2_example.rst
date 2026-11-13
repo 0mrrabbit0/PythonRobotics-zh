@@ -1,4 +1,4 @@
-Graph SLAM for a real-world SE(2) dataset
+真实世界 SE(2) 数据集上的基于图的 SLAM
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: ipython3
@@ -6,22 +6,14 @@ Graph SLAM for a real-world SE(2) dataset
     from graphslam.graph import Graph
     from graphslam.load import load_g2o_se2
 
-Introduction
+引言
 ^^^^^^^^^^^^
 
-For a complete derivation of the Graph SLAM algorithm, please see
-`Graph SLAM Formulation`_.
+基于图的 SLAM 算法的完整推导见 `Graph SLAM Formulation`_。
 
-This notebook illustrates the iterative optimization of a real-world
-:math:`SE(2)` dataset. The code can be found in the ``graphslam``
-folder. For simplicity, numerical differentiation is used in lieu of
-analytic Jacobians. This code originated from the
-`python-graphslam <https://github.com/JeffLIrion/python-graphslam>`__
-repo, which is a full-featured Graph SLAM solver. The dataset in this
-example is used with permission from Luca Carlone and was downloaded
-from his `website <https://lucacarlone.mit.edu/datasets/>`__.
+本笔记演示对一个真实世界 :math:`SE(2)` 数据集的迭代优化。代码位于 ``graphslam`` 文件夹。为了简便，用数值微分代替解析雅可比矩阵。该代码源自 `python-graphslam <https://github.com/JeffLIrion/python-graphslam>`__ 仓库，这是一个功能完整的基于图的 SLAM 求解器。本例中的数据集经 Luca Carlone 许可使用，并从他的 `网站 <https://lucacarlone.mit.edu/datasets/>`__ 下载。
 
-The Dataset
+数据集
 ^^^^^^^^^^^^
 
 .. code:: ipython3
@@ -31,38 +23,23 @@ The Dataset
     print("Number of edges:    {}".format(len(g._edges)))
     print("Number of vertices: {}".format(len(g._vertices)))
 
-
 .. parsed-literal::
 
     Number of edges:    1483
     Number of vertices: 1228
 
-
 .. code:: ipython3
 
     g.plot(title=r"Original ($\chi^2 = {:.0f}$)".format(g.calc_chi2()))
 
-
-
 .. image:: graphSLAM_SE2_example_files/graphSLAM_SE2_example_4_0.png
 
+该数据集中的每条边都是一条约束，它把两个位姿之间测得的 :math:`SE(2)` 变换，与根据当前位姿估计计算出的期望 :math:`SE(2)` 变换相比较。这些边可以分成两类：
 
-Each edge in this dataset is a constraint that compares the measured
-:math:`SE(2)` transformation between two poses to the expected
-:math:`SE(2)` transformation between them, as computed using the current
-pose estimates. These edges can be classified into two categories:
+1. 里程计边约束两个相邻顶点，:math:`SE(2)` 变换的测量直接来自里程计数据。
+2. 扫描匹配边约束两个不相邻的顶点。这些扫描匹配可以用例如二维激光雷达数据或路标来计算；这些约束如何确定，超出本例的范围。在基于图的 SLAM 文献中，这常称为*闭环*。
 
-1. Odometry edges constrain two consecutive vertices, and the
-   measurement for the :math:`SE(2)` transformation comes directly from
-   odometry data.
-2. Scan-matching edges constrain two non-consecutive vertices. These
-   scan matches can be computed using, for example, 2-D LiDAR data or
-   landmarks; the details of how these constraints are determined is
-   beyond the scope of this example. This is often referred to as *loop
-   closure* in the Graph SLAM literature.
-
-We can easily parse out the two different types of edges present in this
-dataset and plot them.
+可以方便地从该数据集中分离出这两类边，并分别画出来。
 
 .. code:: ipython3
 
@@ -106,7 +83,6 @@ dataset and plot them.
     print("\nχ^2 error from odometry edges:       {:11.3f}".format(g_odom.calc_chi2()))
     print("χ^2 error from scan-matching edges:  {:11.3f}".format(g_scan.calc_chi2()))
 
-
 .. parsed-literal::
 
     Number of odometry edges:      1227
@@ -115,41 +91,26 @@ dataset and plot them.
     χ^2 error from odometry edges:             0.232
     χ^2 error from scan-matching edges:  7191686.151
 
-
 .. code:: ipython3
 
     g_odom.plot(title="Odometry edges")
 
-
-
 .. image:: graphSLAM_SE2_example_files/graphSLAM_SE2_example_8_0.png
-
 
 .. code:: ipython3
 
     g_scan.plot(title="Scan-matching edges")
 
-
-
 .. image:: graphSLAM_SE2_example_files/graphSLAM_SE2_example_9_0.png
 
-
-Optimization
+优化
 ^^^^^^^^^^^^
 
-Initially, the pose estimates are consistent with the collected odometry
-measurements, and the odometry edges contribute almost zero towards the
-:math:`\chi^2` error. However, there are large discrepancies between the
-scan-matching constraints and the initial pose estimates. This is not
-surprising, since small errors in odometry readings that are propagated
-over time can lead to large errors in the robot’s trajectory. What makes
-Graph SLAM effective is that it allows incorporation of multiple
-different data sources into a single optimization problem.
+一开始，位姿估计与采集到的里程计测量一致，里程计边对 :math:`\chi^2` 误差的贡献几乎为零。扫描匹配约束与初始位姿估计之间则有很大偏差。这并不意外：里程计读数里的小误差随时间传播，会使机器人轨迹出现很大误差。Graph SLAM 有效，是因为它能把多种不同的数据源放进同一个优化问题。
 
 .. code:: ipython3
 
     g.optimize()
-
 
 .. parsed-literal::
 
@@ -164,23 +125,18 @@ different data sources into a single optimization problem.
             5             215.8405          -0.706393
             6             215.8405          -0.000000
 
-
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/GraphBasedSLAM/Graph_SLAM_optimization.gif
 
 .. code:: ipython3
 
     g.plot(title="Optimized")
 
-
-
 .. image:: graphSLAM_SE2_example_files/graphSLAM_SE2_example_13_0.png
-
 
 .. code:: ipython3
 
     print("\nχ^2 error from odometry edges:       {:7.3f}".format(g_odom.calc_chi2()))
     print("χ^2 error from scan-matching edges:  {:7.3f}".format(g_scan.calc_chi2()))
-
 
 .. parsed-literal::
 
@@ -188,21 +144,14 @@ different data sources into a single optimization problem.
     χ^2 error from odometry edges:       142.189
     χ^2 error from scan-matching edges:   73.652
 
-
 .. code:: ipython3
 
     g_odom.plot(title="Odometry edges")
 
-
-
 .. image:: graphSLAM_SE2_example_files/graphSLAM_SE2_example_15_0.png
-
 
 .. code:: ipython3
 
     g_scan.plot(title="Scan-matching edges")
 
-
-
 .. image:: graphSLAM_SE2_example_files/graphSLAM_SE2_example_16_0.png
-

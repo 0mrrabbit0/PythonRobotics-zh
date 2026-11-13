@@ -1,25 +1,25 @@
-Bezier path planning
+Bézier 路径规划
 --------------------
 
-A sample code of Bezier path planning.
+Bézier 路径规划的示例代码。
 
-It is based on 4 control points Beizer path.
+它基于 4 个控制点的 Bézier 路径。
 
 .. image:: Figure_1.png
 
-If you change the offset distance from start and end point,
+若改变相对起点和终点的偏移距离，
 
-You can get different Beizer course:
+可以得到不同的 Bézier 路径：
 
 .. image:: Figure_2.png
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~~~
 
 .. autofunction:: PathPlanning.BezierPath.bezier_path.calc_4points_bezier_path
 
 
-Reference
+参考文献
 ~~~~~~~~~~~~~~~
 
 -  `Continuous Curvature Path Generation Based on Bezier Curves for

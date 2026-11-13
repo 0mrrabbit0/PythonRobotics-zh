@@ -1,17 +1,17 @@
-Object shape recognition using circle fitting
----------------------------------------------
+使用圆拟合的物体形状识别
+------------------------
 
-This is an object shape recognition using circle fitting.
+这是使用圆拟合进行的物体形状识别。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/circle_fitting/animation.gif
 
-The blue circle is the true object shape.
+蓝色圆是真实物体形状。
 
-The red crosses are observations from a ranging sensor.
+红色十字是测距传感器的观测。
 
-The red circle is the estimated object shape using circle fitting.
+红色圆是使用圆拟合估计的物体形状。
 
-Code Link
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+代码链接
+^^^^^^^^
 
 .. autofunction:: Mapping.circle_fitting.circle_fitting.circle_fitting

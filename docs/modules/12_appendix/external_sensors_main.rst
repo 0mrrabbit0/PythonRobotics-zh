@@ -1,65 +1,65 @@
 .. _`External Sensors for Robots`:
 
-External Sensors for Robots
+机器人的外部传感器
 ============================
 
-This project, `PythonRobotics`, focuses on algorithms, so hardware is not included.
-However, having basic knowledge of hardware in robotics is also important for understanding algorithms.
-Therefore, we will provide an overview.
+本项目 `PythonRobotics` 聚焦于算法，因此不包含硬件。
+不过，具备机器人学中硬件的基本知识，对于理解算法同样重要。
+因此，这里给出一个概述。
 
-Introduction
+引言
 ------------
 
-In recent years, the application of robotic technology has advanced, particularly in areas such as autonomous vehicles and disaster response robots. A crucial element in these technologies is external recognition—the robot's ability to understand its surrounding environment, identify safe zones, and detect moving objects using onboard sensors. Achieving effective external recognition involves various techniques, but equally important is the selection of appropriate sensors. Robots, like the sensors they employ, come in many forms, but external recognition sensors can be broadly categorized into three types. Developing an advanced external recognition system requires a thorough understanding of each sensor's principles and characteristics to determine their optimal application. This article summarizes the principles and features of these sensors for personal study purposes.
+近年来，机器人技术的应用不断推进，尤其是在自动驾驶车辆和灾害应对机器人等领域。这些技术中的一个关键要素是外部识别，也就是机器人利用机载传感器理解周围环境、识别安全区域并检测运动物体的能力。实现有效的外部识别涉及多种技术，但同样重要的是选择合适的传感器。机器人与它们所使用的传感器一样，形态各异，但外部识别传感器大体可以分为三类。要开发先进的外部识别系统，必须充分理解每种传感器的原理和特性，从而确定它们的最佳用途。本文为个人学习总结这些传感器的原理与特点。
 
-Laser Sensors
+激光传感器
 -------------
 
-Laser sensors measure distances by utilizing light, commonly referred to as Light Detection and Ranging (LIDAR). They operate by emitting light towards an object and calculating the distance based on the time it takes for the reflected light to return, using the speed of light as a constant.
+激光传感器利用光来测量距离，通常称为光探测与测距（激光雷达，LIDAR）。它们向物体发射光，并以光速为常量，根据反射光返回所需的时间来计算距离。
 
-Radar Sensors
+雷达传感器
 -------------
 
-Radar measures distances using radio waves, commonly referred to as Radio Detection and Ranging (RADAR). It operates by transmitting radio signals towards an object and calculating the distance based on the time it takes for the reflected waves to return, using the speed of radio waves as a constant. 
+雷达使用无线电波测量距离，通常称为无线电探测与测距（RADAR）。它向物体发射无线电信号，并以无线电波速度为常量，根据反射波返回所需的时间来计算距离。
 
 
-Monocular Cameras
+单目相机
 -----------------
 
-Monocular cameras utilize a single camera to recognize the external environment. Compared to other sensors, they can detect color and brightness information, making them primarily useful for object recognition. However, they face challenges in independently measuring distances to surrounding objects and may struggle in low-light or dark conditions.
+单目相机使用单个相机来识别外部环境。与其他传感器相比，它们能够检测颜色和亮度信息，因此主要用于物体识别。然而，它们难以独立测量到周围物体的距离，并且在弱光或黑暗条件下可能表现不佳。
 
-Requirements for Cameras and Image Processing in Robotics
+机器人学中对相机与图像处理的要求
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-While camera sensors are widely used in applications like surveillance, deploying them in robotics necessitates meeting specific requirements:
+虽然相机传感器广泛用于监控等应用，但把它们部署到机器人上必须满足特定要求：
 
-1. High dynamic range to adapt to various lighting conditions
-2. Wide measurement range
-3. Capability for three-dimensional measurement through techniques like motion stereo
-4. Real-time processing with high frame rates
-5. Cost-effectiveness
+1. 高动态范围，以适应各种光照条件
+2. 宽测量范围
+3. 能够通过运动立体视觉等技术进行三维测量
+4. 高帧率的实时处理
+5. 成本效益
 
-Stereo Cameras
+双目相机
 --------------
 
-Stereo cameras employ multiple cameras to measure distances to surrounding objects. By knowing the positions and orientations of each camera and analyzing the disparity in the images (parallax), the distance to a specific point (the object represented by a particular pixel) can be calculated.
+双目相机使用多个相机来测量到周围物体的距离。在已知每个相机的位置和朝向，并分析图像之间的视差（parallax）之后，就可以计算出到某个特定点（由某个像素所表示的物体）的距离。
 
-Characteristics of Stereo Cameras
+双目相机的特性
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Advantages of stereo cameras include the ability to obtain high-precision and high-density distance information at close range, depending on factors like camera resolution and the distance between cameras (baseline). This makes them suitable for indoor robots that require precise shape recognition of nearby objects. Additionally, stereo cameras are relatively cost-effective compared to other sensors, leading to their use in consumer products like Subaru's EyeSight system. However, stereo cameras are less effective for long-distance measurements due to a decrease in accuracy proportional to the square of the distance. They are also susceptible to environmental factors such as lighting conditions.
+双目相机的优点是，在近距离上能够获得高精度、高密度的距离信息，具体取决于相机分辨率以及相机之间的距离（基线）等因素。这使它们适合需要对附近物体做精确形状识别的室内机器人。此外，与其他传感器相比，双目相机成本相对较低，因此被用于消费产品，例如斯巴鲁的 EyeSight 系统。然而，双目相机不太适合远距离测量，因为精度会随距离的平方下降。它们也容易受到光照条件等环境因素的影响。
 
-Ultrasonic Sensors
+超声波传感器
 ------------------
 
-Ultrasonic sensors are commonly used in indoor robots and some automotive autonomous driving systems. Their features include affordability compared to laser or radar sensors, the ability to detect very close objects, and the capability to sense materials like glass, which may be challenging for lasers or cameras. However, they have limitations such as shorter maximum measurement distances and lower resolution and accuracy.
+超声波传感器常用于室内机器人和部分汽车自动驾驶系统。它们的特点包括：与激光或雷达传感器相比价格较低，能够检测非常近的物体，并且能够感知玻璃等激光或相机可能难以应对的材料。不过，它们也有局限，例如最大测量距离较短，分辨率和精度较低。
 
-References
+参考文献
 ----------
 
-- Wikipedia articles:
+- 维基百科条目：
 
-  - `Lidar Sensors <https://en.wikipedia.org/wiki/Lidar>`_
-  - `Radar Sensors <https://en.wikipedia.org/wiki/Radar>`_
-  - `Stereo Cameras <https://en.wikipedia.org/wiki/Stereo_camera>`_
-  - `Ultrasonic Sensors <https://en.wikipedia.org/wiki/Ultrasonic_transducer>`_
+  - `激光雷达传感器 <https://en.wikipedia.org/wiki/Lidar>`_
+  - `雷达传感器 <https://en.wikipedia.org/wiki/Radar>`_
+  - `双目相机 <https://en.wikipedia.org/wiki/Stereo_camera>`_
+  - `超声波传感器 <https://en.wikipedia.org/wiki/Ultrasonic_transducer>`_

@@ -1,5 +1,5 @@
 
-Nonlinear Model Predictive Control with C-GMRES
+基于 C-GMRES 的非线性模型预测控制
 -----------------------------------------------
 
 .. image:: cgmres_nmpc_1_0.png
@@ -15,17 +15,17 @@ Nonlinear Model Predictive Control with C-GMRES
    :width: 600px
 
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/cgmres_nmpc/animation.gif
-   :alt: gif
+   :alt: 动画
 
-Code Link
+代码链接
 ~~~~~~~~~~~~
 
 .. autofunction:: PathTracking.cgmres_nmpc.cgmres_nmpc.NMPCControllerCGMRES
 
-Mathematical Formulation
+数学表述
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Motion model is
+运动模型为
 
 .. math:: \dot{x}=vcos\theta
 
@@ -33,35 +33,35 @@ Motion model is
 
 .. math:: \dot{\theta}=\frac{v}{WB}sin(u_{\delta})
 
-\ (tan is not good for optimization)
+\ （tan 不适合用于优化）
 
 .. math:: \dot{v}=u_a
 
-Cost function is
+代价函数为
 
 .. math:: J=\frac{1}{2}(u_a^2+u_{\delta}^2)-\phi_a d_a-\phi_\delta d_\delta
 
-Input constraints are
+输入约束为
 
 .. math:: |u_a| \leq u_{a,max}
 
 .. math:: |u_\delta| \leq u_{\delta,max}
 
-So, Hamiltonian　is
+因此，哈密顿函数为
 
 .. math::
 
    J=\frac{1}{2}(u_a^2+u_{\delta}^2)-\phi_a d_a-\phi_\delta d_\delta\\ +\lambda_1vcos\theta+\lambda_2vsin\theta+\lambda_3\frac{v}{WB}sin(u_{\delta})+\lambda_4u_a\\ 
    +\rho_1(u_a^2+d_a^2+u_{a,max}^2)+\rho_2(u_\delta^2+d_\delta^2+u_{\delta,max}^2)
 
-Partial differential equations of the Hamiltonian are:
+哈密顿函数的偏导数为：
 
 :math:`\begin{equation*} \frac{\partial H}{\partial \bf{x}}=\\ \begin{bmatrix} \frac{\partial H}{\partial x}= 0&\\ \frac{\partial H}{\partial y}= 0&\\ \frac{\partial H}{\partial \theta}= -\lambda_1vsin\theta+\lambda_2vcos\theta&\\ \frac{\partial H}{\partial v}=-\lambda_1cos\theta+\lambda_2sin\theta+\lambda_3\frac{1}{WB}sin(u_{\delta})&\\ \end{bmatrix} \\ \end{equation*}`
 
 :math:`\begin{equation*} \frac{\partial H}{\partial \bf{u}}=\\ \begin{bmatrix} \frac{\partial H}{\partial u_a}= u_a+\lambda_4+2\rho_1u_a&\\ \frac{\partial H}{\partial u_\delta}= u_\delta+\lambda_3\frac{v}{WB}cos(u_{\delta})+2\rho_2u_\delta&\\ \frac{\partial H}{\partial d_a}= -\phi_a+2\rho_1d_a&\\ \frac{\partial H}{\partial d_\delta}=-\phi_\delta+2\rho_2d_\delta&\\ \end{bmatrix} \\ \end{equation*}`
 
-Ref
-~~~
+参考文献
+~~~~~~~~~~~~~~~
 
 -  `Shunichi09/nonlinear_control: Implementing the nonlinear model
    predictive control, sliding mode

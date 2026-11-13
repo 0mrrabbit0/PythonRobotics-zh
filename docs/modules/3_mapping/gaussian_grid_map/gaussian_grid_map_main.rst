@@ -1,14 +1,14 @@
 .. _gaussian_grid_map:
 
-Gaussian grid map
------------------
+高斯栅格地图
+------------
 
-This is a 2D Gaussian grid mapping example.
+这是一个二维高斯栅格建图示例。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/gaussian_grid_map/animation.gif
 
-Code Link
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+代码链接
+^^^^^^^^
 
 .. autofunction:: Mapping.gaussian_grid_map.gaussian_grid_map.generate_gaussian_grid_map
-

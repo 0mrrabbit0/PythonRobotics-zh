@@ -1,43 +1,42 @@
 .. _linearquadratic-regulator-(lqr)-speed-and-steering-control:
 
-Linear–quadratic regulator (LQR) speed and steering control
+线性二次调节器（LQR）速度与转向控制
 -----------------------------------------------------------
 
-Path tracking simulation with LQR speed and steering control.
+使用线性二次调节器（LQR）速度与转向控制的路径跟踪仿真。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_speed_steer_control/animation.gif
 
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~~~
 
 .. autofunction:: PathTracking.lqr_speed_steer_control.lqr_speed_steer_control.lqr_speed_steering_control
 
 
-Overview
+概述
 ~~~~~~~~
 
-The LQR (Linear Quadratic Regulator) speed and steering control model implemented in `lqr_speed_steer_control.py` provides a simulation
-for an autonomous vehicle to track:
+`lqr_speed_steer_control.py` 中实现的线性二次调节器（LQR）速度与转向控制模型提供一项仿真，使自动驾驶车辆跟踪：
 
-1. A desired speed by adjusting acceleration based on feedback from the current state and the desired speed.
+1. 期望速度：根据当前状态与期望速度的反馈调节加速度。
 
-2. A desired trajectory by adjusting steering angle based on feedback from the current state and the desired trajectory.
+2. 期望轨迹：根据当前状态与期望轨迹的反馈调节转向角。
 
-by only using one LQT controller.
+上述跟踪仅使用一个 LQT 控制器。
 
-Vehicle motion Model
+车辆运动模型
 ~~~~~~~~~~~~~~~~~~~~~
 
-The below figure shows the geometric model of the vehicle used in this simulation:
+下图为本仿真所用车辆的几何模型：
 
 .. image:: lqr_steering_control_model.jpg
    :width: 600px
 
-The `e`, :math:`{\theta}`, and :math:`\upsilon` represent the lateral error, orientation error, and velocity error, respectively, with respect to the desired trajectory and speed.
-And :math:`\dot{e}` and :math:`\dot{\theta}` represent the rates of change of these errors.
+`e`、:math:`{\theta}` 与 :math:`\upsilon` 分别表示相对于期望轨迹和期望速度的横向误差、航向角误差与速度误差。
+:math:`\dot{e}` 与 :math:`\dot{\theta}` 表示这些误差的变化率。
 
-The :math:`e_t` and :math:`\theta_t`, and :math:`\upsilon` are the updated values of `e`, :math:`\theta`, :math:`\upsilon` and at time `t`, respectively, and can be calculated using the following kinematic equations:
+:math:`e_t`、:math:`\theta_t` 与 :math:`\upsilon` 分别是 `e`、:math:`\theta` 与 :math:`\upsilon` 在时刻 `t` 的更新值，可由下列运动学方程计算：
 
 .. math:: e_t = e_{t-1} + \dot{e}_{t-1} dt
 
@@ -45,86 +44,85 @@ The :math:`e_t` and :math:`\theta_t`, and :math:`\upsilon` are the updated value
 
 .. math:: \upsilon_t = \upsilon_{t-1} + a_{t-1} dt
 
-Where `dt` is the time difference and :math:`a_t` is the acceleration at the time `t`.
+其中 `dt` 为时间差，:math:`a_t` 为时刻 `t` 的加速度。
 
-The change rate of the `e` can be calculated as:
+`e` 的变化率可计算为：
 
 .. math:: \dot{e}_t = V \sin(\theta_{t-1})
 
-Where `V` is the current vehicle speed.
+其中 `V` 为当前车辆速度。
 
-If the :math:`\theta` is small,
+若 :math:`\theta` 很小，
 
 .. math:: \theta \approx 0
 
-the :math:`\sin(\theta)` can be approximated as :math:`\theta`:
+则 :math:`\sin(\theta)` 可近似为 :math:`\theta`：
 
 .. math:: \sin(\theta) = \theta
 
-So, the change rate of the `e` can be approximated as:
+因此，`e` 的变化率可近似为：
 
 .. math:: \dot{e}_t = V \theta_{t-1}
 
-The change rate of the :math:`\theta` can be calculated as:
+:math:`\theta` 的变化率可计算为：
 
 .. math:: \dot{\theta}_t = \frac{V}{L} \tan(\delta)
 
-where `L` is the wheelbase of the vehicle and :math:`\delta` is the steering angle.
+其中 `L` 为车辆轴距，:math:`\delta` 为转向角。
 
-If the :math:`\delta` is small,
+若 :math:`\delta` 很小，
 
 .. math:: \delta \approx 0
 
-the :math:`\tan(\delta)` can be approximated as :math:`\delta`:
+则 :math:`\tan(\delta)` 可近似为 :math:`\delta`：
 
 .. math:: \tan(\delta) = \delta
 
-So, the change rate of the :math:`\theta` can be approximated as:
+因此，:math:`\theta` 的变化率可近似为：
 
 .. math:: \dot{\theta}_t = \frac{V}{L} \delta
 
-The above equations can be used to update the state of the vehicle at each time step.
+上述方程可用于在每个时间步更新车辆状态。
 
-Control Model
+控制模型
 ~~~~~~~~~~~~~~
 
-To formulate the state-space representation of the vehicle dynamics as a linear model,
-the state vector `x` and control input vector `u` are defined as follows:
+为把车辆动力学的状态空间表示写成线性模型，状态向量 `x` 与控制输入向量 `u` 定义如下：
 
 .. math:: x_t = [e_t, \dot{e}_t, \theta_t, \dot{\theta}_t, \upsilon_t]^T
 
 .. math:: u_t = [\delta_t, a_t]^T
 
-The linear state transition equation can be represented as:
+线性状态转移方程可表示为：
 
 .. math:: x_{t+1} = A x_t + B u_t
 
-where:
+其中：
 
 :math:`\begin{equation*} A = \begin{bmatrix} 1 & dt & 0 & 0 & 0\\ 0 & 0 & v & 0 & 0\\ 0 & 0 & 1 & dt & 0\\ 0 & 0 & 0 & 0 & 0\\ 0 & 0 & 0 & 0 & 1\\\end{bmatrix} \end{equation*}`
 
 :math:`\begin{equation*} B = \begin{bmatrix} 0 & 0\\ 0 & 0\\ 0 & 0\\ \frac{v}{L} & 0\\ 0 & dt \\ \end{bmatrix} \end{equation*}`
 
-LQR controller
-~~~~~~~~~~~~~~~
+线性二次调节器（LQR）控制器
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Linear Quadratic Regulator (LQR) controller is used to calculate the optimal control input `u` that minimizes the quadratic cost function:
+线性二次调节器（LQR）控制器用于计算使二次代价函数最小的最优控制输入 `u`：
 
 :math:`J = \sum_{t=0}^{N} (x_t^T Q x_t + u_t^T R u_t)`
 
-where `Q` and `R` are the weighting matrices for the state and control input, respectively.
+其中 `Q` 与 `R` 分别是状态与控制输入的加权矩阵。
 
-for the linear model:
+对于线性模型：
 
 :math:`x_{t+1} = A x_t + B u_t`
 
-The optimal control input `u` can be calculated as:
+最优控制输入 `u` 可计算为：
 
 :math:`u_t = -K x_t`
 
-where `K` is the feedback gain matrix obtained by solving the Riccati equation.
+其中 `K` 是求解 Riccati 方程得到的反馈增益矩阵。
 
-Simulation results
+仿真结果
 ~~~~~~~~~~~~~~~~~~~
 
 
@@ -139,7 +137,7 @@ Simulation results
 
 
 
-Reference
+参考文献
 ~~~~~~~~~~~
 
 -  `Towards fully autonomous driving: Systems and algorithms <https://ieeexplore.ieee.org/document/5940562/>`__

@@ -1,19 +1,19 @@
 .. _dynamic_window_approach:
 
-Dynamic Window Approach
+动态窗口法（DWA）
 -----------------------
 
-This is a 2D navigation sample code with Dynamic Window Approach.
+这是使用动态窗口法（DWA）的二维导航示例代码。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DynamicWindowApproach/animation.gif
 
-Code Link
+代码链接
 +++++++++++++
 
 .. autofunction:: PathPlanning.DynamicWindowApproach.dynamic_window_approach.dwa_control
 
 
-Reference
+参考文献
 ~~~~~~~~~~~~
 
 -  `The Dynamic Window Approach to Collision

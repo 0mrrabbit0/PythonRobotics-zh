@@ -1,12 +1,11 @@
-k-means object clustering
--------------------------
+k-均值目标聚类
+--------------
 
-This is a 2D object clustering with k-means algorithm.
+这是使用 k-均值算法的二维目标聚类。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/kmeans_clustering/animation.gif
 
-Code Link
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+代码链接
+^^^^^^^^
 
 .. autofunction:: Mapping.kmeans_clustering.kmeans_clustering.kmeans_clustering
-

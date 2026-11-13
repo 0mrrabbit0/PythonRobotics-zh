@@ -1,16 +1,16 @@
-Bug planner
+Bug 规划器
 -----------
 
-This is a 2D planning with Bug algorithm.
+这是使用 Bug 算法的二维路径规划。
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/BugPlanner/animation.gif
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~~~
 
 .. autofunction:: PathPlanning.BugPlanning.bug.main
 
-Reference
+参考文献
 ~~~~~~~~~~~~
 
 - `ECE452 Bug Algorithms <https://web.archive.org/web/20201103052224/https://sites.google.com/site/ece452bugalgorithms/>`_

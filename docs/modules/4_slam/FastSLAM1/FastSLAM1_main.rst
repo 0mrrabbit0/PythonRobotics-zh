@@ -1,76 +1,60 @@
 
-FastSLAM1.0
------------
+FastSLAM 1.0
+------------
 
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif
 
 
 
-Simulation
+仿真
 ~~~~~~~~~~
 
-This is a feature based SLAM example using FastSLAM 1.0.
+这是使用 FastSLAM 1.0 的基于特征的同步定位与建图（SLAM）示例。
 
 .. image:: FastSLAM1_1_0.png
    :width: 600px
 
-The blue line is ground truth, the black line is dead reckoning, the red
-line is the estimated trajectory with FastSLAM.
+蓝线是真值，黑线是航位推算，红线是 FastSLAM 估计轨迹。
 
-The red points are particles of FastSLAM.
+红点是 FastSLAM 的粒子。
 
-Black points are landmarks, blue crosses are estimated landmark
-positions by FastSLAM.
+黑点是路标，蓝色叉号是 FastSLAM 估计的路标位置。
 
-Code Link
+代码链接
 ~~~~~~~~~~~~
 
 .. autofunction:: SLAM.FastSLAM1.fast_slam1.fast_slam1
 
 
-Introduction
+引言
 ~~~~~~~~~~~~
 
-FastSLAM algorithm implementation is based on particle filters and
-belongs to the family of probabilistic SLAM approaches. It is used with
-feature-based maps (see gif above) or with occupancy grid maps.
+FastSLAM 算法的实现基于粒子滤波，属于概率 SLAM 方法。它可用于基于特征的地图（见上方动画），也可用于占据栅格地图。
 
-As it is shown, the particle filter differs from EKF by representing the
-robot’s estimation through a set of particles. Each single particle has
-an independent belief, as it holds the pose :math:`(x, y, \theta)` and
-an array of landmark locations
-:math:`[(x_1, y_1), (x_2, y_2), ... (x_n, y_n)]` for n landmarks.
+如图所示，粒子滤波用一组粒子表示机器人的估计，这一点与扩展卡尔曼滤波（EKF）不同。每个粒子持有独立的信念：它保存位姿 :math:`(x, y, \theta)`，以及 n 个路标的位置数组 :math:`[(x_1, y_1), (x_2, y_2), ... (x_n, y_n)]`。
 
--  The blue line is the true trajectory
--  The red line is the estimated trajectory
--  The red dots represent the distribution of particles
--  The black line represent dead reckoning trajectory
--  The blue x is the observed and estimated landmarks
--  The black x is the true landmark
+-  蓝线是真实轨迹
+-  红线是估计轨迹
+-  红点表示粒子的分布
+-  黑线表示航位推算轨迹
+-  蓝色 x 是观测并估计得到的路标
+-  黑色 x 是真实路标
 
-I.e. Each particle maintains a deterministic pose and n-EKFs for each
-landmark and update it with each measurement.
+也就是说，每个粒子维护一个确定的位姿，并对每个路标各维护一个扩展卡尔曼滤波（EKF），且随着每次测量更新它们。
 
-Algorithm walk through
+算法流程
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The particles are initially drawn from a uniform distribution the
-represent the initial uncertainty. At each time step we do:
+粒子最初从表示初始不确定性的均匀分布中抽取。每个时间步做：
 
--  Predict the pose for each particle by using :math:`u` and the motion
-   model (the landmarks are not updated).
--  Update the particles with observations :math:`z`, where the weights
-   are adjusted based on how likely the particle to have the correct
-   pose given the sensor measurement
--  Resampling such that the particles with the largest weights survive
-   and the unlikely ones with the lowest weights die out.
+-  用 :math:`u` 和运动模型预测每个粒子的位姿（路标不更新）。
+-  用观测 :math:`z` 更新粒子，并按“在给定传感器测量时，该粒子拥有正确位姿”的可能性调整重要性权重
+-  重采样：重要性权重最大的粒子得以保留，权重最低、可能性小的粒子被淘汰。
 
-1- Predict
+1- 预测
 ~~~~~~~~~~
 
-The following equations and code snippets we can see how the particles
-distribution evolves in case we provide only the control :math:`(v,w)`,
-which are the linear and angular velocity respectively.
+由下列方程和代码片段可以看到，在只给出控制量 :math:`(v,w)` （分别是线速度与角速度）时，粒子分布如何演化。
 
 :math:`\begin{equation*} F= \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} \end{equation*}`
 
@@ -80,17 +64,11 @@ which are the linear and angular velocity respectively.
 
 :math:`\begin{equation*} \begin{bmatrix} x_{t+1} \\ y_{t+1} \\ \theta_{t+1} \end{bmatrix}= \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}\begin{bmatrix} x_{t} \\ y_{t} \\ \theta_{t} \end{bmatrix}+ \begin{bmatrix} \Delta t cos(\theta) & 0\\ \Delta t sin(\theta) & 0\\ 0 & \Delta t \end{bmatrix} \begin{bmatrix} v_{t} + \sigma_v\\ w_{t} + \sigma_w\\ \end{bmatrix} \end{equation*}`
 
-The following snippets playback the recorded trajectory of each
-particle.
+下面的代码片段回放每个粒子已经记录下来的轨迹。
 
-To get the insight of the motion model change the value of :math:`R` and
-re-run the cells again. As R is the parameters that indicates how much
-we trust that the robot executed the motion commands.
+为了理解运动模型，可以改变 :math:`R` 的取值并重新运行这些单元。R 这个参数表示我们有多信任机器人确实执行了运动指令。
 
-It is interesting to notice also that only motion will increase the
-uncertainty in the system as the particles start to spread out more. If
-observations are included the uncertainty will decrease and particles
-will converge to the correct estimate.
+还可以看到，只有运动时系统的不确定性会增大，粒子逐渐散开。若加入观测，不确定性会减小，粒子会收敛到正确估计。
 
 .. code-block:: ipython3
 
@@ -201,31 +179,20 @@ will converge to the correct estimate.
     interactive(children=(IntSlider(value=0, description='t', max=499), Output()), _dom_classes=('widget-interact'…
 
 
-2- Update
+2- 更新
 ~~~~~~~~~
 
-For the update step it is useful to observe a single particle and the
-effect of getting a new measurements on the weight of the particle.
+在更新步中，观察单个粒子，以及一次新测量对该粒子重要性权重的影响，会有帮助。
 
-As mentioned earlier, each particle maintains :math:`N` :math:`2x2` EKFs
-to estimate the landmarks, which includes the EKF process described in
-the EKF notebook. The difference is the change in the weight of the
-particle according to how likely the measurement is.
+如前所述，每个粒子维护 :math:`N` 个 :math:`2x2` 的 EKF 来估计路标，其中包含 EKF 笔记里描述的 EKF 过程。差别在于，粒子的重要性权重会按该测量出现的可能性而改变。
 
-The weight is updated according to the following equation:
+重要性权重按下式更新：
 
 :math:`\begin{equation*} w_i = |2\pi Q|^{\frac{-1}{2}} exp\{\frac{-1}{2}(z_t - \hat z_i)^T Q^{-1}(z_t-\hat z_i)\} \end{equation*}`
 
-Where, :math:`w_i` is the computed weight, :math:`Q` is the measurement
-covariance, :math:`z_t` is the actual measurment and :math:`\hat z_i` is
-the predicted measurement of particle :math:`i`.
+其中，:math:`w_i` 是算出的重要性权重，:math:`Q` 是测量协方差，:math:`z_t` 是实际测量，:math:`\hat z_i` 是粒子 :math:`i` 的预测测量。
 
-To experiment this, a single particle is initialized then passed an
-initial measurement, which results in a relatively average weight.
-However, setting the particle coordinate to a wrong value to simulate
-wrong estimation will result in a very low weight. The lower the weight
-the less likely that this particle will be drawn during resampling and
-probably will die out.
+为了演示这一点，先初始化一个粒子并传入一次初始测量，得到的重要性权重相对居中。若把粒子坐标设成错误数值来模拟错误估计，重要性权重会变得非常低。权重越低，这个粒子在重采样中被抽到的可能性越小，因而很可能会被淘汰。
 
 .. code-block:: ipython3
 
@@ -395,7 +362,6 @@ probably will die out.
     particles[0].x = -10
     particles = update_with_observation(particles, z)
     print("weight after wrong prediction", particles[0].w)
-            
 
 
 .. parsed-literal::
@@ -406,27 +372,16 @@ probably will die out.
     weight after wrong prediction 7.951154575772496e-07
 
 
-3- Resampling
+3- 重采样
 ~~~~~~~~~~~~~
 
-In the resampling steps a new set of particles are chosen from the old
-set. This is done according to the weight of each particle.
+在重采样步骤中，按每个粒子的重要性权重，从旧粒子集合中选出一组新粒子。
 
-The figure shows 100 particles distributed uniformly between [-0.5, 0.5]
-with the weights of each particle distributed according to a Gaussian
-funciton.
+图中有 100 个粒子均匀分布在 [-0.5, 0.5] 上，各粒子的重要性权重按高斯函数分布。
 
-The resampling picks
+重采样按概率抽取 :math:`i \in 1,...,N` 中的粒子，抽到某一粒子的概率满足 :math:`i ∝ \omega_i`，其中 :math:`\omega_i` 是该粒子的重要性权重。
 
-:math:`i \in 1,...,N` particles with probability to pick particle with
-index :math:`i ∝ \omega_i`, where :math:`\omega_i` is the weight of that
-particle
-
-To get the intuition of the resampling step we will look at a set of
-particles which are initialized with a given x location and weight.
-After the resampling the particles are more concetrated in the location
-where they had the highest weights. This is also indicated by the
-indices
+为了建立对重采样的直观认识，看一组以给定 x 位置和重要性权重初始化的粒子。重采样之后，粒子更集中在原先权重最高的位置。粒子下标也同样说明了这一点。
 
 .. code-block:: ipython3
 
@@ -536,7 +491,7 @@ indices
 .. image:: FastSLAM1_12_1.png
 
 
-References
+参考文献
 ~~~~~~~~~~
 
 - `PROBABILISTIC ROBOTICS <http://www.probabilistic-robotics.org/>`_

@@ -1,47 +1,47 @@
-Optimal Trajectory in a Frenet Frame
+Frenet 坐标系中的最优轨迹
 ------------------------------------
 
-This is optimal trajectory generation in a Frenet Frame.
+这是在 Frenet 坐标系中生成最优轨迹。
 
-The cyan line is the target course and black crosses are obstacles.
+青色线是目标路线，黑色叉号是障碍物。
 
-The red line is predicted path.
+红线是预测路径。
 
-Code Link
+代码链接
 ~~~~~~~~~~~~~~
 
 .. autofunction:: PathPlanning.FrenetOptimalTrajectory.frenet_optimal_trajectory.main
 
 
-High Speed and Velocity Keeping Scenario
+高速且保持速度的场景
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/FrenetOptimalTrajectory/high_speed_and_velocity_keeping_frenet_path.gif
 
-This scenario shows how the trajectory is maintained at high speeds while keeping a consistent velocity.
+该场景展示如何在高速下保持轨迹，并维持一致的速度。
 
-High Speed and Merging and Stopping Scenario
+高速汇入与停车场景
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/FrenetOptimalTrajectory/high_speed_and_merging_and_stopping_frenet_path.gif
 
-This scenario demonstrates the trajectory planning at high speeds with merging and stopping behaviors.
+该场景演示高速下带有汇入与停车行为的轨迹规划。
 
-Low Speed and Velocity Keeping Scenario
+低速且保持速度的场景
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/FrenetOptimalTrajectory/low_speed_and_velocity_keeping_frenet_path.gif
 
-This scenario demonstrates how the trajectory is managed at low speeds while maintaining a steady velocity.
+该场景演示如何在低速下管理轨迹，并维持稳定的速度。
 
-Low Speed and Merging and Stopping Scenario
+低速汇入与停车场景
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/FrenetOptimalTrajectory/low_speed_and_merging_and_stopping_frenet_path.gif
 
-This scenario illustrates the trajectory planning at low speeds with merging and stopping behaviors.
+该场景说明低速下带有汇入与停车行为的轨迹规划。
 
-Reference
+参考文献
 
 -  `Optimal Trajectory Generation for Dynamic Street Scenarios in a
    Frenet
@@ -49,4 +49,3 @@ Reference
 
 -  `Optimal trajectory generation for dynamic street scenarios in a
    Frenet Frame <https://www.youtube.com/watch?v=Cj6tAQe7UCY>`__
-

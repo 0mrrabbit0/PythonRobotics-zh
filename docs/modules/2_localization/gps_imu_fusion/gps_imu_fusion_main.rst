@@ -1,87 +1,54 @@
-GPS/IMU Fusion Localization with Bias Estimation
-================================================
+带偏差估计的 GPS/惯性测量单元（IMU）融合定位
+============================================
 
-This example uses an extended Kalman filter (EKF) to combine body-frame
-accelerometer and gyroscope measurements with GPS positions in a local metric
-frame. IMU prediction runs at 20 Hz and GPS correction at 1 Hz. The simulation
-compares fusion with and without bias estimation and IMU-only dead reckoning
-along a figure-eight trajectory, including a GPS outage from 20 to 30 seconds.
+本示例使用扩展卡尔曼滤波（EKF），在局部米制坐标系中，把机体坐标系下的加速度计和陀螺仪测量与 GPS 位置结合起来。惯性测量单元（IMU）预测以 20 Hz 运行，GPS 校正以 1 Hz 运行。仿真沿 8 字形轨迹比较带偏差估计的融合、不带偏差估计的融合，以及仅使用惯性测量单元（IMU）的航位推算，其中包括从 20 秒到 30 秒的 GPS 中断。
 
 .. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/5abf69412ae056a2f30ba562a1c04600b6062fe4/Localization/gps_imu_fusion/animation.gif
-   :alt: GPS and IMU fusion localization with position covariance ellipses and bias estimates with three-sigma uncertainty bands against ground truth
+   :alt: GPS 与惯性测量单元（IMU）融合定位，含位置协方差椭圆，以及相对真值带有三倍标准差不确定度区间的偏差估计
 
-The lower three panels show the EKF's estimated accelerometer x/y biases
-(m/s²) and gyroscope bias (deg/s) in blue, with ground truth as black dashed
-lines. The true biases are 0.04 m/s², -0.03 m/s² and 0.4 deg/s, respectively.
-Gray shading marks the GPS outage in the error and bias plots.
+下方三个面板以蓝色显示扩展卡尔曼滤波（EKF）估计的加速度计 x/y 偏差（m/s²）和陀螺仪偏差（deg/s），黑色虚线为真值。真实偏差分别为 0.04 m/s²、-0.03 m/s² 和 0.4 deg/s。灰色阴影在误差图和偏差图中标出 GPS 中断。
 
-Covariance-based uncertainty
-----------------------------
+基于协方差的不确定度
+--------------------
 
-The path plot shows a 3σ position ellipse centered on each EKF estimate, with
-markers for the current estimates and ground truth. If :math:`\lambda_i` are
-the eigenvalues of the position covariance :math:`P_{xy}`, the semi-axis
-lengths are :math:`3\sqrt{\lambda_i}` and the eigenvectors give their directions.
-This includes the x/y cross-covariance. The ellipse boundary satisfies
+路径图在每个扩展卡尔曼滤波（EKF）估计处绘制以该估计为中心的 3σ 位置椭圆，并标出当前估计和真值。若 :math:`\lambda_i` 是位置协方差 :math:`P_{xy}` 的特征值，则半轴长度为 :math:`3\sqrt{\lambda_i}`，特征向量给出它们的方向。
+其中包含 x/y 互协方差。椭圆边界满足
 :math:`(\mathbf{p}-\hat{\mathbf{p}})^T P_{xy}^{-1}
-(\mathbf{p}-\hat{\mathbf{p}})=9`.
+(\mathbf{p}-\hat{\mathbf{p}})=9`。
 
-The dashed blue line in the position-error plot tracks the bias-estimating
-EKF's ellipse semi-major axis, :math:`3\sqrt{\lambda_{\max}(P_{xy})}`.
-It is the ellipse's enclosing radius, not the standard deviation of the
-Euclidean position error. An error below this line alone does not guarantee
-that the true position lies inside the ellipse; direction also matters.
+位置误差图中的蓝色虚线跟踪带偏差估计的扩展卡尔曼滤波（EKF）的椭圆半长轴 :math:`3\sqrt{\lambda_{\max}(P_{xy})}`。
+它是椭圆的外接半径，不是欧氏位置误差的标准差。仅凭误差低于这条线，并不能保证真实位置落在椭圆内部，方向同样重要。
 
-Each bias panel shades :math:`\hat b_i \pm 3\sqrt{P_{ii}}`, using the matching
-diagonal element of the estimated state covariance. Gyroscope estimates and
-standard deviations are both converted from rad/s to deg/s. The estimate is
-at the center of its band; the true value provides an independent comparison.
-The plots use the filter covariance directly, so they show uncertainty
-contracting with GPS corrections and growing during the outage.
+每个偏差面板对 :math:`\hat b_i \pm 3\sqrt{P_{ii}}` 加阴影，使用估计状态协方差中对应的对角元素。陀螺仪的估计值和标准差都从 rad/s 转换为 deg/s。估计值位于其区间的中心，真值提供独立对照。
+这些图直接使用滤波器的协方差，因此显示不确定度随 GPS 校正而收缩，并在中断期间增大。
 
-For the default seed-0 simulation, ground truth stays within the
-bias-estimating EKF's position ellipse and all three bias bands at every
-sample. The EKF without bias estimation has position errors outside its
-ellipse during parts of the run. These are results for this synthetic run,
-not a guarantee of coverage for other data. A 3σ ellipse encloses about
-98.9% of an ideal 2D Gaussian, whereas a scalar ±3σ interval encloses about
-99.7%; see `Matplotlib's confidence-ellipse explanation
-<https://matplotlib.org/stable/gallery/statistics/confidence_ellipse.html>`_.
+对于默认的种子 0 仿真，在每个采样上，真值都位于带偏差估计的扩展卡尔曼滤波（EKF）的位置椭圆之内，也位于全部三个偏差区间之内。不带偏差估计的扩展卡尔曼滤波（EKF）在运行的部分时段，位置误差落在其椭圆之外。这些是本次合成仿真的结果，并不保证对其他数据具有同样的覆盖率。3σ 椭圆约包围理想二维高斯分布的 98.9%，而标量 ±3σ 区间约包围 99.7%；参见 `Matplotlib 置信椭圆说明
+<https://matplotlib.org/stable/gallery/statistics/confidence_ellipse.html>`_。
 
-Assumptions
------------
+假设
+------
 
-Motion is restricted to a horizontal plane. The IMU is aligned with the body
-frame and its acceleration has already been compensated for gravity. GPS
-positions are expressed in metres, not latitude and longitude. Sensors are
-time-aligned and co-located. Initial heading and velocity are approximately
-known. Roll, pitch, altitude, magnetometers and barometers are not modeled.
+运动限制在水平面内。惯性测量单元（IMU）与机体坐标系对齐，其加速度已经过重力补偿。GPS 位置以米表示，而不是纬度和经度。各传感器在时间上对齐，并且安装在同一位置。初始航向和速度近似已知。横滚、俯仰、高度、磁力计和气压计都没有建模。
 
-The example estimates constant or slowly varying accelerometer and gyroscope
-biases. GPS observes position only, so heading and bias estimation depend on
-motion and the initial uncertainty; they cannot all be recovered from a
-stationary position measurement. No real sensor data, outlier rejection or
-hardware-specific calibration is included.
+本示例估计恒定或缓慢变化的加速度计偏差和陀螺仪偏差。GPS 只观测位置，因此航向和偏差的估计依赖于运动以及初始不确定度；它们无法全部从静止时的位置测量中恢复。其中不包含真实传感器数据、离群点剔除，也不包含针对具体硬件的标定。
 
-State and inertial prediction
------------------------------
+状态与惯性预测
+--------------
 
-The eight-dimensional state contains world position, world velocity, heading,
-two body-frame accelerometer biases and one yaw-rate bias:
+八维状态包含世界坐标系位置、世界坐标系速度、航向、两个机体坐标系加速度计偏差，以及一个航向角速度偏差：
 
 .. math::
 
    \mathbf{x} = [p_x, p_y, v_x, v_y, \psi, b_{ax}, b_{ay}, b_\omega]^T.
 
-Let :math:`\mathbf{a}_m` and :math:`\omega_m` be the measured acceleration
-and yaw rate. With the body-to-world rotation
+设 :math:`\mathbf{a}_m` 和 :math:`\omega_m` 分别为测得的加速度和航向角速度。借助机体坐标系到世界坐标系的旋转
 
 .. math::
 
    R(\psi)=\begin{bmatrix}\cos\psi&-\sin\psi\\\sin\psi&\cos\psi\end{bmatrix},
    \qquad \mathbf{a}_w=R(\psi)(\mathbf{a}_m-\mathbf{b}_a),
 
-the discrete prediction holds world acceleration constant over one sample:
+离散预测在一个采样周期内把世界坐标系加速度视为常量：
 
 .. math::
 
@@ -90,9 +57,9 @@ the discrete prediction holds world acceleration constant over one sample:
    \psi^{-} &= \operatorname{wrap}(\psi+(\omega_m-b_\omega)\Delta t),\\
    \mathbf{b}^{-} &= \mathbf{b}.
 
-Heading is wrapped to :math:`[-\pi,\pi)`. Define
-:math:`\mathbf{j}=[-a_{wy},a_{wx}]^T`. In block order
-:math:`(\mathbf{p},\mathbf{v},\psi,\mathbf{b}_a,b_\omega)`, the Jacobians are
+航向被卷绕到 :math:`[-\pi,\pi)`。定义
+:math:`\mathbf{j}=[-a_{wy},a_{wx}]^T`。按分块顺序
+:math:`(\mathbf{p},\mathbf{v},\psi,\mathbf{b}_a,b_\omega)`，雅可比矩阵为
 
 .. math::
 
@@ -107,25 +74,24 @@ Heading is wrapped to :math:`[-\pi,\pi)`. Define
    \tfrac12\Delta t^2R&0\\ \Delta t R&0\\ 0&\Delta t\\ 0&0\\ 0&0
    \end{bmatrix}.
 
-Covariance propagates as
+协方差按如下方式传播
 
 .. math::
 
    P^{-}=FPF^T+GQ_{\mathrm{imu}}G^T+Q_b.
 
-:math:`Q_{\mathrm{imu}}` is the covariance of a discrete IMU sample.
-For bias random-walk standard deviations specified per square root second,
-the bias block of :math:`Q_b` is
-:math:`\operatorname{diag}(\sigma_{bax}^2,\sigma_{bay}^2,\sigma_{b\omega}^2)\Delta t`;
-its other entries are zero. The simulation adds independent Gaussian sensor
-noise and fixed biases, while the filter allows those biases to vary slowly.
+:math:`Q_{\mathrm{imu}}` 是一次离散惯性测量单元（IMU）采样的协方差。
+对于按每平方根秒给出的偏差随机游走标准差，
+:math:`Q_b` 的偏差分块为
+:math:`\operatorname{diag}(\sigma_{bax}^2,\sigma_{bay}^2,\sigma_{b\omega}^2)\Delta t`；
+其余元素为零。仿真加入相互独立的高斯传感器噪声和固定偏差，而滤波器允许这些偏差缓慢变化。
 
-GPS correction and outages
---------------------------
+GPS 校正与中断
+--------------
 
-GPS supplies :math:`\mathbf{z}=[p_x,p_y]^T` with measurement matrix
-:math:`H=[I_2\;0_{2\times6}]` and covariance
-:math:`R_{\mathrm{gps}}=\sigma_{\mathrm{gps}}^2 I_2`.
+GPS 提供 :math:`\mathbf{z}=[p_x,p_y]^T`，测量矩阵为
+:math:`H=[I_2\;0_{2\times6}]`，协方差为
+:math:`R_{\mathrm{gps}}=\sigma_{\mathrm{gps}}^2 I_2`。
 
 .. math::
 
@@ -134,35 +100,19 @@ GPS supplies :math:`\mathbf{z}=[p_x,p_y]^T` with measurement matrix
    \mathbf{x}^{+} &= \mathbf{x}^{-}+K(\mathbf{z}-H\mathbf{x}^{-}),\\
    P^{+} &= (I-KH)P^{-}(I-KH)^T+KR_{\mathrm{gps}}K^T.
 
-The gain is computed with a linear solve, and the Joseph covariance update
-helps preserve numerical symmetry and positive semidefiniteness. Between GPS
-fixes, and throughout the outage, only IMU prediction is performed. Uncertainty
-can grow during the outage and decreases when GPS corrections resume.
+增益通过求解线性方程组得到，Joseph 协方差更新有助于保持数值上的对称性和半正定性。在相邻两次 GPS 定位之间以及整个中断期间，只进行惯性测量单元（IMU）预测。不确定度在中断期间可能增大，并在 GPS 校正恢复后减小。
 
-Comparison without bias estimation
-----------------------------------
+不含偏差估计的对比
+------------------
 
-The baseline EKF estimates only :math:`[p_x,p_y,v_x,v_y,\psi]^T`. It assumes
-zero accelerometer and gyroscope bias, so it uses the raw IMU measurements
-without bias compensation. Its prediction uses the first five rows and
-columns of :math:`F` and the first five rows of :math:`G`, with no bias
-random-walk term. GPS still corrects position, velocity and heading through
-their cross-covariances. Thus it differs from IMU-only dead reckoning, which
-never receives GPS corrections.
+基线扩展卡尔曼滤波（EKF）只估计 :math:`[p_x,p_y,v_x,v_y,\psi]^T`。它假设加速度计偏差和陀螺仪偏差为零，因此使用未经偏差补偿的原始惯性测量单元（IMU）测量。其预测使用 :math:`F` 的前五行和前五列，以及 :math:`G` 的前五行，并且不含偏差随机游走项。GPS 仍然通过互协方差校正位置、速度和航向。因此它不同于仅使用惯性测量单元（IMU）的航位推算，后者从不接收 GPS 校正。
 
-All three methods use exactly the same IMU samples, including the same nonzero
-sensor biases and noise. Both EKFs receive the same GPS fixes and outage
-schedule, and start with the same pose, velocity and corresponding covariance.
-Only the eight-state EKF estimates and compensates for the biases. The red
-dashed curves show the five-state EKF without bias estimation.
+三种方法使用完全相同的惯性测量单元（IMU）采样，包括相同的非零传感器偏差和噪声。两种扩展卡尔曼滤波（EKF）接收相同的 GPS 定位和中断时段，并以相同的位姿、速度及相应协方差为初值。只有八维状态的扩展卡尔曼滤波（EKF）估计并补偿这些偏差。红色虚线表示不带偏差估计的五维状态扩展卡尔曼滤波（EKF）。
 
-The analytic reference trajectory is independent of the filter's discrete
-integrator. A fixed random seed makes the example reproducible, and the error
-plot shows each method's Euclidean position error. These synthetic results
-are not a real-sensor accuracy claim.
+解析参考轨迹与滤波器的离散积分器无关。固定的随机种子使本示例可以复现，误差图给出每种方法的欧氏位置误差。这些合成结果并不是对真实传感器精度的结论。
 
-Code
-----
+代码
+------
 
 .. autofunction:: Localization.gps_imu_fusion.gps_imu_fusion.predict
 
@@ -170,8 +120,8 @@ Code
 
 .. autofunction:: Localization.gps_imu_fusion.gps_imu_fusion.simulate
 
-References
-----------
+参考文献
+--------
 
 - `Oliver J. Woodman, An introduction to inertial navigation, University of Cambridge, 2007 <https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-696.pdf>`_
 - :doc:`../extended_kalman_filter_localization_files/extended_kalman_filter_localization`
