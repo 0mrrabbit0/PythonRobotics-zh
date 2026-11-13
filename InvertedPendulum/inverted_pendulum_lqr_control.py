@@ -1,6 +1,6 @@
 """
-Inverted Pendulum LQR control
-author: Trung Kien - letrungkien.k53.hut@gmail.com
+倒立摆线性二次调节器（LQR）控制
+作者：Trung Kien - letrungkien.k53.hut@gmail.com
 """
 
 import math
@@ -10,20 +10,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import inv, eig
 
-# Model parameters
+# 模型参数
 
-l_bar = 2.0  # length of bar
+l_bar = 2.0  # 摆杆长度
 M = 1.0  # [kg]
 m = 0.3  # [kg]
 g = 9.8  # [m/s^2]
 
-nx = 4  # number of state
-nu = 1  # number of input
-Q = np.diag([0.0, 1.0, 1.0, 0.0])  # state cost matrix
-R = np.diag([0.01])  # input cost matrix
+nx = 4  # 状态数量
+nu = 1  # 输入数量
+Q = np.diag([0.0, 1.0, 1.0, 0.0])  # 状态代价矩阵
+R = np.diag([0.01])  # 输入代价矩阵
 
-delta_t = 0.1  # time tick [s]
-sim_time = 5.0  # simulation time [s]
+delta_t = 0.1  # 时间步长 [s]
+sim_time = 5.0  # 仿真时间 [s]
 
 show_animation = True
 
@@ -42,10 +42,10 @@ def main():
     while sim_time > time:
         time += delta_t
 
-        # calc control input
+        # 计算控制输入
         u = lqr_control(x)
 
-        # simulate inverted pendulum cart
+        # 仿真倒立摆小车
         x = simulation(x, u)
 
         if show_animation:
@@ -71,7 +71,7 @@ def simulation(x, u):
 
 def solve_DARE(A, B, Q, R, maxiter=150, eps=0.01):
     """
-    Solve a discrete time_Algebraic Riccati equation (DARE)
+    求解离散时间代数 Riccati 方程（DARE）
     """
     P = Q
 
@@ -87,16 +87,16 @@ def solve_DARE(A, B, Q, R, maxiter=150, eps=0.01):
 
 def dlqr(A, B, Q, R):
     """
-    Solve the discrete time lqr controller.
+    求解离散时间线性二次调节器（LQR）控制器。
     x[k+1] = A x[k] + B u[k]
     cost = sum x[k].T*Q*x[k] + u[k].T*R*u[k]
-    # ref Bertsekas, p.151
+    # 参考文献 Bertsekas, p.151
     """
 
-    # first, try to solve the ricatti equation
+    # 首先尝试求解 Riccati 方程
     P = solve_DARE(A, B, Q, R)
 
-    # compute the LQR gain
+    # 计算线性二次调节器（LQR）增益
     K = inv(B.T @ P @ B + R) @ (B.T @ P @ A)
 
     eigVals, eigVecs = eig(A - B @ K)
@@ -115,7 +115,7 @@ def lqr_control(x):
 
 def get_numpy_array_from_matrix(x):
     """
-    get build-in list from matrix
+    从矩阵得到内置列表
     """
     return np.array(x).flatten()
 
@@ -180,7 +180,7 @@ def plot_cart(xt, theta):
     plt.plot(flatten(wx), flatten(wy), "-k")
     plt.title(f"x: {xt:.2f} , theta: {math.degrees(theta):.2f}")
 
-    # for stopping simulation with the esc key.
+    # 按 esc 键停止仿真。
     plt.gcf().canvas.mpl_connect(
         'key_release_event',
         lambda event: [exit(0) if event.key == 'escape' else None])

@@ -1,6 +1,6 @@
 """
-Inverted Pendulum MPC control
-author: Atsushi Sakai
+倒立摆模型预测控制（MPC）
+作者：Atsushi Sakai
 """
 
 import math
@@ -10,21 +10,21 @@ import cvxpy
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Model parameters
+# 模型参数
 
-l_bar = 2.0  # length of bar
+l_bar = 2.0  # 摆杆长度
 M = 1.0  # [kg]
 m = 0.3  # [kg]
 g = 9.8  # [m/s^2]
 
-nx = 4  # number of state
-nu = 1  # number of input
-Q = np.diag([0.0, 1.0, 1.0, 0.0])  # state cost matrix
-R = np.diag([0.01])  # input cost matrix
+nx = 4  # 状态数量
+nu = 1  # 输入数量
+Q = np.diag([0.0, 1.0, 1.0, 0.0])  # 状态代价矩阵
+R = np.diag([0.01])  # 输入代价矩阵
 
-T = 30  # Horizon length
-delta_t = 0.1  # time tick
-sim_time = 5.0  # simulation time [s]
+T = 30  # 预测时域长度
+delta_t = 0.1  # 时间步长
+sim_time = 5.0  # 仿真时间 [s]
 
 show_animation = True
 
@@ -43,14 +43,14 @@ def main():
     while sim_time > time:
         time += delta_t
 
-        # calc control input
+        # 计算控制输入
         opt_x, opt_delta_x, opt_theta, opt_delta_theta, opt_input = \
             mpc_control(x)
 
-        # get input
+        # 取得输入
         u = opt_input[0]
 
-        # simulate inverted pendulum cart
+        # 仿真倒立摆小车
         x = simulation(x, u)
 
         if show_animation:
@@ -110,7 +110,7 @@ def mpc_control(x0):
 
 def get_numpy_array_from_matrix(x):
     """
-    get build-in list from matrix
+    从矩阵得到内置列表
     """
     return np.array(x).flatten()
 
@@ -175,7 +175,7 @@ def plot_cart(xt, theta):
     plt.plot(flatten(wx), flatten(wy), "-k")
     plt.title(f"x: {xt:.2f} , theta: {math.degrees(theta):.2f}")
 
-    # for stopping simulation with the esc key.
+    # 按 esc 键停止仿真。
     plt.gcf().canvas.mpl_connect(
         'key_release_event',
         lambda event: [exit(0) if event.key == 'escape' else None])
