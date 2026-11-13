@@ -7,38 +7,38 @@ show_animation = True
 
 
 def calc_normal_vector(p1, p2, p3):
-    """Calculate normal vector of triangle
+    """计算三角形的法向量
 
     Parameters
     ----------
     p1 : np.array
-        3D point
+        三维点
     p2 : np.array
-        3D point
+        三维点
     p3 : np.array
-        3D point
+        三维点
 
     Returns
     -------
     normal_vector : np.array
-        normal vector (3,)
+        法向量 (3,)
 
     """
-    # calculate two vectors of triangle
+    # 计算三角形的两条向量
     v1 = p2 - p1
     v2 = p3 - p1
 
-    # calculate normal vector
+    # 计算法向量
     normal_vector = np.cross(v1, v2)
 
-    # normalize vector
+    # 归一化向量
     normal_vector = normal_vector / np.linalg.norm(normal_vector)
 
     return normal_vector
 
 
 def sample_3d_points_from_a_plane(num_samples, normal):
-    points_2d = np.random.normal(size=(num_samples, 2))  # 2D points on a plane
+    points_2d = np.random.normal(size=(num_samples, 2))  # 平面上的二维点
     d = 0
     for i in range(len(points_2d)):
         point_3d = np.append(points_2d[i], 0)
@@ -66,29 +66,26 @@ def distance_to_plane(point, normal, origin):
 def ransac_normal_vector_estimation(points_3d, inlier_radio_th=0.7,
                                     inlier_dist=0.1, p=0.99):
     """
-    RANSAC based normal vector estimation
+    基于 RANSAC 的法向量估计
 
     Parameters
     ----------
     points_3d : np.array
-        3D points (N, 3)
+        三维点 (N, 3)
     inlier_radio_th : float
-        Inlier ratio threshold. If inlier ratio is larger than this value,
-        the iteration is stopped. Default is 0.7.
+        内点比例阈值。若内点比例大于该值，则停止迭代。默认值为 0.7。
     inlier_dist : float
-        Inlier distance threshold. If distance between points and estimated
-        plane is smaller than this value, the point is inlier. Default is 0.1.
+        内点距离阈值。若点到估计平面的距离小于该值，则该点为内点。默认值为 0.1。
     p : float
-         Probability that at least one of the sets of random samples does not
-         include an outlier. If this probability is near 1, the iteration
-         number is large. Default is 0.99.
+         至少有一组随机样本不含外点的概率。该概率接近 1 时，
+         迭代次数较大。默认值为 0.99。
 
     Returns
     -------
     center_vector : np.array
-        Center of estimated plane. (3,)
+        估计平面的中心。(3,)
     normal_vector : np.array
-        Normal vector of estimated plane. (3,)
+        估计平面的法向量。(3,)
 
     """
     center = np.mean(points_3d, axis=0)
@@ -96,7 +93,7 @@ def ransac_normal_vector_estimation(points_3d, inlier_radio_th=0.7,
     max_iter = int(np.floor(np.log(1.0-p)/np.log(1.0-(1.0-inlier_radio_th)**3)))
 
     for ite in range(max_iter):
-        # Random sampling
+        # 随机采样
         sampled_ids = np.random.choice(points_3d.shape[0], size=3,
                                        replace=False)
         sampled_points = points_3d[sampled_ids, :]
@@ -105,7 +102,7 @@ def ransac_normal_vector_estimation(points_3d, inlier_radio_th=0.7,
         p3 = sampled_points[2, :]
         normal_vector = calc_normal_vector(p1, p2, p3)
 
-        # calc inlier ratio
+        # 计算内点比例
         n_inliner = 0
         for i in range(points_3d.shape[0]):
             p = points_3d[i, :]
@@ -146,7 +143,7 @@ def main2(rng=None):
     noise_scale = 0.1
 
     points_3d = sample_3d_points_from_a_plane(num_samples, true_normal)
-    # add random noise
+    # 添加随机噪声
     points_3d += np.random.normal(size=points_3d.shape, scale=noise_scale)
 
     print(f"{points_3d.shape=}")

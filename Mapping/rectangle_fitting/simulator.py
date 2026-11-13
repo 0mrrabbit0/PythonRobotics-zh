@@ -1,8 +1,8 @@
 """ 
 
-Simulator
+仿真器
 
-author: Atsushi Sakai
+作者：Atsushi Sakai
 
 """
 import sys
@@ -40,7 +40,7 @@ class VehicleSimulator:
     def plot(self):
         plt.plot(self.x, self.y, ".b")
 
-        # convert global coordinate
+        # 转换到全局坐标
         gx, gy = self.calc_global_contour()
         plt.plot(gx, gy, "--b")
 
@@ -99,7 +99,7 @@ class LidarSimulator:
     def get_observation_points(self, v_list, angle_resolution):
         x, y, angle, r = [], [], [], []
 
-        # store all points
+        # 存储全部点
         for v in v_list:
 
             gx, gy = v.calc_global_contour()
@@ -114,7 +114,7 @@ class LidarSimulator:
                 angle.append(v_angle)
                 r.append(vr)
 
-        # ray casting filter
+        # 射线投射滤波
         rx, ry = self.ray_casting_filter(angle, r, angle_resolution)
 
         return rx, ry

@@ -1,11 +1,11 @@
 """
-Distance Map
+距离图
 
-author: Wang Zheng (@Aglargil)
+作者：Wang Zheng (@Aglargil)
 
 Reference:
 
-- [Distance Map]
+- [距离图]
 (https://cs.brown.edu/people/pfelzens/papers/dt-final.pdf)
 """
 
@@ -19,26 +19,26 @@ ENABLE_PLOT = True
 
 def compute_sdf_scipy(obstacles):
     """
-    Compute the signed distance field (SDF) from a boolean field using scipy.
-    This function has the same functionality as compute_sdf.
-    However, by using scipy.ndimage.distance_transform_edt, it can compute much faster.
+    使用 scipy 由布尔场计算符号距离场（SDF）。
+    本函数与 compute_sdf 功能相同。
+    但借助 scipy.ndimage.distance_transform_edt，计算速度快得多。
 
-    Example: 500×500 map
-    • compute_sdf: 3 sec
-    • compute_sdf_scipy: 0.05 sec
+    示例：500×500 地图
+    • compute_sdf：3 秒
+    • compute_sdf_scipy：0.05 秒
 
     Parameters
     ----------
     obstacles : array_like
-        A 2D boolean array where '1' represents obstacles and '0' represents free space.
+        二维布尔数组，其中 '1' 表示障碍物，'0' 表示自由空间。
 
     Returns
     -------
     array_like
-        A 2D array representing the signed distance field, where positive values indicate distance
-        to the nearest obstacle, and negative values indicate distance to the nearest free space.
+        表示符号距离场的二维数组，正值表示到最近障碍物的距离，
+        负值表示到最近自由空间的距离。
     """
-    # distance_transform_edt use '0' as obstacles, so we need to convert the obstacles to '0'
+    # distance_transform_edt 将 '0' 视为障碍物，因此需要把障碍物转换为 '0'
     a = scipy.ndimage.distance_transform_edt(obstacles == 0)
     b = scipy.ndimage.distance_transform_edt(obstacles == 1)
     return a - b
@@ -46,41 +46,41 @@ def compute_sdf_scipy(obstacles):
 
 def compute_udf_scipy(obstacles):
     """
-    Compute the unsigned distance field (UDF) from a boolean field using scipy.
-    This function has the same functionality as compute_udf.
-    However, by using scipy.ndimage.distance_transform_edt, it can compute much faster.
+    使用 scipy 由布尔场计算无符号距离场（UDF）。
+    本函数与 compute_udf 功能相同。
+    但借助 scipy.ndimage.distance_transform_edt，计算速度快得多。
 
-    Example: 500×500 map
-    • compute_udf: 1.5 sec
-    • compute_udf_scipy: 0.02 sec
+    示例：500×500 地图
+    • compute_udf：1.5 秒
+    • compute_udf_scipy：0.02 秒
 
     Parameters
     ----------
     obstacles : array_like
-        A 2D boolean array where '1' represents obstacles and '0' represents free space.
+        二维布尔数组，其中 '1' 表示障碍物，'0' 表示自由空间。
 
     Returns
     -------
     array_like
-        A 2D array of distances from the nearest obstacle, with the same dimensions as `bool_field`.
+        到最近障碍物的距离的二维数组，维度与 `bool_field` 相同。
     """
     return scipy.ndimage.distance_transform_edt(obstacles == 0)
 
 
 def compute_sdf(obstacles):
     """
-    Compute the signed distance field (SDF) from a boolean field.
+    由布尔场计算符号距离场（SDF）。
 
     Parameters
     ----------
     obstacles : array_like
-        A 2D boolean array where '1' represents obstacles and '0' represents free space.
+        二维布尔数组，其中 '1' 表示障碍物，'0' 表示自由空间。
 
     Returns
     -------
     array_like
-        A 2D array representing the signed distance field, where positive values indicate distance
-        to the nearest obstacle, and negative values indicate distance to the nearest free space.
+        表示符号距离场的二维数组，正值表示到最近障碍物的距离，
+        负值表示到最近自由空间的距离。
     """
     a = compute_udf(obstacles)
     b = compute_udf(obstacles == 0)
@@ -89,17 +89,17 @@ def compute_sdf(obstacles):
 
 def compute_udf(obstacles):
     """
-    Compute the unsigned distance field (UDF) from a boolean field.
+    由布尔场计算无符号距离场（UDF）。
 
     Parameters
     ----------
     obstacles : array_like
-        A 2D boolean array where '1' represents obstacles and '0' represents free space.
+        二维布尔数组，其中 '1' 表示障碍物，'0' 表示自由空间。
 
     Returns
     -------
     array_like
-        A 2D array of distances from the nearest obstacle, with the same dimensions as `bool_field`.
+        到最近障碍物的距离的二维数组，维度与 `bool_field` 相同。
     """
     edt = obstacles.copy()
     if not np.all(np.isin(edt, [0, 1])):
@@ -117,17 +117,17 @@ def compute_udf(obstacles):
 
 def dt(d):
     """
-    Compute 1D distance transform under the squared Euclidean distance
+    在平方欧氏距离下计算一维距离变换
 
     Parameters
     ----------
     d : array_like
-        Input array containing the distances.
+        包含距离的输入数组。
 
     Returns:
     --------
     d : array_like
-        The transformed array with computed distances.
+        已计算距离的变换后数组。
     """
     v = np.zeros(len(d) + 1)
     z = np.zeros(len(d) + 1)
@@ -169,7 +169,7 @@ def main():
         ]
     )
 
-    # Compute the signed distance field
+    # 计算符号距离场
     sdf = compute_sdf(obstacles)
     udf = compute_udf(obstacles)
 

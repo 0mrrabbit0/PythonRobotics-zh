@@ -1,8 +1,8 @@
 """
 
-Object shape recognition with circle fitting
+使用圆拟合进行目标形状识别
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
 
 """
 
@@ -16,33 +16,31 @@ show_animation = True
 
 def circle_fitting(x, y):
     """
-    Fits a circle to a given set of points using a least-squares approach.
+    用最小二乘法将圆拟合到给定点集。
 
-    This function calculates the center (x, y) and radius of a circle that best fits
-    the given set of points in a two-dimensional plane. It minimizes the squared
-    errors between the circle and the provided points and returns the calculated
-    center coordinates, radius, and the fitting error.
+    本函数计算二维平面上最拟合给定点集的圆的圆心 (x, y) 与半径。
+    它最小化圆与所给点之间的平方误差，并返回计算出的圆心坐标、半径与拟合误差。
 
     Raises
     ------
     ValueError
-        If the input lists x and y do not contain the same number of elements.
+        若输入列表 x 与 y 的元素个数不同。
 
     Parameters
     ----------
     x : list[float]
-        The x-coordinates of the points.
+        点的 x 坐标。
     y : list[float]
-        The y-coordinates of the points.
+        点的 y 坐标。
 
     Returns
     -------
     tuple[float, float, float, float]
-        A tuple containing:
-        - The x-coordinate of the center of the fitted circle (float).
-        - The y-coordinate of the center of the fitted circle (float).
-        - The radius of the fitted circle (float).
-        - The fitting error as a deviation metric (float).
+        包含以下内容的元组：
+        - 拟合圆圆心的 x 坐标 (float)。
+        - 拟合圆圆心的 y 坐标 (float)。
+        - 拟合圆的半径 (float)。
+        - 作为偏差度量的拟合误差 (float)。
     """
 
     sumx = sum(x)
@@ -73,7 +71,7 @@ def circle_fitting(x, y):
 def get_sample_points(cx, cy, cr, angle_reso):
     x, y, angle, r = [], [], [], []
 
-    # points sampling
+    # 点采样
     for theta in np.arange(0.0, 2.0 * math.pi, angle_reso):
         nx = cx + cr * math.cos(theta)
         ny = cy + cr * math.sin(theta)
@@ -85,7 +83,7 @@ def get_sample_points(cx, cy, cr, angle_reso):
         angle.append(nangle)
         r.append(nr)
 
-    # ray casting filter
+    # 射线投射滤波
     rx, ry = ray_casting_filter(x, y, angle, r, angle_reso)
 
     return rx, ry
@@ -121,15 +119,15 @@ def plot_circle(x, y, size, color="-b"):  # pragma: no cover
 
 def main():
 
-    # simulation parameters
-    simtime = 15.0  # simulation time
-    dt = 1.0  # time tick
+    # 仿真参数
+    simtime = 15.0  # 仿真时间
+    dt = 1.0  # 时间步长
 
-    cx = -2.0  # initial x position of obstacle
-    cy = -8.0  # initial y position of obstacle
-    cr = 1.0  # obstacle radious
-    theta = np.deg2rad(30.0)  # obstacle moving direction
-    angle_reso = np.deg2rad(3.0)  # sensor angle resolution
+    cx = -2.0  # 障碍物初始 x 位置
+    cy = -8.0  # 障碍物初始 y 位置
+    cr = 1.0  # 障碍物半径
+    theta = np.deg2rad(30.0)  # 障碍物运动方向
+    angle_reso = np.deg2rad(3.0)  # 传感器角度分辨率
 
     time = 0.0
     while time <= simtime:
@@ -145,7 +143,7 @@ def main():
 
         if show_animation:  # pragma: no cover
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             plt.axis("equal")

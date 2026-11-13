@@ -1,12 +1,12 @@
 """
 
-Object shape recognition with L-shape fitting
+使用 L 形拟合进行目标形状识别
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
 
 Reference:
-- Efficient L-Shape Fitting for Vehicle Detection Using Laser Scanners -
-The Robotics Institute Carnegie Mellon University
+- 利用激光扫描仪进行车辆检测的高效 L 形拟合 -
+卡内基梅隆大学机器人研究所
 https://www.ri.cmu.edu/publications/
 efficient-l-shape-fitting-for-vehicle-detection-using-laser-scanners/
 
@@ -31,8 +31,7 @@ show_animation = True
 
 class LShapeFitting:
     """
-    LShapeFitting class. You can use this class by initializing the class and
-    changing the parameters, and then calling the fitting method.
+    LShapeFitting 类。使用时先初始化该类并修改参数，然后调用拟合方法。
 
     """
 
@@ -43,40 +42,40 @@ class LShapeFitting:
 
     def __init__(self):
         """
-        Default parameter settings
+        默认参数设置
         """
-        #: Fitting criteria parameter
+        #: 拟合准则参数
         self.criteria = self.Criteria.VARIANCE
-        #: Minimum distance for closeness criteria parameter [m]
+        #: 贴近准则的最小距离参数 [m]
         self.min_dist_of_closeness_criteria = 0.01
-        #: Angle difference parameter [deg]
+        #: 角度差参数 [deg]
         self.d_theta_deg_for_search = 1.0
-        #: Range segmentation parameter [m]
+        #: 距离分割参数 [m]
         self.R0 = 3.0
-        #: Range segmentation parameter [m]
+        #: 距离分割参数 [m]
         self.Rd = 0.001
 
     def fitting(self, ox, oy):
         """
-        Fitting L-shape model to object points
+        将 L 形模型拟合到目标点
 
         Parameters
         ----------
-        ox : x positions of range points from an object
-        oy : y positions of range points from an object
+        ox : 来自某一目标的距离点的 x 位置
+        oy : 来自某一目标的距离点的 y 位置
 
         Returns
         -------
-        rects: Fitting rectangles
-        id_sets: id sets of each cluster
+        rects: 拟合得到的矩形
+        id_sets: 每个聚类的 id 集合
 
         """
-        # step1: Adaptive Range Segmentation
+        # 步骤 1：自适应距离分割
         id_sets = self._adoptive_range_segmentation(ox, oy)
 
-        # step2 Rectangle search
+        # 步骤 2：矩形搜索
         rects = []
-        for ids in id_sets:  # for each cluster
+        for ids in id_sets:  # 对每个聚类
             cx = [ox[i] for i in range(len(ox)) if i in ids]
             cy = [oy[i] for i in range(len(oy)) if i in ids]
             rects.append(self._rectangle_search(cx, cy))
@@ -92,7 +91,7 @@ class LShapeFitting:
     def _calc_closeness_criterion(self, c1, c2):
         c1_max, c1_min, c2_max, c2_min = LShapeFitting._find_min_max(c1, c2)
 
-        # Vectorization
+        # 向量化
         d1 = np.minimum(c1_max - c1, c1 - c1_min)
         d2 = np.minimum(c2_max - c2, c2 - c2_min)
         d = np.maximum(np.minimum(d1, d2), self.min_dist_of_closeness_criteria)
@@ -104,7 +103,7 @@ class LShapeFitting:
     def _calc_variance_criterion(c1, c2):
         c1_max, c1_min, c2_max, c2_min = LShapeFitting._find_min_max(c1, c2)
 
-        # Vectorization
+        # 向量化
         d1 = np.minimum(c1_max - c1, c1 - c1_min)
         d2 = np.minimum(c2_max - c2, c2 - c2_min)
         e1 = d1[d1 < d2]
@@ -135,7 +134,7 @@ class LShapeFitting:
             c1 = c[:, 0]
             c2 = c[:, 1]
 
-            # Select criteria
+            # 选择准则
             cost = 0.0
             if self.criteria == self.Criteria.AREA:
                 cost = self._calc_area_criterion(c1, c2)
@@ -147,7 +146,7 @@ class LShapeFitting:
             if min_cost[0] < cost:
                 min_cost = (cost, theta)
 
-        # calc best rectangle
+        # 计算最优矩形
         sin_s = np.sin(min_cost[1])
         cos_s = np.cos(min_cost[1])
 
@@ -172,7 +171,7 @@ class LShapeFitting:
 
     def _adoptive_range_segmentation(self, ox, oy):
 
-        # Setup initial cluster
+        # 设置初始聚类
         segment_list = []
         for i, _ in enumerate(ox):
             c = set()
@@ -183,7 +182,7 @@ class LShapeFitting:
                     c.add(j)
             segment_list.append(c)
 
-        # Merge cluster
+        # 合并聚类
         while True:
             no_change = True
             for (c1, c2) in list(itertools.permutations(range(len(segment_list)), 2)):
@@ -232,11 +231,11 @@ class RectangleData:
 
 def main():
 
-    # simulation parameters
-    sim_time = 30.0  # simulation time
-    dt = 0.2  # time tick
+    # 仿真参数
+    sim_time = 30.0  # 仿真时间
+    dt = 0.2  # 时间步长
 
-    angle_resolution = np.deg2rad(3.0)  # sensor angle resolution
+    angle_resolution = np.deg2rad(3.0)  # 传感器角度分辨率
 
     v1 = VehicleSimulator(-10.0, 0.0, np.deg2rad(90.0),
                           0.0, 50.0 / 3.6, 3.0, 5.0)
@@ -259,7 +258,7 @@ def main():
 
         if show_animation:  # pragma: no cover
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
@@ -268,7 +267,7 @@ def main():
             v1.plot()
             v2.plot()
 
-            # Plot range observation
+            # 绘制距离观测
             for ids in id_sets:
                 x = [ox[i] for i in range(len(ox)) if i in ids]
                 y = [oy[i] for i in range(len(ox)) if i in ids]

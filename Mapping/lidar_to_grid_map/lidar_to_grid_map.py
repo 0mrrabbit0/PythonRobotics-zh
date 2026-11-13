@@ -1,8 +1,8 @@
 """
 
-LIDAR to 2D grid map example
+激光雷达转二维栅格地图示例
 
-author: Erno Horvath, Csaba Hajdu based on Atsushi Sakai's scripts
+作者：Erno Horvath、Csaba Hajdu，基于 Atsushi Sakai 的脚本
 
 """
 
@@ -17,7 +17,7 @@ EXTEND_AREA = 1.0
 
 def file_read(f):
     """
-    Reading LIDAR laser beams (angles and corresponding distance data)
+    读取激光雷达光束（角度及对应的距离数据）
     """
     with open(f) as data:
         measures = [line.split(",") for line in data]
@@ -33,34 +33,34 @@ def file_read(f):
 
 def bresenham(start, end):
     """
-    Implementation of Bresenham's line drawing algorithm
-    See en.wikipedia.org/wiki/Bresenham's_line_algorithm
-    Bresenham's Line Algorithm
-    Produces a np.array from start and end (original from roguebasin.com)
+    Bresenham 直线绘制算法的实现
+    参见 en.wikipedia.org/wiki/Bresenham's_line_algorithm
+    Bresenham 直线算法
+    由起点和终点生成 np.array（原始实现来自 roguebasin.com）
     >>> points1 = bresenham((4, 4), (6, 10))
     >>> print(points1)
     np.array([[4,4], [4,5], [5,6], [5,7], [5,8], [6,9], [6,10]])
     """
-    # setup initial conditions
+    # 设置初始条件
     x1, y1 = start
     x2, y2 = end
     dx = x2 - x1
     dy = y2 - y1
-    is_steep = abs(dy) > abs(dx)  # determine how steep the line is
-    if is_steep:  # rotate line
+    is_steep = abs(dy) > abs(dx)  # 判断直线的陡峭程度
+    if is_steep:  # 旋转直线
         x1, y1 = y1, x1
         x2, y2 = y2, x2
-    # swap start and end points if necessary and store swap state
+    # 必要时交换起点与终点，并记录交换状态
     swapped = False
     if x1 > x2:
         x1, x2 = x2, x1
         y1, y2 = y2, y1
         swapped = True
-    dx = x2 - x1  # recalculate differentials
-    dy = y2 - y1  # recalculate differentials
-    error = int(dx / 2.0)  # calculate error
+    dx = x2 - x1  # 重新计算差分
+    dy = y2 - y1  # 重新计算差分
+    error = int(dx / 2.0)  # 计算误差
     y_step = 1 if y1 < y2 else -1
-    # iterate over bounding box generating points between start and end
+    # 在包围盒上迭代，生成起点与终点之间的点
     y = y1
     points = []
     for x in range(x1, x2 + 1):
@@ -70,7 +70,7 @@ def bresenham(start, end):
         if error < 0:
             y += y_step
             error += dx
-    if swapped:  # reverse the list if the coordinates were swapped
+    if swapped:  # 若坐标被交换过，则反转列表
         points.reverse()
     points = np.array(points)
     return points
@@ -78,8 +78,7 @@ def bresenham(start, end):
 
 def calc_grid_map_config(ox, oy, xy_resolution):
     """
-    Calculates the size, and the maximum distances according to the the
-    measurement center
+    根据测量中心计算尺寸与最大距离
     """
     min_x = round(min(ox) - EXTEND_AREA / 2.0)
     min_y = round(min(oy) - EXTEND_AREA / 2.0)
@@ -101,9 +100,9 @@ def atan_zero_to_twopi(y, x):
 def init_flood_fill(center_point, obstacle_points, xy_points, min_coord,
                     xy_resolution):
     """
-    center_point: center point
-    obstacle_points: detected obstacles points (x,y)
-    xy_points: (x,y) point pairs
+    center_point: 中心点
+    obstacle_points: 检测到的障碍物点 (x,y)
+    xy_points: (x,y) 点对
     """
     center_x, center_y = center_point
     prev_ix, prev_iy = center_x - 1, center_y
@@ -112,13 +111,13 @@ def init_flood_fill(center_point, obstacle_points, xy_points, min_coord,
     min_x, min_y = min_coord
     occupancy_map = (np.ones((xw, yw))) * 0.5
     for (x, y) in zip(ox, oy):
-        # x coordinate of the the occupied area
+        # 占据区域的 x 坐标
         ix = int(round((x - min_x) / xy_resolution))
-        # y coordinate of the the occupied area
+        # 占据区域的 y 坐标
         iy = int(round((y - min_y) / xy_resolution))
         free_area = bresenham((prev_ix, prev_iy), (ix, iy))
         for fa in free_area:
-            occupancy_map[fa[0]][fa[1]] = 0  # free area 0.0
+            occupancy_map[fa[0]][fa[1]] = 0  # 自由区域 0.0
         prev_ix = ix
         prev_iy = iy
     return occupancy_map
@@ -126,32 +125,32 @@ def init_flood_fill(center_point, obstacle_points, xy_points, min_coord,
 
 def flood_fill(center_point, occupancy_map):
     """
-    center_point: starting point (x,y) of fill
-    occupancy_map: occupancy map generated from Bresenham ray-tracing
+    center_point: 填充的起始点 (x,y)
+    occupancy_map: 由 Bresenham 射线追踪生成的占据地图
     """
-    # Fill empty areas with queue method
+    # 用队列方法填充空白区域
     sx, sy = occupancy_map.shape
     fringe = deque()
     fringe.appendleft(center_point)
     while fringe:
         n = fringe.pop()
         nx, ny = n
-        # West
+        # 西
         if nx > 0:
             if occupancy_map[nx - 1, ny] == 0.5:
                 occupancy_map[nx - 1, ny] = 0.0
                 fringe.appendleft((nx - 1, ny))
-        # East
+        # 东
         if nx < sx - 1:
             if occupancy_map[nx + 1, ny] == 0.5:
                 occupancy_map[nx + 1, ny] = 0.0
                 fringe.appendleft((nx + 1, ny))
-        # North
+        # 北
         if ny > 0:
             if occupancy_map[nx, ny - 1] == 0.5:
                 occupancy_map[nx, ny - 1] = 0.0
                 fringe.appendleft((nx, ny - 1))
-        # South
+        # 南
         if ny < sy - 1:
             if occupancy_map[nx, ny + 1] == 0.5:
                 occupancy_map[nx, ny + 1] = 0.0
@@ -160,34 +159,34 @@ def flood_fill(center_point, occupancy_map):
 
 def generate_ray_casting_grid_map(ox, oy, xy_resolution, breshen=True):
     """
-    The breshen boolean tells if it's computed with bresenham ray casting
-    (True) or with flood fill (False)
+    布尔量 breshen 表示采用 Bresenham 射线投射计算（True）
+    还是采用泛洪填充计算（False）
     """
     min_x, min_y, max_x, max_y, x_w, y_w = calc_grid_map_config(
         ox, oy, xy_resolution)
-    # default 0.5 -- [[0.5 for i in range(y_w)] for i in range(x_w)]
+    # 默认 0.5 -- [[0.5 for i in range(y_w)] for i in range(x_w)]
     occupancy_map = np.ones((x_w, y_w)) / 2
     center_x = int(
-        round(-min_x / xy_resolution))  # center x coordinate of the grid map
+        round(-min_x / xy_resolution))  # 栅格地图的中心 x 坐标
     center_y = int(
-        round(-min_y / xy_resolution))  # center y coordinate of the grid map
-    # occupancy grid computed with bresenham ray casting
+        round(-min_y / xy_resolution))  # 栅格地图的中心 y 坐标
+    # 用 Bresenham 射线投射计算的占据栅格
     if breshen:
         for (x, y) in zip(ox, oy):
-            # x coordinate of the the occupied area
+            # 占据区域的 x 坐标
             ix = int(round((x - min_x) / xy_resolution))
-            # y coordinate of the the occupied area
+            # 占据区域的 y 坐标
             iy = int(round((y - min_y) / xy_resolution))
             laser_beams = bresenham((center_x, center_y), (
-                ix, iy))  # line form the lidar to the occupied point
+                ix, iy))  # 从激光雷达到占据点的线段
             for laser_beam in laser_beams:
                 occupancy_map[laser_beam[0]][
-                    laser_beam[1]] = 0.0  # free area 0.0
-            occupancy_map[ix][iy] = 1.0  # occupied area 1.0
-            occupancy_map[ix + 1][iy] = 1.0  # extend the occupied area
-            occupancy_map[ix][iy + 1] = 1.0  # extend the occupied area
-            occupancy_map[ix + 1][iy + 1] = 1.0  # extend the occupied area
-    # occupancy grid computed with with flood fill
+                    laser_beam[1]] = 0.0  # 自由区域 0.0
+            occupancy_map[ix][iy] = 1.0  # 占据区域 1.0
+            occupancy_map[ix + 1][iy] = 1.0  # 扩展占据区域
+            occupancy_map[ix][iy + 1] = 1.0  # 扩展占据区域
+            occupancy_map[ix + 1][iy + 1] = 1.0  # 扩展占据区域
+    # 用泛洪填充计算的占据栅格
     else:
         occupancy_map = init_flood_fill((center_x, center_y), (ox, oy),
                                         (x_w, y_w),
@@ -197,19 +196,19 @@ def generate_ray_casting_grid_map(ox, oy, xy_resolution, breshen=True):
         for (x, y) in zip(ox, oy):
             ix = int(round((x - min_x) / xy_resolution))
             iy = int(round((y - min_y) / xy_resolution))
-            occupancy_map[ix][iy] = 1.0  # occupied area 1.0
-            occupancy_map[ix + 1][iy] = 1.0  # extend the occupied area
-            occupancy_map[ix][iy + 1] = 1.0  # extend the occupied area
-            occupancy_map[ix + 1][iy + 1] = 1.0  # extend the occupied area
+            occupancy_map[ix][iy] = 1.0  # 占据区域 1.0
+            occupancy_map[ix + 1][iy] = 1.0  # 扩展占据区域
+            occupancy_map[ix][iy + 1] = 1.0  # 扩展占据区域
+            occupancy_map[ix + 1][iy + 1] = 1.0  # 扩展占据区域
     return occupancy_map, min_x, max_x, min_y, max_y, xy_resolution
 
 
 def main():
     """
-    Example usage
+    使用示例
     """
     print(__file__, "start")
-    xy_resolution = 0.02  # x-y grid resolution
+    xy_resolution = 0.02  # x-y 栅格分辨率
     ang, dist = file_read("lidar01.csv")
     ox = np.sin(ang) * dist
     oy = np.cos(ang) * dist
@@ -230,8 +229,8 @@ def main():
     plt.axis("equal")
     plt.plot(0.0, 0.0, "ob")
     plt.gca().set_aspect("equal", "box")
-    bottom, top = plt.ylim()  # return the current y-lim
-    plt.ylim((top, bottom))  # rescale y axis, to match the grid orientation
+    bottom, top = plt.ylim()  # 返回当前 y 轴范围
+    plt.ylim((top, bottom))  # 重新缩放 y 轴，以匹配栅格朝向
     plt.grid(True)
     plt.show()
 

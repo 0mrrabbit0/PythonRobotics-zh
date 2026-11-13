@@ -1,8 +1,8 @@
 """
 
-Object clustering with k-means algorithm
+使用 k-均值算法的目标聚类
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
 
 """
 
@@ -10,7 +10,7 @@ import math
 import matplotlib.pyplot as plt
 import random
 
-# k means parameters
+# k-均值参数
 MAX_LOOP = 10
 DCOST_TH = 0.1
 show_animation = True
@@ -18,26 +18,23 @@ show_animation = True
 
 def kmeans_clustering(rx, ry, nc):
     """
-    Performs k-means clustering on the given dataset, iteratively adjusting cluster centroids
-    until convergence within a defined threshold or reaching the maximum number of
-    iterations.
+    对给定数据集执行 k-均值聚类，迭代调整聚类质心，
+    直到收敛到给定阈值以内或达到最大迭代次数。
 
-    The implementation initializes clusters, calculates initial centroids, and refines the
-    clusters through iterative updates to optimize the cost function based on minimum
-    distance between datapoints and centroids.
+    实现会初始化聚类、计算初始质心，并通过迭代更新细化聚类，
+    以基于数据点与质心之间最小距离的代价函数进行优化。
 
-    Arguments:
+    参数:
         rx: List[float]
-            The x-coordinates of the dataset points to be clustered.
+            待聚类数据点的 x 坐标。
         ry: List[float]
-            The y-coordinates of the dataset points to be clustered.
+            待聚类数据点的 y 坐标。
         nc: int
-            The number of clusters to group the data into.
+            将数据划分成的聚类数量。
 
     Returns:
         Clusters
-            An instance containing the final cluster assignments and centroids after
-            convergence.
+            包含收敛后最终聚类分配与质心的实例。
 
     Raises:
         None
@@ -119,7 +116,7 @@ def calc_raw_data(cx, cy, n_points, rand_d):
 
 
 def update_positions(cx, cy):
-    # object moving parameters
+    # 目标运动参数
     DX1 = 0.4
     DY1 = 0.5
     DX2 = -0.3
@@ -149,16 +146,16 @@ def main():
         print("Time:", time)
         time += dt
 
-        # objects moving simulation
+        # 目标运动仿真
         cx, cy = update_positions(cx, cy)
         raw_x, raw_y = calc_raw_data(cx, cy, n_points, rand_d)
 
         clusters = kmeans_clustering(raw_x, raw_y, n_cluster)
 
-        # for animation
+        # 用于动画
         if show_animation:  # pragma: no cover
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             clusters.plot_cluster()

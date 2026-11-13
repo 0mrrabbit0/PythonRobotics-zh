@@ -1,8 +1,8 @@
 """
 
-Grid map library in python
+Python 栅格地图库
 
-author: Atsushi Sakai
+作者：Atsushi Sakai
 
 """
 from functools import total_ordering
@@ -32,19 +32,19 @@ class FloatGrid:
 
 class GridMap:
     """
-    GridMap class
+    GridMap 类
     """
 
     def __init__(self, width, height, resolution,
                  center_x, center_y, init_val=FloatGrid(0.0)):
         """__init__
 
-        :param width: number of grid for width
-        :param height: number of grid for height
-        :param resolution: grid resolution [m]
-        :param center_x: center x position  [m]
-        :param center_y: center y position [m]
-        :param init_val: initial value for all grid
+        :param width: 宽度方向的栅格数
+        :param height: 高度方向的栅格数
+        :param resolution: 栅格分辨率 [m]
+        :param center_x: 中心 x 位置 [m]
+        :param center_y: 中心 y 位置 [m]
+        :param init_val: 全部栅格的初始值
         """
         self.width = width
         self.height = height
@@ -62,10 +62,10 @@ class GridMap:
     def get_value_from_xy_index(self, x_ind, y_ind):
         """get_value_from_xy_index
 
-        when the index is out of grid map area, return None
+        当索引超出栅格地图范围时，返回 None
 
-        :param x_ind: x index
-        :param y_ind: y index
+        :param x_ind: x 索引
+        :param y_ind: y 索引
         """
 
         grid_ind = self.calc_grid_index_from_xy_index(x_ind, y_ind)
@@ -78,8 +78,8 @@ class GridMap:
     def get_xy_index_from_xy_pos(self, x_pos, y_pos):
         """get_xy_index_from_xy_pos
 
-        :param x_pos: x position [m]
-        :param y_pos: y position [m]
+        :param x_pos: x 位置 [m]
+        :param y_pos: y 位置 [m]
         """
         x_ind = self.calc_xy_index_from_position(
             x_pos, self.left_lower_x, self.width)
@@ -91,17 +91,17 @@ class GridMap:
     def set_value_from_xy_pos(self, x_pos, y_pos, val):
         """set_value_from_xy_pos
 
-        return bool flag, which means setting value is succeeded or not
+        返回布尔标志，表示设值是否成功
 
-        :param x_pos: x position [m]
-        :param y_pos: y position [m]
-        :param val: grid value
+        :param x_pos: x 位置 [m]
+        :param y_pos: y 位置 [m]
+        :param val: 栅格值
         """
 
         x_ind, y_ind = self.get_xy_index_from_xy_pos(x_pos, y_pos)
 
         if (not x_ind) or (not y_ind):
-            return False  # NG
+            return False  # 失败
 
         flag = self.set_value_from_xy_index(x_ind, y_ind, val)
 
@@ -110,11 +110,11 @@ class GridMap:
     def set_value_from_xy_index(self, x_ind, y_ind, val):
         """set_value_from_xy_index
 
-        return bool flag, which means setting value is succeeded or not
+        返回布尔标志，表示设值是否成功
 
-        :param x_ind: x index
-        :param y_ind: y index
-        :param val: grid value
+        :param x_ind: x 索引
+        :param y_ind: y 索引
+        :param val: 栅格值
         """
 
         if (x_ind is None) or (y_ind is None):
@@ -124,27 +124,27 @@ class GridMap:
 
         if 0 <= grid_ind < self.n_data and isinstance(val, self.data_type):
             self.data[grid_ind] = val
-            return True  # OK
+            return True  # 成功
         else:
-            return False  # NG
+            return False  # 失败
 
     def set_value_from_polygon(self, pol_x, pol_y, val, inside=True):
         """set_value_from_polygon
 
-        Setting value inside or outside polygon
+        在多边形内部或外部设值
 
-        :param pol_x: x position list for a polygon
-        :param pol_y: y position list for a polygon
-        :param val: grid value
-        :param inside: setting data inside or outside
+        :param pol_x: 多边形的 x 位置列表
+        :param pol_y: 多边形的 y 位置列表
+        :param val: 栅格值
+        :param inside: 在内部还是外部设置数据
         """
 
-        # making ring polygon
+        # 构成闭合多边形
         if (pol_x[0] != pol_x[-1]) or (pol_y[0] != pol_y[-1]):
             np.append(pol_x, pol_x[0])
             np.append(pol_y, pol_y[0])
 
-        # setting value for all grid
+        # 为全部栅格设值
         for x_ind in range(self.width):
             for y_ind in range(self.height):
                 x_pos, y_pos = self.calc_grid_central_xy_position_from_xy_index(
@@ -166,8 +166,8 @@ class GridMap:
     def calc_grid_index_from_xy_pos(self, x_pos, y_pos):
         """get_xy_index_from_xy_pos
 
-        :param x_pos: x position [m]
-        :param y_pos: y position [m]
+        :param x_pos: x 位置 [m]
+        :param y_pos: y 位置 [m]
         """
         x_ind = self.calc_xy_index_from_position(
             x_pos, self.left_lower_x, self.width)

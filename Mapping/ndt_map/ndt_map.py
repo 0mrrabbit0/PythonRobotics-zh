@@ -1,5 +1,5 @@
 """
-Normal Distribution Transform (NDTGrid) mapping sample
+正态分布变换（NDT）栅格建图示例
 """
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,51 +11,51 @@ from utils.plot import plot_covariance_ellipse
 
 class NDTMap:
     """
-    Normal Distribution Transform (NDT) map class
+    正态分布变换（NDT）地图类
 
-    :param ox: obstacle x position list
-    :param oy: obstacle y position list
-    :param resolution: grid resolution [m]
+    :param ox: 障碍物 x 位置列表
+    :param oy: 障碍物 y 位置列表
+    :param resolution: 栅格分辨率 [m]
     """
 
     class NDTGrid:
         """
-        NDT grid
+        正态分布变换（NDT）栅格
         """
 
         def __init__(self):
-            #: Number of points in the NDTGrid grid
+            #: NDTGrid 栅格中的点数
             self.n_points = 0
-            #: Mean x position of points in the NDTGrid cell
+            #: NDTGrid 单元中点的 x 均值位置
             self.mean_x = None
-            #: Mean y position of points in the NDTGrid cell
+            #: NDTGrid 单元中点的 y 均值位置
             self.mean_y = None
-            #: Center x position of the NDT grid
+            #: 正态分布变换（NDT）栅格的中心 x 位置
             self.center_grid_x = None
-            #: Center y position of the NDT grid
+            #: 正态分布变换（NDT）栅格的中心 y 位置
             self.center_grid_y = None
-            #: Covariance matrix of the NDT grid
+            #: 正态分布变换（NDT）栅格的协方差矩阵
             self.covariance = None
-            #: Eigen vectors of the NDT grid
+            #: 正态分布变换（NDT）栅格的特征向量
             self.eig_vec = None
-            #: Eigen values of the NDT grid
+            #: 正态分布变换（NDT）栅格的特征值
             self.eig_values = None
 
     def __init__(self, ox, oy, resolution):
-        #: Minimum number of points in the NDT grid
+        #: 正态分布变换（NDT）栅格中的最少点数
         self.min_n_points = 3
-        #: Resolution of the NDT grid [m]
+        #: 正态分布变换（NDT）栅格的分辨率 [m]
         self.resolution = resolution
-        width = int((max(ox) - min(ox))/resolution) + 3  # rounding up + right and left margin
+        width = int((max(ox) - min(ox))/resolution) + 3  # 向上取整并加上左右边距
         height = int((max(oy) - min(oy))/resolution) + 3
         center_x = np.mean(ox)
         center_y = np.mean(oy)
         self.ox = ox
         self.oy = oy
-        #: NDT grid index map
+        #: 正态分布变换（NDT）栅格索引图
         self.grid_index_map = self._create_grid_index_map(ox, oy)
 
-        #: NDT grid map. Each grid contains NDTGrid object
+        #: 正态分布变换（NDT）栅格地图。每个栅格包含一个 NDTGrid 对象
         self._construct_grid_map(center_x, center_y, height, ox, oy, resolution, width)
 
     def _construct_grid_map(self, center_x, center_y, height, ox, oy, resolution, width):
@@ -83,29 +83,29 @@ class NDTMap:
 def create_dummy_observation_data():
     ox = []
     oy = []
-    # left corridor
+    # 左侧走廊
     for y in range(-50, 50):
         ox.append(-20.0)
         oy.append(y)
-    # right corridor 1
+    # 右侧走廊 1
     for y in range(-50, 0):
         ox.append(20.0)
         oy.append(y)
-    # right corridor 2
+    # 右侧走廊 2
     for x in range(20, 50):
         ox.append(x)
         oy.append(0)
-    # right corridor 3
+    # 右侧走廊 3
     for x in range(20, 50):
         ox.append(x)
         oy.append(x/2.0+10)
-    # right corridor 4
+    # 右侧走廊 4
     for y in range(20, 50):
         ox.append(20)
         oy.append(y)
     ox = np.array(ox)
     oy = np.array(oy)
-    # Adding random noize
+    # 添加随机噪声
     ox += np.random.rand(len(ox)) * 1.0
     oy += np.random.rand(len(ox)) * 1.0
     return ox, oy
@@ -118,13 +118,13 @@ def main():
     grid_resolution = 10.0
     ndt_map = NDTMap(ox, oy, grid_resolution)
 
-    # plot raw observation
+    # 绘制原始观测
     plt.plot(ox, oy, ".r")
 
-    # plot grid clustering
+    # 绘制栅格聚类
     [plt.plot(ox[inds], oy[inds], "x") for inds in ndt_map.grid_index_map.values()]
 
-    # plot ndt grid map
+    # 绘制正态分布变换（NDT）栅格地图
     [plot_covariance_ellipse(ndt.mean_x, ndt.mean_y, ndt.covariance, color="-k") for ndt in ndt_map.grid_map.data if ndt.n_points > 0]
 
     plt.axis("equal")

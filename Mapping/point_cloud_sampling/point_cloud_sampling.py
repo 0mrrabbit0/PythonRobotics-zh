@@ -1,8 +1,8 @@
 """
-Point cloud sampling example codes. This code supports
-- Voxel point sampling
-- Farthest point sampling
-- Poisson disk sampling
+点云采样示例代码。本代码支持
+- 体素点采样
+- 最远点采样
+- 泊松盘采样
 
 """
 import matplotlib.pyplot as plt
@@ -15,19 +15,19 @@ do_plot = True
 
 def voxel_point_sampling(original_points: npt.NDArray, voxel_size: float):
     """
-    Voxel Point Sampling function.
-    This function sample N-dimensional points with voxel grid.
-    Points in a same voxel grid will be merged by mean operation for sampling.
+    体素点采样函数。
+    本函数用体素栅格对 N 维点进行采样。
+    同一体素栅格中的点通过均值运算合并以完成采样。
 
     Parameters
     ----------
-    original_points :  (M, N) N-dimensional points for sampling.
-                        The number of points is M.
-    voxel_size : voxel grid size
+    original_points :  (M, N) 用于采样的 N 维点。
+                        点数为 M。
+    voxel_size : 体素栅格尺寸
 
     Returns
     -------
-    sampled points (M', N)
+    采样点 (M', N)
     """
     voxel_dict = defaultdict(list)
     for i in range(original_points.shape[0]):
@@ -41,19 +41,19 @@ def voxel_point_sampling(original_points: npt.NDArray, voxel_size: float):
 def farthest_point_sampling(orig_points: npt.NDArray,
                             n_points: int, seed: int):
     """
-    Farthest point sampling function
-    This function sample N-dimensional points with the farthest point policy.
+    最远点采样函数
+    本函数按最远点策略对 N 维点进行采样。
 
     Parameters
     ----------
-    orig_points :  (M, N) N-dimensional points for sampling.
-                    The number of points is M.
-    n_points : number of points for sampling
-    seed : random seed number
+    orig_points :  (M, N) 用于采样的 N 维点。
+                    点数为 M。
+    n_points : 采样点数
+    seed : 随机种子
 
     Returns
     -------
-    sampled points (n_points, N)
+    采样点 (n_points, N)
 
     """
     rng = np.random.default_rng(seed)
@@ -66,9 +66,9 @@ def farthest_point_sampling(orig_points: npt.NDArray,
         distances = np.linalg.norm(orig_points[np.newaxis, :] - base_point,
                                    axis=2).flatten()
         min_distances = np.minimum(min_distances, distances)
-        distances_rank = np.argsort(-min_distances)  # Farthest order
-        for i in distances_rank:  # From the farthest point
-            if i not in selected_ids:  # if not selected yes, select it
+        distances_rank = np.argsort(-min_distances)  # 由远到近的顺序
+        for i in distances_rank:  # 从最远点开始
+            if i not in selected_ids:  # 若尚未选中，则选中它
                 selected_ids.append(i)
                 break
     return orig_points[selected_ids, :]
@@ -77,22 +77,22 @@ def farthest_point_sampling(orig_points: npt.NDArray,
 def poisson_disk_sampling(orig_points: npt.NDArray, n_points: int,
                           min_distance: float, seed: int, MAX_ITER=1000):
     """
-    Poisson disk sampling function
-    This function sample N-dimensional points randomly until the number of
-    points keeping minimum distance between selected points.
+    泊松盘采样函数
+    本函数随机采样 N 维点，直到点数满足要求，
+    并保持已选点之间的最小距离。
 
     Parameters
     ----------
-    orig_points :  (M, N) N-dimensional points for sampling.
-                    The number of points is M.
-    n_points : number of points for sampling
-    min_distance : minimum distance between selected points.
-    seed : random seed number
-    MAX_ITER : Maximum number of iteration. Default is 1000.
+    orig_points :  (M, N) 用于采样的 N 维点。
+                    点数为 M。
+    n_points : 采样点数
+    min_distance : 已选点之间的最小距离。
+    seed : 随机种子
+    MAX_ITER : 最大迭代次数。默认值为 1000。
 
     Returns
     -------
-    sampled points (n_points or less, N)
+    采样点（n_points 或更少, N）
     """
     rng = np.random.default_rng(seed)
     selected_id = rng.choice(range(orig_points.shape[0]))

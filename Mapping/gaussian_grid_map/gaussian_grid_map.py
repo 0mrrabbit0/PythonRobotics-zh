@@ -1,8 +1,8 @@
 """
 
-2D gaussian grid map sample
+二维高斯栅格地图示例
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
 
 """
 
@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 
-EXTEND_AREA = 10.0  # [m] grid map extention length
+EXTEND_AREA = 10.0  # [m] 栅格地图扩展长度
 
 show_animation = True
 
@@ -28,7 +28,7 @@ def generate_gaussian_grid_map(ox, oy, xyreso, std):
             x = ix * xyreso + minx
             y = iy * xyreso + miny
 
-            # Search minimum distance
+            # 搜索最小距离
             mindis = float("inf")
             for (iox, ioy) in zip(ox, oy):
                 d = math.hypot(iox - x, ioy - y)
@@ -62,8 +62,8 @@ def draw_heatmap(data, minx, maxx, miny, maxy, xyreso):
 def main():
     print(__file__ + " start!!")
 
-    xyreso = 0.5  # xy grid resolution
-    STD = 5.0  # standard diviation for gaussian distribution
+    xyreso = 0.5  # xy 栅格分辨率
+    STD = 5.0  # 高斯分布的标准差
 
     for i in range(5):
         ox = (np.random.rand(4) - 0.5) * 10.0
@@ -73,7 +73,7 @@ def main():
 
         if show_animation:  # pragma: no cover
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             draw_heatmap(gmap, minx, maxx, miny, maxy, xyreso)

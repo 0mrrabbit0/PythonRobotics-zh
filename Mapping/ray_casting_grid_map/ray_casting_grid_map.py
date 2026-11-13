@@ -1,8 +1,8 @@
 """
 
-Ray casting 2D grid map example
+射线投射二维栅格地图示例
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者：Atsushi Sakai (@Atsushi_twi)
 
 """
 
@@ -113,8 +113,8 @@ def draw_heatmap(data, minx, maxx, miny, maxy, xyreso):
 def main():
     print(__file__ + " start!!")
 
-    xyreso = 0.25  # x-y grid resolution [m]
-    yawreso = np.deg2rad(10.0)  # yaw angle resolution [rad]
+    xyreso = 0.25  # x-y 栅格分辨率 [m]
+    yawreso = np.deg2rad(10.0)  # 航向角分辨率 [rad]
 
     for i in range(5):
         ox = (np.random.rand(4) - 0.5) * 10.0
@@ -124,7 +124,7 @@ def main():
 
         if show_animation:  # pragma: no cover
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 esc 键停止仿真。
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             draw_heatmap(pmap, minx, maxx, miny, maxy, xyreso)
