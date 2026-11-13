@@ -1,7 +1,7 @@
 """
-Extended Kalman Filter SLAM example
+扩展卡尔曼滤波同步定位与建图（EKF-SLAM）示例
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者: Atsushi Sakai (@Atsushi_twi)
 """
 
 import math
@@ -10,38 +10,38 @@ import matplotlib.pyplot as plt
 import numpy as np
 from utils.angle import angle_mod
 
-# EKF state covariance
+# EKF 状态协方差
 Cx = np.diag([0.5, 0.5, np.deg2rad(30.0)]) ** 2
 
-#  Simulation parameter
+#  仿真参数
 Q_sim = np.diag([0.2, np.deg2rad(1.0)]) ** 2
 R_sim = np.diag([1.0, np.deg2rad(10.0)]) ** 2
 
-DT = 0.1  # time tick [s]
-SIM_TIME = 50.0  # simulation time [s]
-MAX_RANGE = 20.0  # maximum observation range
-M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
-STATE_SIZE = 3  # State size [x,y,yaw]
-LM_SIZE = 2  # LM state size [x,y]
+DT = 0.1  # 时间步长 [s]
+SIM_TIME = 50.0  # 仿真时间 [s]
+MAX_RANGE = 20.0  # 最大观测距离
+M_DIST_TH = 2.0  # 数据关联的马氏距离阈值。
+STATE_SIZE = 3  # 状态维度 [x,y,yaw]
+LM_SIZE = 2  # 路标状态维度 [x,y]
 
 show_animation = True
 
 
 def ekf_slam(xEst, PEst, u, z):
-    # Predict
+    # 预测
     G, Fx = jacob_motion(xEst, u)
     xEst[0:STATE_SIZE] = motion_model(xEst[0:STATE_SIZE], u)
     PEst = G.T @ PEst @ G + Fx.T @ Cx @ Fx
     initP = np.eye(2)
 
-    # Update
-    for iz in range(len(z[:, 0])):  # for each observation
+    # 更新
+    for iz in range(len(z[:, 0])):  # 对每个观测
         min_id = search_correspond_landmark_id(xEst, PEst, z[iz, 0:2])
 
         nLM = calc_n_lm(xEst)
         if min_id == nLM:
             print("New LM")
-            # Extend state and covariance matrix
+            # 扩展状态与协方差矩阵
             xAug = np.vstack((xEst, calc_landmark_position(xEst, z[iz, :])))
             PAug = np.vstack((np.hstack((PEst, np.zeros((len(xEst), LM_SIZE)))),
                               np.hstack((np.zeros((LM_SIZE, len(xEst))), initP))))
@@ -69,7 +69,7 @@ def calc_input():
 def observation(xTrue, xd, u, RFID):
     xTrue = motion_model(xTrue, u)
 
-    # add noise to gps x-y
+    # 为 GPS 的 x-y 添加噪声
     z = np.zeros((0, 3))
 
     for i in range(len(RFID[:, 0])):
@@ -79,12 +79,12 @@ def observation(xTrue, xd, u, RFID):
         d = math.hypot(dx, dy)
         angle = pi_2_pi(math.atan2(dy, dx) - xTrue[2, 0])
         if d <= MAX_RANGE:
-            dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # add noise
-            angle_n = angle + np.random.randn() * Q_sim[1, 1] ** 0.5  # add noise
+            dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # 添加噪声
+            angle_n = angle + np.random.randn() * Q_sim[1, 1] ** 0.5  # 添加噪声
             zi = np.array([dn, angle_n, i])
             z = np.vstack((z, zi))
 
-    # add noise to input
+    # 为输入添加噪声
     ud = np.array([[
         u[0, 0] + np.random.randn() * R_sim[0, 0] ** 0.5,
         u[1, 0] + np.random.randn() * R_sim[1, 1] ** 0.5]]).T
@@ -141,7 +141,7 @@ def get_landmark_position_from_state(x, ind):
 
 def search_correspond_landmark_id(xAug, PAug, zi):
     """
-    Landmark association with Mahalanobis distance
+    基于马氏距离的路标关联
     """
 
     nLM = calc_n_lm(xAug)
@@ -153,7 +153,7 @@ def search_correspond_landmark_id(xAug, PAug, zi):
         y, S, H = calc_innovation(lm, xAug, PAug, zi, i)
         min_dist.append(y.T @ np.linalg.inv(S) @ y)
 
-    min_dist.append(M_DIST_TH)  # new landmark
+    min_dist.append(M_DIST_TH)  # 新路标
 
     min_id = min_dist.index(min(min_dist))
 
@@ -200,20 +200,20 @@ def main():
 
     time = 0.0
 
-    # RFID positions [x, y]
+    # RFID 位置 [x, y]
     RFID = np.array([[10.0, -2.0],
                      [15.0, 10.0],
                      [3.0, 15.0],
                      [-5.0, 20.0]])
 
-    # State Vector [x y yaw v]'
+    # 状态向量 [x y yaw v]'
     xEst = np.zeros((STATE_SIZE, 1))
     xTrue = np.zeros((STATE_SIZE, 1))
     PEst = np.eye(STATE_SIZE)
 
-    xDR = np.zeros((STATE_SIZE, 1))  # Dead reckoning
+    xDR = np.zeros((STATE_SIZE, 1))  # 航位推算
 
-    # history
+    # 历史记录
     hxEst = xEst
     hxTrue = xTrue
     hxDR = xTrue
@@ -228,14 +228,14 @@ def main():
 
         x_state = xEst[0:STATE_SIZE]
 
-        # store data history
+        # 保存数据历史
         hxEst = np.hstack((hxEst, x_state))
         hxDR = np.hstack((hxDR, xDR))
         hxTrue = np.hstack((hxTrue, xTrue))
 
         if show_animation:  # pragma: no cover
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 Esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
@@ -243,7 +243,7 @@ def main():
             plt.plot(RFID[:, 0], RFID[:, 1], "*k")
             plt.plot(xEst[0], xEst[1], ".r")
 
-            # plot landmark
+            # 绘制路标
             for i in range(calc_n_lm(xEst)):
                 plt.plot(xEst[STATE_SIZE + i * 2],
                          xEst[STATE_SIZE + i * 2 + 1], "xg")

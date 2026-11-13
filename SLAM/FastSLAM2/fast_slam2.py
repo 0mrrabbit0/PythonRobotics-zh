@@ -1,8 +1,8 @@
 """
 
-FastSLAM 2.0 example
+FastSLAM 2.0 示例
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者: Atsushi Sakai (@Atsushi_twi)
 
 """
 
@@ -12,23 +12,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 from utils.angle import angle_mod
 
-# Fast SLAM covariance
+# FastSLAM 协方差
 Q = np.diag([3.0, np.deg2rad(10.0)]) ** 2
 R = np.diag([1.0, np.deg2rad(20.0)]) ** 2
 
-#  Simulation parameter
+#  仿真参数
 Q_SIM = np.diag([0.3, np.deg2rad(2.0)]) ** 2
 R_SIM = np.diag([0.5, np.deg2rad(10.0)]) ** 2
 OFFSET_YAW_RATE_NOISE = 0.01
 
-DT = 0.1  # time tick [s]
-SIM_TIME = 50.0  # simulation time [s]
-MAX_RANGE = 20.0  # maximum observation range
-M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
-STATE_SIZE = 3  # State size [x,y,yaw]
-LM_SIZE = 2  # LM state size [x,y]
-N_PARTICLE = 100  # number of particle
-NTH = N_PARTICLE / 1.5  # Number of particle for re-sampling
+DT = 0.1  # 时间步长 [s]
+SIM_TIME = 50.0  # 仿真时间 [s]
+MAX_RANGE = 20.0  # 最大观测距离
+M_DIST_TH = 2.0  # 数据关联的马氏距离阈值。
+STATE_SIZE = 3  # 状态维度 [x,y,yaw]
+LM_SIZE = 2  # 路标状态维度 [x,y]
+N_PARTICLE = 100  # 粒子数量
+NTH = N_PARTICLE / 1.5  # 重采样所需的粒子数量
 
 show_animation = True
 
@@ -41,9 +41,9 @@ class Particle:
         self.y = 0.0
         self.yaw = 0.0
         self.P = np.eye(3)
-        # landmark x-y positions
+        # 路标的 x-y 位置
         self.lm = np.zeros((n_landmark, LM_SIZE))
-        # landmark position covariance
+        # 路标位置协方差
         self.lmP = np.zeros((n_landmark * LM_SIZE, LM_SIZE))
 
 
@@ -93,7 +93,7 @@ def predict_particles(particles, u):
         px[0, 0] = particles[i].x
         px[1, 0] = particles[i].y
         px[2, 0] = particles[i].yaw
-        ud = u + (np.random.randn(1, 2) @ R ** 0.5).T  # add noise
+        ud = u + (np.random.randn(1, 2) @ R ** 0.5).T  # 添加噪声
         px = motion_model(px, ud)
         particles[i].x = px[0, 0]
         particles[i].y = px[1, 0]
@@ -113,7 +113,7 @@ def add_new_lm(particle, z, Q_cov):
     particle.lm[lm_id, 0] = particle.x + r * c
     particle.lm[lm_id, 1] = particle.y + r * s
 
-    # covariance
+    # 协方差
     dx = r * c
     dy = r * s
     d2 = dx ** 2 + dy ** 2
@@ -206,7 +206,7 @@ def proposal_sampling(particle, z, Q_cov):
     lm_id = int(z[2])
     xf = particle.lm[lm_id, :].reshape(2, 1)
     Pf = particle.lmP[2 * lm_id:2 * lm_id + 2]
-    # State
+    # 状态
     x = np.array([particle.x, particle.y, particle.yaw]).reshape(3, 1)
     P = particle.P
     zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q_cov)
@@ -217,8 +217,8 @@ def proposal_sampling(particle, z, Q_cov):
 
     Pi = np.linalg.inv(P)
 
-    particle.P = np.linalg.inv(Hv.T @ Sfi @ Hv + Pi)  # proposal covariance
-    x += particle.P @ Hv.T @ Sfi @ dz  # proposal mean
+    particle.P = np.linalg.inv(Hv.T @ Sfi @ Hv + Pi)  # 建议分布协方差
+    x += particle.P @ Hv.T @ Sfi @ dz  # 建议分布均值
 
     particle.x = x[0, 0]
     particle.y = x[1, 0]
@@ -232,10 +232,10 @@ def update_with_observation(particles, z):
         landmark_id = int(z[2, iz])
 
         for ip in range(N_PARTICLE):
-            # new landmark
+            # 新路标
             if abs(particles[ip].lm[landmark_id, 0]) <= 0.01:
                 particles[ip] = add_new_lm(particles[ip], z[:, iz], Q)
-            # known landmark
+            # 已知路标
             else:
                 w = compute_weight(particles[ip], z[:, iz], Q)
                 particles[ip].w *= w
@@ -248,7 +248,7 @@ def update_with_observation(particles, z):
 
 def resampling(particles):
     """
-    low variance re-sampling
+    低方差重采样
     """
 
     particles = normalize_weight(particles)
@@ -259,9 +259,9 @@ def resampling(particles):
 
     pw = np.array(pw)
 
-    n_eff = 1.0 / (pw @ pw.T)  # Effective particle number
+    n_eff = 1.0 / (pw @ pw.T)  # 有效粒子数
 
-    if n_eff < NTH:  # resampling
+    if n_eff < NTH:  # 重采样
         w_cum = np.cumsum(pw)
         base = np.cumsum(pw * 0.0 + 1 / N_PARTICLE) - 1 / N_PARTICLE
         resample_id = base + np.random.rand(base.shape[0]) / N_PARTICLE
@@ -287,7 +287,7 @@ def resampling(particles):
 
 
 def calc_input(time):
-    if time <= 3.0:  # wait at first
+    if time <= 3.0:  # 初始等待
         v = 0.0
         yaw_rate = 0.0
     else:
@@ -300,10 +300,10 @@ def calc_input(time):
 
 
 def observation(x_true, xd, u, rfid):
-    # calc true state
+    # 计算真实状态
     x_true = motion_model(x_true, u)
 
-    # add noise to range observation
+    # 为距离观测添加噪声
     z = np.zeros((3, 0))
 
     for i in range(len(rfid[:, 0])):
@@ -313,13 +313,13 @@ def observation(x_true, xd, u, rfid):
         d = math.hypot(dx, dy)
         angle = pi_2_pi(math.atan2(dy, dx) - x_true[2, 0])
         if d <= MAX_RANGE:
-            dn = d + np.random.randn() * Q_SIM[0, 0] ** 0.5  # add noise
+            dn = d + np.random.randn() * Q_SIM[0, 0] ** 0.5  # 添加噪声
             angle_noise = np.random.randn() * Q_SIM[1, 1] ** 0.5
-            angle_with_noise = angle + angle_noise  # add noise
+            angle_with_noise = angle + angle_noise  # 添加噪声
             zi = np.array([dn, pi_2_pi(angle_with_noise), i]).reshape(3, 1)
             z = np.hstack((z, zi))
 
-    # add noise to input
+    # 为输入添加噪声
     ud1 = u[0, 0] + np.random.randn() * R_SIM[0, 0] ** 0.5
     ud2 = u[1, 0] + np.random.randn() * R_SIM[
         1, 1] ** 0.5 + OFFSET_YAW_RATE_NOISE
@@ -355,7 +355,7 @@ def main():
 
     time = 0.0
 
-    # RFID positions [x, y]
+    # RFID 位置 [x, y]
     rfid = np.array([[10.0, -2.0],
                      [15.0, 10.0],
                      [15.0, 15.0],
@@ -367,12 +367,12 @@ def main():
                      ])
     n_landmark = rfid.shape[0]
 
-    # State Vector [x y yaw v]'
-    x_est = np.zeros((STATE_SIZE, 1))  # SLAM estimation
-    x_true = np.zeros((STATE_SIZE, 1))  # True state
-    x_dr = np.zeros((STATE_SIZE, 1))  # Dead reckoning
+    # 状态向量 [x y yaw v]'
+    x_est = np.zeros((STATE_SIZE, 1))  # SLAM 估计
+    x_true = np.zeros((STATE_SIZE, 1))  # 真实状态
+    x_dr = np.zeros((STATE_SIZE, 1))  # 航位推算
 
-    # history
+    # 历史记录
     hist_x_est = x_est
     hist_x_true = x_true
     hist_x_dr = x_dr
@@ -391,14 +391,14 @@ def main():
 
         x_state = x_est[0: STATE_SIZE]
 
-        # store data history
+        # 保存数据历史
         hist_x_est = np.hstack((hist_x_est, x_state))
         hist_x_dr = np.hstack((hist_x_dr, x_dr))
         hist_x_true = np.hstack((hist_x_true, x_true))
 
         if show_animation:  # pragma: no cover
             plt.cla()
-            # for stopping simulation with the esc key.
+            # 按 Esc 键停止仿真。
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])

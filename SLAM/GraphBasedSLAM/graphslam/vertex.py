@@ -1,10 +1,10 @@
-# Copyright (c) 2020 Jeff Irion and contributors
+# 版权所有 (c) 2020 Jeff Irion 及贡献者
 #
-# This file originated from the `graphslam` package:
+# 本文件源自 `graphslam` 包：
 #
 #   https://github.com/JeffLIrion/python-graphslam
 
-"""A ``Vertex`` class.
+"""``Vertex`` 类。
 
 """
 
@@ -13,25 +13,25 @@ import matplotlib.pyplot as plt
 
 # pylint: disable=too-few-public-methods
 class Vertex:
-    """A class for representing a vertex in Graph SLAM.
+    """表示基于图的同步定位与建图（Graph SLAM）中一个顶点的类。
 
     Parameters
     ----------
     vertex_id : int
-        The vertex's unique ID
+        顶点的唯一 ID
     pose : graphslam.pose.se2.PoseSE2
-        The pose associated with the vertex
+        与该顶点关联的位姿
     vertex_index : int, None
-        The vertex's index in the graph's ``vertices`` list
+        该顶点在图的 ``vertices`` 列表中的索引
 
     Attributes
     ----------
     id : int
-        The vertex's unique ID
+        顶点的唯一 ID
     index : int, None
-        The vertex's index in the graph's ``vertices`` list
+        该顶点在图的 ``vertices`` 列表中的索引
     pose : graphslam.pose.se2.PoseSE2
-        The pose associated with the vertex
+        与该顶点关联的位姿
 
     """
     def __init__(self, vertex_id, pose, vertex_index=None):
@@ -40,27 +40,27 @@ class Vertex:
         self.index = vertex_index
 
     def to_g2o(self):
-        """Export the vertex to the .g2o format.
+        """将顶点导出为 .g2o 格式。
 
         Returns
         -------
         str
-            The vertex in .g2o format
+            .g2o 格式的顶点
 
         """
         return "VERTEX_SE2 {} {} {} {}\n".format(self.id, self.pose[0], self.pose[1], self.pose[2])
 
     def plot(self, color='r', marker='o', markersize=3):
-        """Plot the vertex.
+        """绘制顶点。
 
         Parameters
         ----------
         color : str
-            The color that will be used to plot the vertex
+            绘制顶点所用的颜色
         marker : str
-            The marker that will be used to plot the vertex
+            绘制顶点所用的标记
         markersize : int
-            The size of the plotted vertex
+            所绘制顶点的大小
 
         """
         x, y = self.pose.position

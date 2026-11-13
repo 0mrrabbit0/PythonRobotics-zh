@@ -1,10 +1,10 @@
-# Copyright (c) 2020 Jeff Irion and contributors
+# 版权所有 (c) 2020 Jeff Irion 及贡献者
 #
-# This file originated from the `graphslam` package:
+# 本文件源自 `graphslam` 包：
 #
 #   https://github.com/JeffLIrion/python-graphslam
 
-r"""A class for odometry edges.
+r"""里程计边的类。
 
 """
 
@@ -13,30 +13,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-#: The difference that will be used for numerical differentiation
+#: 数值微分所用的差分量
 EPSILON = 1e-6
 
 
 class EdgeOdometry:
-    r"""A class for representing odometry edges in Graph SLAM.
+    r"""表示基于图的同步定位与建图（Graph SLAM）中里程计边的类。
 
     Parameters
     ----------
     vertices : list[graphslam.vertex.Vertex]
-        A list of the vertices constrained by the edge
+        受该边约束的顶点列表
     information : np.ndarray
-        The information matrix :math:`\Omega_j` associated with the edge
+        与该边关联的信息矩阵 :math:`\Omega_j`
     estimate : graphslam.pose.se2.PoseSE2
-        The expected measurement :math:`\mathbf{z}_j`
+        期望测量 :math:`\mathbf{z}_j`
 
     Attributes
     ----------
     vertices : list[graphslam.vertex.Vertex]
-        A list of the vertices constrained by the edge
+        受该边约束的顶点列表
     information : np.ndarray
-        The information matrix :math:`\Omega_j` associated with the edge
+        与该边关联的信息矩阵 :math:`\Omega_j`
     estimate : PoseSE2
-        The expected measurement :math:`\mathbf{z}_j`
+        期望测量 :math:`\mathbf{z}_j`
 
     """
     def __init__(self, vertex_ids, information, estimate, vertices=None):
@@ -46,7 +46,7 @@ class EdgeOdometry:
         self.vertices = vertices
 
     def calc_error(self):
-        r"""Calculate the error for the edge: :math:`\mathbf{e}_j \in \mathbb{R}^\bullet`.
+        r"""计算该边的误差：:math:`\mathbf{e}_j \in \mathbb{R}^\bullet`。
 
         .. math::
 
@@ -56,13 +56,13 @@ class EdgeOdometry:
         Returns
         -------
         np.ndarray
-            The error for the edge
+            该边的误差
 
         """
         return (self.estimate - (self.vertices[1].pose - self.vertices[0].pose)).to_compact()
 
     def calc_chi2(self):
-        r"""Calculate the :math:`\chi^2` error for the edge.
+        r"""计算该边的 :math:`\chi^2` 误差。
 
         .. math::
 
@@ -72,7 +72,7 @@ class EdgeOdometry:
         Returns
         -------
         float
-            The :math:`\chi^2` error for the edge
+            该边的 :math:`\chi^2` 误差
 
         """
         err = self.calc_error()
@@ -80,16 +80,16 @@ class EdgeOdometry:
         return np.dot(np.dot(np.transpose(err), self.information), err)
 
     def calc_chi2_gradient_hessian(self):
-        r"""Calculate the edge's contributions to the graph's :math:`\chi^2` error, gradient (:math:`\mathbf{b}`), and Hessian (:math:`H`).
+        r"""计算该边对图的 :math:`\chi^2` 误差、梯度（:math:`\mathbf{b}`）与 Hessian 矩阵（:math:`H`）的贡献。
 
         Returns
         -------
         float
-            The :math:`\chi^2` error for the edge
+            该边的 :math:`\chi^2` 误差
         dict
-            The edge's contribution(s) to the gradient
+            该边对梯度的贡献
         dict
-            The edge's contribution(s) to the Hessian
+            该边对 Hessian 矩阵的贡献
 
         """
         chi2 = self.calc_chi2()
@@ -101,7 +101,7 @@ class EdgeOdometry:
         return chi2, {v.index: np.dot(np.dot(np.transpose(err), self.information), jacobian) for v, jacobian in zip(self.vertices, jacobians)}, {(self.vertices[i].index, self.vertices[j].index): np.dot(np.dot(np.transpose(jacobians[i]), self.information), jacobians[j]) for i in range(len(jacobians)) for j in range(i, len(jacobians))}
 
     def calc_jacobians(self):
-        r"""Calculate the Jacobian of the edge's error with respect to each constrained pose.
+        r"""计算该边误差关于每个受约束位姿的雅可比矩阵。
 
         .. math::
 
@@ -111,69 +111,69 @@ class EdgeOdometry:
         Returns
         -------
         list[np.ndarray]
-            The Jacobian matrices for the edge with respect to each constrained pose
+            该边关于每个受约束位姿的雅可比矩阵
 
         """
         err = self.calc_error()
 
-        # The dimensionality of the compact pose representation
+        # 紧凑位姿表示的维度
         dim = len(self.vertices[0].pose.to_compact())
 
         return [self._calc_jacobian(err, dim, i) for i in range(len(self.vertices))]
 
     def _calc_jacobian(self, err, dim, vertex_index):
-        r"""Calculate the Jacobian of the edge with respect to the specified vertex's pose.
+        r"""计算该边关于指定顶点位姿的雅可比矩阵。
 
         Parameters
         ----------
         err : np.ndarray
-            The current error for the edge (see :meth:`EdgeOdometry.calc_error`)
+            该边的当前误差（见 :meth:`EdgeOdometry.calc_error`）
         dim : int
-            The dimensionality of the compact pose representation
+            紧凑位姿表示的维度
         vertex_index : int
-            The index of the vertex (pose) for which we are computing the Jacobian
+            正在计算雅可比矩阵的顶点（位姿）索引
 
         Returns
         -------
         np.ndarray
-            The Jacobian of the edge with respect to the specified vertex's pose
+            该边关于指定顶点位姿的雅可比矩阵
 
         """
         jacobian = np.zeros(err.shape + (dim,))
         p0 = self.vertices[vertex_index].pose.copy()
 
         for d in range(dim):
-            # update the pose
+            # 更新位姿
             delta_pose = np.zeros(dim)
             delta_pose[d] = EPSILON
             self.vertices[vertex_index].pose += delta_pose
 
-            # compute the numerical derivative
+            # 计算数值导数
             jacobian[:, d] = (self.calc_error() - err) / EPSILON
 
-            # restore the pose
+            # 恢复位姿
             self.vertices[vertex_index].pose = p0.copy()
 
         return jacobian
 
     def to_g2o(self):
-        """Export the edge to the .g2o format.
+        """将边导出为 .g2o 格式。
 
         Returns
         -------
         str
-            The edge in .g2o format
+            .g2o 格式的边
 
         """
         return "EDGE_SE2 {} {} {} {} {} ".format(self.vertex_ids[0], self.vertex_ids[1], self.estimate[0], self.estimate[1], self.estimate[2]) + " ".join([str(x) for x in self.information[np.triu_indices(3, 0)]]) + "\n"
 
     def plot(self, color='b'):
-        """Plot the edge.
+        """绘制该边。
 
         Parameters
         ----------
         color : str
-            The color that will be used to plot the edge
+            绘制该边所用的颜色
 
         """
         xy = np.array([v.pose.position for v in self.vertices])

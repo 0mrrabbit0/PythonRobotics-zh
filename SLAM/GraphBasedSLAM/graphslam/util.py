@@ -1,10 +1,10 @@
-# Copyright (c) 2020 Jeff Irion and contributors
+# 版权所有 (c) 2020 Jeff Irion 及贡献者
 #
-# This file originated from the `graphslam` package:
+# 本文件源自 `graphslam` 包：
 #
 #   https://github.com/JeffLIrion/python-graphslam
 
-"""Utility functions used throughout the package.
+"""本包中使用的工具函数。
 
 """
 
@@ -15,28 +15,28 @@ TWO_PI = 2 * np.pi
 
 
 def neg_pi_to_pi(angle):
-    r"""Normalize ``angle`` to be in :math:`[-\pi, \pi)`.
+    r"""将 ``angle`` 归一化到 :math:`[-\pi, \pi)`。
 
     Parameters
     ----------
     angle : float
-        An angle (in radians)
+        角度（弧度）
 
     Returns
     -------
     float
-        The angle normalized to :math:`[-\pi, \pi)`
+        归一化到 :math:`[-\pi, \pi)` 的角度
 
     """
     return (angle + np.pi) % (TWO_PI) - np.pi
 
 
 def solve_for_edge_dimensionality(n):
-    r"""Solve for the dimensionality of an edge.
+    r"""求解一条边的维度。
 
-    In a .g2o file, an edge is specified as ``<estimate> <information matrix>``, where only the upper triangular portion of the matrix is provided.
+    在 .g2o 文件中，一条边表示为 ``<estimate> <information matrix>``，其中只给出信息矩阵的上三角部分。
 
-    This solves the problem:
+    本函数求解如下问题：
 
     .. math::
 
@@ -45,26 +45,26 @@ def solve_for_edge_dimensionality(n):
     Returns
     -------
     int
-        The dimensionality of the edge
+        边的维度
 
     """
     return int(round(np.sqrt(2 * n + 2.25) - 1.5))
 
 
 def upper_triangular_matrix_to_full_matrix(arr, n):
-    """Given an upper triangular matrix, return the full matrix.
+    """给定上三角矩阵，返回完整矩阵。
 
     Parameters
     ----------
     arr : np.ndarray
-        The upper triangular portion of the matrix
+        矩阵的上三角部分
     n : int
-        The size of the matrix
+        矩阵的阶数
 
     Returns
     -------
     mat : np.ndarray
-        The full matrix
+        完整矩阵
 
     """
     triu0 = np.triu_indices(n, 0)

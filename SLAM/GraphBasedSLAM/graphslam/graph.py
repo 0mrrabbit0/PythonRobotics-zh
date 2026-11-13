@@ -1,10 +1,10 @@
-# Copyright (c) 2020 Jeff Irion and contributors
+# 版权所有 (c) 2020 Jeff Irion 及贡献者
 #
-# This file originated from the `graphslam` package:
+# 本文件源自 `graphslam` 包：
 #
 #   https://github.com/JeffLIrion/python-graphslam
 
-r"""A ``Graph`` class that stores the edges and vertices required for Graph SLAM.
+r"""存储基于图的同步定位与建图（Graph SLAM）所需边与顶点的 ``Graph`` 类。
 
 """
 
@@ -23,23 +23,23 @@ warnings.filterwarnings("ignore", category=SparseEfficiencyWarning)
 
 # pylint: disable=too-few-public-methods
 class _Chi2GradientHessian:
-    r"""A class that is used to aggregate the :math:`\chi^2` error, gradient, and Hessian.
+    r"""用于汇总 :math:`\chi^2` 误差、梯度与 Hessian 矩阵的类。
 
     Parameters
     ----------
     dim : int
-        The compact dimensionality of the poses
+        位姿的紧凑维度
 
     Attributes
     ----------
     chi2 : float
-        The :math:`\chi^2` error
+        :math:`\chi^2` 误差
     dim : int
-        The compact dimensionality of the poses
+        位姿的紧凑维度
     gradient : defaultdict
-        The contributions to the gradient vector
+        对梯度向量的贡献
     hessian : defaultdict
-        The contributions to the Hessian matrix
+        对 Hessian 矩阵的贡献
 
     """
 
@@ -51,12 +51,12 @@ class _Chi2GradientHessian:
 
     @staticmethod
     def update(chi2_grad_hess, incoming):
-        r"""Update the :math:`\chi^2` error and the gradient and Hessian dictionaries.
+        r"""更新 :math:`\chi^2` 误差以及梯度与 Hessian 字典。
 
         Parameters
         ----------
         chi2_grad_hess : _Chi2GradientHessian
-            The ``_Chi2GradientHessian`` that will be updated
+            将被更新的 ``_Chi2GradientHessian``
         incoming : tuple
 
         """
@@ -75,36 +75,36 @@ class _Chi2GradientHessian:
 
 
 class Graph(object):
-    r"""A graph that will be optimized via Graph SLAM.
+    r"""将通过基于图的同步定位与建图（Graph SLAM）进行优化的图。
 
     Parameters
     ----------
     edges : list[graphslam.edge.edge_odometry.EdgeOdometry]
-        A list of the vertices in the graph
+        图中边的列表
     vertices : list[graphslam.vertex.Vertex]
-        A list of the vertices in the graph
+        图中顶点的列表
 
     Attributes
     ----------
     _chi2 : float, None
-        The current :math:`\chi^2` error, or ``None`` if it has not yet been computed
+        当前的 :math:`\chi^2` 误差；若尚未计算则为 ``None``
     _edges : list[graphslam.edge.edge_odometry.EdgeOdometry]
-        A list of the edges (i.e., constraints) in the graph
+        图中边（即约束）的列表
     _gradient : numpy.ndarray, None
-        The gradient :math:`\mathbf{b}` of the :math:`\chi^2` error, or ``None`` if it has not yet been computed
+        :math:`\chi^2` 误差的梯度 :math:`\mathbf{b}`；若尚未计算则为 ``None``
     _hessian : scipy.sparse.lil_matrix, None
-        The Hessian matrix :math:`H`, or ``None`` if it has not yet been computed
+        Hessian 矩阵 :math:`H`；若尚未计算则为 ``None``
     _vertices : list[graphslam.vertex.Vertex]
-        A list of the vertices in the graph
+        图中顶点的列表
 
     """
 
     def __init__(self, edges, vertices):
-        # The vertices and edges lists
+        # 顶点列表与边列表
         self._edges = edges
         self._vertices = vertices
 
-        # The chi^2 error, gradient, and Hessian
+        # chi^2 误差、梯度与 Hessian 矩阵
         self._chi2 = None
         self._gradient = None
         self._hessian = None
@@ -112,14 +112,14 @@ class Graph(object):
         self._link_edges()
 
     def _link_edges(self):
-        """Fill in the ``vertices`` attributes for the graph's edges.
+        """填充图中各边的 ``vertices`` 属性。
 
         """
         index_id_dict = {i: v.id for i, v in enumerate(self._vertices)}
         id_index_dict = {v_id: v_index for v_index, v_id in
                          index_id_dict.items()}
 
-        # Fill in the vertices' `index` attribute
+        # 填充各顶点的 `index` 属性
         for v in self._vertices:
             v.index = id_index_dict[v.id]
 
@@ -128,19 +128,19 @@ class Graph(object):
                           e.vertex_ids]
 
     def calc_chi2(self):
-        r"""Calculate the :math:`\chi^2` error for the ``Graph``.
+        r"""计算 ``Graph`` 的 :math:`\chi^2` 误差。
 
         Returns
         -------
         float
-            The :math:`\chi^2` error
+            :math:`\chi^2` 误差
 
         """
         self._chi2 = sum((e.calc_chi2() for e in self._edges))
         return self._chi2
 
     def _calc_chi2_gradient_hessian(self):
-        r"""Calculate the :math:`\chi^2` error, the gradient :math:`\mathbf{b}`, and the Hessian :math:`H`.
+        r"""计算 :math:`\chi^2` 误差、梯度 :math:`\mathbf{b}` 与 Hessian 矩阵 :math:`H`。
 
         """
         n = len(self._vertices)
@@ -152,12 +152,12 @@ class Graph(object):
 
         self._chi2 = chi2_gradient_hessian.chi2
 
-        # Fill in the gradient vector
+        # 填充梯度向量
         self._gradient = np.zeros(n * dim, dtype=float)
         for idx, cont in chi2_gradient_hessian.gradient.items():
             self._gradient[idx * dim: (idx + 1) * dim] += cont
 
-        # Fill in the Hessian matrix
+        # 填充 Hessian 矩阵
         self._hessian = lil_matrix((n * dim, n * dim), dtype=float)
         for (row_idx, col_idx), cont in chi2_gradient_hessian.hessian.items():
             x_start = row_idx * dim
@@ -175,32 +175,32 @@ class Graph(object):
                     np.transpose(cont)
 
     def optimize(self, tol=1e-4, max_iter=20, fix_first_pose=True):
-        r"""Optimize the :math:`\chi^2` error for the ``Graph``.
+        r"""优化 ``Graph`` 的 :math:`\chi^2` 误差。
 
         Parameters
         ----------
         tol : float
-            If the relative decrease in the :math:`\chi^2` error between iterations is less than ``tol``, we will stop
+            若迭代间 :math:`\chi^2` 误差的相对下降小于 ``tol``，则停止
         max_iter : int
-            The maximum number of iterations
+            最大迭代次数
         fix_first_pose : bool
-            If ``True``, we will fix the first pose
+            若为 ``True``，则固定第一个位姿
 
         """
         n = len(self._vertices)
         dim = len(self._vertices[0].pose.to_compact())
 
-        # Previous iteration's chi^2 error
+        # 上一次迭代的 chi^2 误差
         chi2_prev = -1.
 
-        # For displaying the optimization progress
+        # 用于显示优化过程
         print("\nIteration                chi^2        rel. change")
         print("---------                -----        -----------")
 
         for i in range(max_iter):
             self._calc_chi2_gradient_hessian()
 
-            # Check for convergence (from the previous iteration); this avoids having to calculate chi^2 twice
+            # 检查（上一次迭代的）收敛性；这样可避免把 chi^2 计算两次
             if i > 0:
                 rel_diff = (chi2_prev - self._chi2) / (
                             chi2_prev + np.finfo(float).eps)
@@ -211,36 +211,36 @@ class Graph(object):
             else:
                 print("{:9d} {:20.4f}".format(i, self._chi2))
 
-            # Update the previous iteration's chi^2 error
+            # 更新上一次迭代的 chi^2 误差
             chi2_prev = self._chi2
 
-            # Hold the first pose fixed
+            # 固定第一个位姿
             if fix_first_pose:
                 self._hessian[:dim, :] = 0.
                 self._hessian[:, :dim] = 0.
                 self._hessian[:dim, :dim] += np.eye(dim)
                 self._gradient[:dim] = 0.
 
-            # Solve for the updates
+            # 求解更新量
             dx = spsolve(self._hessian, -self._gradient)
 
-            # Apply the updates
+            # 应用更新量
             for v, dx_i in zip(self._vertices, np.split(dx, n)):
                 v.pose += dx_i
 
-        # If we reached the maximum number of iterations, print out the final iteration's results
+        # 若已达到最大迭代次数，则打印最后一次迭代的结果
         self.calc_chi2()
         rel_diff = (chi2_prev - self._chi2) / (chi2_prev + np.finfo(float).eps)
         print("{:9d} {:20.4f} {:18.6f}".format(
             max_iter, self._chi2, -rel_diff))
 
     def to_g2o(self, outfile):
-        """Save the graph in .g2o format.
+        """以 .g2o 格式保存图。
 
         Parameters
         ----------
         outfile : str
-            The path where the graph will be saved
+            图的保存路径
 
         """
         with open(outfile, 'w') as f:
@@ -252,20 +252,20 @@ class Graph(object):
 
     def plot(self, vertex_color='r', vertex_marker='o', vertex_markersize=3,
              edge_color='b', title=None):
-        """Plot the graph.
+        """绘制该图。
 
         Parameters
         ----------
         vertex_color : str
-            The color that will be used to plot the vertices
+            绘制顶点所用的颜色
         vertex_marker : str
-            The marker that will be used to plot the vertices
+            绘制顶点所用的标记
         vertex_markersize : int
-            The size of the plotted vertices
+            所绘制顶点的大小
         edge_color : str
-            The color that will be used to plot the edges
+            绘制边所用的颜色
         title : str, None
-            The title that will be used for the plot
+            图的标题
 
         """
         plt.figure()

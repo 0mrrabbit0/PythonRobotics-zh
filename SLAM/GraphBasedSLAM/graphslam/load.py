@@ -1,10 +1,10 @@
-# Copyright (c) 2020 Jeff Irion and contributors
+# 版权所有 (c) 2020 Jeff Irion 及贡献者
 #
-# This file originated from the `graphslam` package:
+# 本文件源自 `graphslam` 包：
 #
 #   https://github.com/JeffLIrion/python-graphslam
 
-"""Functions for loading graphs.
+"""用于加载图的函数。
 
 """
 
@@ -22,17 +22,17 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def load_g2o_se2(infile):
-    """Load an :math:`SE(2)` graph from a .g2o file.
+    """从 .g2o 文件加载 :math:`SE(2)` 图。
 
     Parameters
     ----------
     infile : str
-        The path to the .g2o file
+        .g2o 文件路径
 
     Returns
     -------
     Graph
-        The loaded graph
+        加载得到的图
 
     """
     edges = []

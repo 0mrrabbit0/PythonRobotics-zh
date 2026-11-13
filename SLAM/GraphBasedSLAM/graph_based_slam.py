@@ -1,10 +1,10 @@
 """
 
-Graph based SLAM example
+基于图的同步定位与建图（SLAM）示例
 
-author: Atsushi Sakai (@Atsushi_twi)
+作者: Atsushi Sakai (@Atsushi_twi)
 
-Ref
+参考文献
 
 [A Tutorial on Graph-Based SLAM]
 (http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)
@@ -23,21 +23,21 @@ import numpy as np
 from scipy.spatial.transform import Rotation as Rot
 from utils.angle import angle_mod
 
-#  Simulation parameter
+#  仿真参数
 Q_sim = np.diag([0.2, np.deg2rad(1.0)]) ** 2
 R_sim = np.diag([0.1, np.deg2rad(10.0)]) ** 2
 
-DT = 2.0  # time tick [s]
-SIM_TIME = 100.0  # simulation time [s]
-MAX_RANGE = 30.0  # maximum observation range
-STATE_SIZE = 3  # State size [x,y,yaw]
+DT = 2.0  # 时间步长 [s]
+SIM_TIME = 100.0  # 仿真时间 [s]
+MAX_RANGE = 30.0  # 最大观测距离
+STATE_SIZE = 3  # 状态维度 [x,y,yaw]
 
-# Covariance parameter of Graph Based SLAM
+# 基于图的同步定位与建图（SLAM）的协方差参数
 C_SIGMA1 = 0.1
 C_SIGMA2 = 0.1
 C_SIGMA3 = np.deg2rad(1.0)
 
-MAX_ITR = 20  # Maximum iteration
+MAX_ITR = 20  # 最大迭代次数
 
 show_graph_d_time = 20.0  # [s]
 show_animation = True
@@ -47,7 +47,7 @@ class Edge:
 
     def __init__(self):
         self.e = np.zeros((3, 1))
-        self.omega = np.zeros((3, 3))  # information matrix
+        self.omega = np.zeros((3, 3))  # 信息矩阵
         self.d1 = 0.0
         self.d2 = 0.0
         self.yaw1 = 0.0
@@ -112,7 +112,7 @@ def calc_edges(x_list, z_list):
         x2, y2, yaw2 = x_list[0, t2], x_list[1, t2], x_list[2, t2]
 
         if z_list[t1] is None or z_list[t2] is None:
-            continue  # No observation
+            continue  # 无观测
 
         for iz1 in range(len(z_list[t1][:, 0])):
             for iz2 in range(len(z_list[t2][:, 0])):
@@ -181,7 +181,7 @@ def graph_based_slam(x_init, hz):
         for edge in edges:
             H, b = fill_H_and_b(H, b, edge)
 
-        # to fix origin
+        # 固定原点
         H[0:STATE_SIZE, 0:STATE_SIZE] += np.identity(STATE_SIZE)
 
         dx = - np.linalg.inv(H) @ b
@@ -207,7 +207,7 @@ def calc_input():
 def observation(xTrue, xd, u, RFID):
     xTrue = motion_model(xTrue, u)
 
-    # add noise to gps x-y
+    # 为 GPS 的 x-y 添加噪声
     z = np.zeros((0, 4))
 
     for i in range(len(RFID[:, 0])):
@@ -218,14 +218,14 @@ def observation(xTrue, xd, u, RFID):
         angle = pi_2_pi(math.atan2(dy, dx)) - xTrue[2, 0]
         phi = pi_2_pi(math.atan2(dy, dx))
         if d <= MAX_RANGE:
-            dn = d + np.random.randn() * Q_sim[0, 0]  # add noise
+            dn = d + np.random.randn() * Q_sim[0, 0]  # 添加噪声
             angle_noise = np.random.randn() * Q_sim[1, 1]
             angle += angle_noise
             phi += angle_noise
             zi = np.array([dn, angle, phi, i])
             z = np.vstack((z, zi))
 
-    # add noise to input
+    # 为输入添加噪声
     ud1 = u[0, 0] + np.random.randn() * R_sim[0, 0]
     ud2 = u[1, 0] + np.random.randn() * R_sim[1, 1]
     ud = np.array([[ud1, ud2]]).T
@@ -258,7 +258,7 @@ def main():
 
     time = 0.0
 
-    # RFID positions [x, y, yaw]
+    # RFID 位置 [x, y, yaw]
     RFID = np.array([[10.0, -2.0, 0.0],
                      [15.0, 10.0, 0.0],
                      [3.0, 15.0, 0.0],
@@ -266,11 +266,11 @@ def main():
                      [-5.0, 5.0, 0.0]
                      ])
 
-    # State Vector [x y yaw v]'
+    # 状态向量 [x y yaw v]'
     xTrue = np.zeros((STATE_SIZE, 1))
-    xDR = np.zeros((STATE_SIZE, 1))  # Dead reckoning
+    xDR = np.zeros((STATE_SIZE, 1))  # 航位推算
 
-    # history
+    # 历史记录
     hxTrue = []
     hxDR = []
     hz = []
@@ -300,7 +300,7 @@ def main():
 
             if show_animation:  # pragma: no cover
                 plt.cla()
-                # for stopping simulation with the esc key.
+                # 按 Esc 键停止仿真。
                 plt.gcf().canvas.mpl_connect(
                     'key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])

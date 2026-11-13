@@ -1,15 +1,15 @@
 """
-Iterative Closest Point (ICP) SLAM example
-author: Atsushi Sakai (@Atsushi_twi), Göktuğ Karakaşlı, Shamil Gemuev
+迭代最近点（ICP）同步定位与建图（SLAM）示例
+作者: Atsushi Sakai (@Atsushi_twi), Göktuğ Karakaşlı, Shamil Gemuev
 """
 
 import math
 
-from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 未使用的导入
 import matplotlib.pyplot as plt
 import numpy as np
 
-#  ICP parameters
+#  迭代最近点（ICP）参数
 EPS = 0.0001
 MAX_ITER = 100
 
@@ -18,15 +18,15 @@ show_animation = True
 
 def icp_matching(previous_points, current_points):
     """
-    Iterative Closest Point matching
-    - input
-    previous_points: 2D or 3D points in the previous frame
-    current_points: 2D or 3D points in the current frame
-    - output
-    R: Rotation matrix
-    T: Translation vector
+    迭代最近点匹配
+    - 输入
+    previous_points: 上一帧中的二维或三维点
+    current_points: 当前帧中的二维或三维点
+    - 输出
+    R: 旋转矩阵
+    T: 平移向量
     """
-    H = None  # homogeneous transformation matrix
+    H = None  # 齐次变换矩阵
 
     dError = np.inf
     preError = np.inf
@@ -46,13 +46,13 @@ def icp_matching(previous_points, current_points):
 
         indexes, error = nearest_neighbor_association(previous_points, current_points)
         Rt, Tt = svd_motion_estimation(previous_points[:, indexes], current_points)
-        # update current points
+        # 更新当前点
         current_points = (Rt @ current_points) + Tt[:, np.newaxis]
 
         dError = preError - error
         print("Residual:", error)
 
-        if dError < 0:  # prevent matrix H changing, exit loop
+        if dError < 0:  # 防止矩阵 H 变化，退出循环
             print("Not Converge...", preError, dError, count)
             break
 
@@ -89,12 +89,12 @@ def update_homogeneous_matrix(Hin, R, T):
 
 def nearest_neighbor_association(previous_points, current_points):
 
-    # calc the sum of residual errors
+    # 计算残差之和
     delta_points = previous_points - current_points
     d = np.linalg.norm(delta_points, axis=0)
     error = sum(d)
 
-    # calc index with nearest neighbor assosiation
+    # 用最近邻关联计算索引
     d = np.linalg.norm(np.repeat(current_points, previous_points.shape[1], axis=1)
                        - np.tile(previous_points, (1, current_points.shape[1])), axis=0)
     indexes = np.argmin(d.reshape(current_points.shape[1], previous_points.shape[1]), axis=1)
@@ -119,7 +119,7 @@ def svd_motion_estimation(previous_points, current_points):
 
 
 def plot_points(previous_points, current_points, figure):
-    # for stopping simulation with the esc key.
+    # 按 Esc 键停止仿真。
     plt.gcf().canvas.mpl_connect(
         'key_release_event',
         lambda event: [exit(0) if event.key == 'escape' else None])
@@ -143,21 +143,21 @@ def plot_points(previous_points, current_points, figure):
 def main():
     print(__file__ + " start!!")
 
-    # simulation parameters
+    # 仿真参数
     nPoint = 1000
     fieldLength = 50.0
-    motion = [0.5, 2.0, np.deg2rad(-10.0)]  # movement [x[m],y[m],yaw[deg]]
+    motion = [0.5, 2.0, np.deg2rad(-10.0)]  # 运动量 [x[m],y[m],yaw[deg]]
 
-    nsim = 3  # number of simulation
+    nsim = 3  # 仿真次数
 
     for _ in range(nsim):
 
-        # previous points
+        # 上一帧点集
         px = (np.random.rand(nPoint) - 0.5) * fieldLength
         py = (np.random.rand(nPoint) - 0.5) * fieldLength
         previous_points = np.vstack((px, py))
 
-        # current points
+        # 当前帧点集
         cx = [math.cos(motion[2]) * x - math.sin(motion[2]) * y + motion[0]
               for (x, y) in zip(px, py)]
         cy = [math.sin(motion[2]) * x + math.cos(motion[2]) * y + motion[1]
@@ -172,22 +172,22 @@ def main():
 def main_3d_points():
     print(__file__ + " start!!")
 
-    # simulation parameters for 3d point set
+    # 三维点集的仿真参数
     nPoint = 1000
     fieldLength = 50.0
-    motion = [0.5, 2.0, -5, np.deg2rad(-10.0)]  # [x[m],y[m],z[m],roll[deg]]
+    motion = [0.5, 2.0, -5, np.deg2rad(-10.0)]  # [x[m],y[m],z[m],横滚[deg]]
 
-    nsim = 3  # number of simulation
+    nsim = 3  # 仿真次数
 
     for _ in range(nsim):
 
-        # previous points
+        # 上一帧点集
         px = (np.random.rand(nPoint) - 0.5) * fieldLength
         py = (np.random.rand(nPoint) - 0.5) * fieldLength
         pz = (np.random.rand(nPoint) - 0.5) * fieldLength
         previous_points = np.vstack((px, py, pz))
 
-        # current points
+        # 当前帧点集
         cx = [math.cos(motion[3]) * x - math.sin(motion[3]) * z + motion[0]
               for (x, z) in zip(px, pz)]
         cy = [y + motion[1] for y in py]

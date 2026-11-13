@@ -1,10 +1,10 @@
-# Copyright (c) 2020 Jeff Irion and contributors
+# 版权所有 (c) 2020 Jeff Irion 及贡献者
 #
-# This file originated from the `graphslam` package:
+# 本文件源自 `graphslam` 包：
 #
 #   https://github.com/JeffLIrion/python-graphslam
 
-r"""Representation of a pose in :math:`SE(2)`.
+r""":math:`SE(2)` 中的位姿表示。
 
 """
 
@@ -15,14 +15,14 @@ from ..util import neg_pi_to_pi
 
 
 class PoseSE2(np.ndarray):
-    r"""A representation of a pose in :math:`SE(2)`.
+    r""":math:`SE(2)` 中的位姿表示。
 
     Parameters
     ----------
     position : np.ndarray, list
-        The position in :math:`\mathbb{R}^2`
+        :math:`\mathbb{R}^2` 中的位置
     orientation : float
-        The angle of the pose (in radians)
+        位姿的角度（弧度）
 
     """
 
@@ -33,45 +33,45 @@ class PoseSE2(np.ndarray):
 
     # pylint: disable=arguments-differ
     def copy(self):
-        """Return a copy of the pose.
+        """返回位姿的副本。
 
         Returns
         -------
         PoseSE2
-            A copy of the pose
+            位姿的副本
 
         """
         return PoseSE2(self[:2], self[2])
 
     def to_array(self):
-        """Return the pose as a numpy array.
+        """以 numpy 数组形式返回位姿。
 
         Returns
         -------
         np.ndarray
-            The pose as a numpy array
+            作为 numpy 数组的位姿
 
         """
         return np.array(self)
 
     def to_compact(self):
-        """Return the pose as a compact numpy array.
+        """以紧凑 numpy 数组形式返回位姿。
 
         Returns
         -------
         np.ndarray
-            The pose as a compact numpy array
+            作为紧凑 numpy 数组的位姿
 
         """
         return np.array(self)
 
     def to_matrix(self):
-        """Return the pose as an :math:`SE(2)` matrix.
+        """以 :math:`SE(2)` 矩阵形式返回位姿。
 
         Returns
         -------
         np.ndarray
-            The pose as an :math:`SE(2)` matrix
+            作为 :math:`SE(2)` 矩阵的位姿
 
         """
         return np.array([[np.cos(self[2]), -np.sin(self[2]), self[0]],
@@ -80,17 +80,17 @@ class PoseSE2(np.ndarray):
 
     @classmethod
     def from_matrix(cls, matrix):
-        """Return the pose as an :math:`SE(2)` matrix.
+        """由 :math:`SE(2)` 矩阵得到位姿。
 
         Parameters
         ----------
         matrix : np.ndarray
-            The :math:`SE(2)` matrix that will be converted to a `PoseSE2` instance
+            将转换为 `PoseSE2` 实例的 :math:`SE(2)` 矩阵
 
         Returns
         -------
         PoseSE2
-            The matrix as a `PoseSE2` object
+            作为 `PoseSE2` 对象的矩阵
 
         """
         return cls([matrix[0, 2], matrix[1, 2]],
@@ -98,41 +98,41 @@ class PoseSE2(np.ndarray):
 
     # ======================================================================= #
     #                                                                         #
-    #                                Properties                               #
+    #                                  属性                                   #
     #                                                                         #
     # ======================================================================= #
     @property
     def position(self):
-        """Return the pose's position.
+        """返回位姿的位置。
 
         Returns
         -------
         np.ndarray
-            The position portion of the pose
+            位姿中的位置部分
 
         """
         return np.array(self[:2])
 
     @property
     def orientation(self):
-        """Return the pose's orientation.
+        """返回位姿的朝向。
 
         Returns
         -------
         float
-            The angle of the pose
+            位姿的角度
 
         """
         return self[2]
 
     @property
     def inverse(self):
-        """Return the pose's inverse.
+        """返回位姿的逆。
 
         Returns
         -------
         PoseSE2
-            The pose's inverse
+            位姿的逆
 
         """
         return PoseSE2([-self[0] * np.cos(self[2]) - self[1] * np.sin(self[2]),
@@ -141,21 +141,21 @@ class PoseSE2(np.ndarray):
 
     # ======================================================================= #
     #                                                                         #
-    #                              Magic Methods                              #
+    #                                魔术方法                                 #
     #                                                                         #
     # ======================================================================= #
     def __add__(self, other):
-        r"""Add poses (i.e., pose composition): :math:`p_1 \oplus p_2`.
+        r"""位姿相加（即位姿复合）：:math:`p_1 \oplus p_2`。
 
         Parameters
         ----------
         other : PoseSE2
-            The other pose
+            另一个位姿
 
         Returns
         -------
         PoseSE2
-            The result of pose composition
+            位姿复合的结果
 
         """
         return PoseSE2(
@@ -164,17 +164,17 @@ class PoseSE2(np.ndarray):
              ], neg_pi_to_pi(self[2] + other[2]))
 
     def __sub__(self, other):
-        r"""Subtract poses (i.e., inverse pose composition): :math:`p_1 \ominus p_2`.
+        r"""位姿相减（即逆位姿复合）：:math:`p_1 \ominus p_2`。
 
         Parameters
         ----------
         other : PoseSE2
-            The other pose
+            另一个位姿
 
         Returns
         -------
         PoseSE2
-            The result of inverse pose composition
+            逆位姿复合的结果
 
         """
         return PoseSE2([(self[0] - other[0]) * np.cos(other[2]) + (
